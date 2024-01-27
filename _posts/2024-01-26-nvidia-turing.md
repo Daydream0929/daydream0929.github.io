@@ -30,15 +30,15 @@ Turing架构是Nvidia继Pascal架构后于2018年新推出的架构，包括2080
 
 ## 性能
 
-![image-20240128003001206](https://github.com/Daydream0929/daydream0929.github.io/blob/master/_screenshots/image-20240128003001206.png)
+![image-20240128003001206](https://raw.githubusercontent.com/Daydream0929/daydream0929.github.io/master/_screenshots/image-20240128003001206.png)
 
 ## Pascal VS Turing
 
-![image-20240128002634916](https://github.com/Daydream0929/daydream0929.github.io/blob/master/_screenshots/image-20240128002634916.png)
+![image-20240128002634916](https://raw.githubusercontent.com/Daydream0929/daydream0929.github.io/master/_screenshots/image-20240128002634916.png)
 
-![image-20240128002725203](https://github.com/Daydream0929/daydream0929.github.io/blob/master/_screenshots/image-20240128002725203.png)
+![image-20240128002725203](https://raw.githubusercontent.com/Daydream0929/daydream0929.github.io/master/_screenshots/image-20240128002725203.png)
 
-![image-20240128002737478](https://github.com/Daydream0929/daydream0929.github.io/blob/master/_screenshots/image-20240128002737478.png)
+![image-20240128002737478](https://raw.githubusercontent.com/Daydream0929/daydream0929.github.io/master/_screenshots/image-20240128002737478.png)
 
 
 

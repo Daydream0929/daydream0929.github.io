@@ -2,6 +2,9 @@
 
 Turing架构是Nvidia继Pascal架构后于2018年新推出的架构，包括2080Ti等显卡均使用的是Turing架构。Turing架构相较于Pascal架构增加了Cuda Core的数量，引入了DLSS，GDDR6等新的技术。本文简要介绍Turing架构的新特性，性能以及和上一代架构Pascal的对比，选择Turing架构的主要原因是我刚好有一张2080Ti的显卡，并且使用其学习CUDA编程。因此选择从此架构作为落脚点，一步步深入揭开NVIDIA显卡的架构原理。
 
+## GPU硬件/软件架构
+<img src="https://raw.githubusercontent.com/Daydream0929/daydream0929.github.io/master/_screenshots/image-20240128233856346.png" width="50%" height=auto class="center"/>
+
 ## 新特性
 
 ### New Streaming Multiprocessor（SM）

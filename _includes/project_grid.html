@@ -1,0 +1,34 @@
+{%- assign projects = site.data.projects | sort: "order" -%}
+<div class="project-grid">
+  {%- for project in projects -%}
+    {%- if project.featured -%}
+      <article class="project-card">
+        <div class="project-card__index" aria-hidden="true">{{ forloop.index | prepend: "0" | slice: -2, 2 }}</div>
+        <div class="project-card__body">
+          <div class="project-card__meta">
+            <span>{{ project.type_label }}</span>
+            <span class="project-status project-status--{{ project.status }}">
+              <span class="project-status__dot" aria-hidden="true"></span>{{ project.status_label }}
+            </span>
+          </div>
+
+          <h3>{{ project.title }}</h3>
+          <p>{{ project.summary }}</p>
+
+          <ul class="tag-list" aria-label="项目标签">
+            {%- for tag in project.tags -%}
+              <li>{{ tag }}</li>
+            {%- endfor -%}
+          </ul>
+
+          <div class="project-card__actions">
+            <a class="button button--primary" href="{{ project.site_url }}">
+              {{ project.action_label }} <span aria-hidden="true">↗</span>
+            </a>
+            <a class="text-link" href="{{ project.repo_url }}">查看源码 <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+    {%- endif -%}
+  {%- endfor -%}
+</div>

@@ -1,0 +1,18 @@
+- id: riscv-isa-manual
+  title: RISC-V ISA Manual
+  summary: >-
+    RISC-V 指令集规范的在线阅读版，覆盖非特权 ISA、特权架构与
+    Profiles，并随仓库更新自动构建。
+  type: documentation
+  type_label: 在线文档
+  status: live
+  status_label: 已上线
+  site_url: https://daydream0929.github.io/riscv-isa-manual/
+  repo_url: https://github.com/Daydream0929/riscv-isa-manual
+  action_label: 打开手册
+  tags:
+    - RISC-V
+    - ISA
+    - Architecture
+  featured: true
+  order: 10

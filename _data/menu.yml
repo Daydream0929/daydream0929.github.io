@@ -1,37 +1,15 @@
-# For documentation on this file, see:
-# https://github.com/riggraz/no-style-please#customize-the-menu
-
 entries:
-  - title: info
+  - title: 项目
     entries:
-      - title: zhenjunfeng's blog.
-      - title: github repo
-        url: https://github.com/Daydream0929
-
-  - title: all posts
+      - title: RISC-V ISA Manual
+        url: https://daydream0929.github.io/riscv-isa-manual/
+  - title: 最近笔记
     post_list:
       limit: 5
       show_more: true
-      show_more_text: See archive...
+      show_more_text: 查看全部文章…
       show_more_url: archive.html
-
-  - title: posts by category
-    post_list:
-      category: example2
-      show_more: true
-      show_more_text: See more posts...
-      show_more_url: example2-archive.html
-
-  - title: rss
+  - title: GitHub
+    url: https://github.com/Daydream0929
+  - title: RSS
     url: feed.xml
-  
-  - title: another list
-    entries:
-      - title: with subitems
-        entries:
-          - title: with subsubitems
-          - title: example page
-            url: about
-  - title: PRO TIP
-    entries:
-      - title: to edit this menu, edit _data/menu.yml file

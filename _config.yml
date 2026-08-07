@@ -1,26 +1,51 @@
-title: no style, please! # name of the site
-author: Riccardo Graziosi # name of site's author
-email: riccardo.graziosi97@gmail.com # email of site's author
-url: https://riggraz.dev # root address of the site
-baseurl: "/no-style-please" # subpath of the site, e.g. "/blog" (leave it blank "" if you're site shouldn't use a subpath)
-description: > # description of the site (multiple lines allowed)
-  A (nearly) no-CSS, fast, minimalist Jekyll theme.
+title: Daydream0929
+author: Zhenjun Feng
+url: https://daydream0929.github.io
+baseurl: ""
+lang: zh-CN
+description: >-
+  Zhenjun Feng 的个人技术工作台，集中收录系统、计算机体系结构、
+  并行计算相关的在线项目与学习笔记。
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      image:
+        path: /assets/images/social-card.png
+        width: 1200
+        height: 630
 
 permalink: /:slug.html
 
-favicon: "logo.png" # name+extension of favicon (which must be put on the root folder)
+favicon: "logo.png"
 # goat_counter: "yoursitename" # put your GoatCounter name if you want to use GoatCounter analytics
 
-theme: no-style-please # if you are using GitHub Pages, change it to remote_theme: riggraz/no-style-please
+theme: no-style-please
 
 theme_config:
   appearance: "auto" # can be "light", "dark" or "auto"
-  back_home_text: ".." # customize text for homepage link in post layout
-  date_format: "%Y-%m-%d" # customize how date is formatted
-  show_description: false # show blog description in home page
+  back_home_text: "← 返回主页"
+  date_format: "%Y-%m-%d"
+  show_description: false
 
 sass:
   style: :compressed
+
+# This binary was stored in _posts and is not a Jekyll article. Keeping it out
+# of the content pipeline avoids UTF-8 parser warnings during Pages builds.
+exclude:
+  - .bundle
+  - .jekyll-cache
+  - .sass-cache
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE.txt
+  - README.md
+  - no-style-please.gemspec
+  - node_modules
+  - vendor
+  - _posts/2024-01-27-通用矩阵乘法.pdf
 
 plugins:
   - jekyll-feed

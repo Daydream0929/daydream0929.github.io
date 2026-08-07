@@ -1,13 +1,94 @@
 ---
 layout: default
 ---
-<header>
-  <h1>{{ site.title }}</h1>
-  {%-if site.theme_config.show_description-%}
-    <p>{{ site.description }}</p>
-  {%-endif-%}
-</header>
+<div class="portal">
+  <header class="site-header">
+    <a class="wordmark" href="{{ '/' | relative_url }}" aria-label="Daydream0929 主页">
+      <span class="wordmark__mark" aria-hidden="true">D/</span>
+      <span>DAYDREAM0929</span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a href="#projects">项目</a>
+      <a href="#notes">笔记</a>
+      <a href="https://github.com/Daydream0929">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
 
-{%-include menu_item.html collection=site.data.menu.entries-%}
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__copy">
+      <p class="eyebrow"><span aria-hidden="true"></span> ZHENJUN FENG · PERSONAL INDEX</p>
+      <h1 id="hero-title">把代码变成<br><em>可以打开的东西。</em></h1>
+      <p class="hero__intro">
+        这里是我的技术工作台，集中收录已部署的项目、在线文档和学习笔记。
+        关注系统、计算机体系结构与并行计算。
+      </p>
+      <div class="hero__actions">
+        <a class="button button--primary" href="#projects">浏览项目 <span aria-hidden="true">↓</span></a>
+        <a class="text-link" href="{{ '/archive.html' | relative_url }}">全部笔记 <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
 
-{{ content }}
+    <aside class="hero__status" aria-label="站点状态">
+      <div class="status-window__bar">
+        <span></span><span></span><span></span>
+        <code>~/daydream0929</code>
+      </div>
+      <div class="status-window__body">
+        <p><span class="prompt">$</span> status</p>
+        <dl>
+          <div><dt>focus</dt><dd>architecture</dd></div>
+          <div><dt>projects</dt><dd>{{ site.data.projects | size | prepend: "0" }}</dd></div>
+          <div><dt>notes</dt><dd>{{ site.posts | size | prepend: "0" }}</dd></div>
+          <div><dt>state</dt><dd class="is-live"><span></span> online</dd></div>
+        </dl>
+        <p class="cursor-line"><span class="prompt">$</span> explore<span class="cursor" aria-hidden="true"></span></p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="portal-section" id="projects" aria-labelledby="projects-title">
+    <div class="section-heading">
+      <div>
+        <p class="section-number">01 / PROJECTS</p>
+        <h2 id="projects-title">已部署项目</h2>
+      </div>
+      <p>可以直接打开使用的文档、工具与实验。</p>
+    </div>
+    {%- include project_grid.html -%}
+  </section>
+
+  <section class="portal-section notes-section" id="notes" aria-labelledby="notes-title">
+    <div class="section-heading">
+      <div>
+        <p class="section-number">02 / NOTES</p>
+        <h2 id="notes-title">最近笔记</h2>
+      </div>
+      <p>关于计算机体系结构、CUDA 与性能优化的记录。</p>
+    </div>
+
+    <ol class="notes-list">
+      {%- assign notes = site.posts | where: "category", "notes" -%}
+      {%- for post in notes limit: 4 -%}
+        <li>
+          <a href="{{ post.url | relative_url }}">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+            <span>{{ post.title }}</span>
+            <span class="notes-list__arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ol>
+    <a class="text-link notes-more" href="{{ '/archive.html' | relative_url }}">查看全部文章 <span aria-hidden="true">→</span></a>
+  </section>
+
+  {{ content }}
+
+  <footer class="site-footer">
+    <p><span class="live-dot" aria-hidden="true"></span> 持续构建中</p>
+    <div>
+      <a href="https://github.com/Daydream0929">GitHub</a>
+      <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+    </div>
+    <p>© {{ site.time | date: "%Y" }} Zhenjun Feng</p>
+  </footer>
+</div>

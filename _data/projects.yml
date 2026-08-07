@@ -16,3 +16,22 @@
     - Architecture
   featured: true
   order: 10
+
+- id: xiangshan-microarchitecture
+  title: XiangShan 微架构学习地图
+  summary: >-
+    面向 RISC-V64 Bring-up 与性能优化的软件视角导读，用固定版本源码串联
+    前端、乱序后端、执行单元、LSU、MMU、缓存一致性与性能计数器。
+  type: documentation
+  type_label: 微架构导读
+  status: live
+  status_label: 已上线
+  site_url: https://daydream0929.github.io/XiangShan/
+  repo_url: https://github.com/Daydream0929/XiangShan
+  action_label: 打开学习地图
+  tags:
+    - RISC-V64
+    - Microarchitecture
+    - XiangShan
+  featured: true
+  order: 20

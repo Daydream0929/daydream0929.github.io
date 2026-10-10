@@ -32,3 +32,20 @@ Zhenjun Feng 的个人技术项目门户与技术笔记，使用 Jekyll 构建�
 bundle install
 bundle exec jekyll serve
 ```
+
+## 技术调研报告集
+
+`reports/` 存放完整的独立 HTML 调研报告（图表内联、离线可读），
+`reports/index.html` 从 `_data/reports.yml` 动态生成索引页。日常维护流程：
+
+1. 在工作区用 document skill 生成报告并渲染为自包含 HTML；
+2. 运行 document skill 的 `publish_site.py`，脚本把 HTML 复制到 `reports/`、
+   按 id 合并 `_data/reports.yml` 条目并提交推送；
+3. GitHub Actions 构建后即可在 <https://daydream0929.github.io/reports/> 查看。
+
+`_data/reports.yml` 条目字段：`id / title / summary / date / tags / url`，按 id 合并。
+
+## 内部工具：document skill
+
+`skills/document/` 是生成上述报告的 document skill 副本（编写规范 + 渲染与发布脚本），
+仅随仓库做版本管理，已通过 `_config.yml` 的 `exclude` 排除，不发布到站点。

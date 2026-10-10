@@ -1,0 +1,95 @@
+---
+layout: page
+title: 技术调研报告集
+lang: zh-CN
+---
+<style>
+  .reports-intro {
+    color: var(--muted);
+    margin: 0.6rem 0 1.2rem;
+  }
+  .reports-intro code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85em;
+  }
+  .report-stack {
+    border-top: 1px solid var(--line-strong);
+    margin-top: 1.6rem;
+  }
+  .report-item {
+    padding: 1.2rem 0 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .report-item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .report-item__tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+  }
+  .report-item__tags li {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0 0.55rem;
+    line-height: 1.5;
+  }
+  .report-item__title {
+    margin: 0.45rem 0 0.35rem;
+    font-size: 1.12rem;
+    line-height: 1.45;
+  }
+  .report-item__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .report-item__title a:hover {
+    color: var(--accent);
+  }
+  .report-item__title .report-item__arrow {
+    font-size: 0.85em;
+    opacity: 0.45;
+    margin-left: 0.35rem;
+  }
+  .report-item__summary {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+</style>
+
+{%- assign reports = site.data.reports | sort: "date" | reverse -%}
+
+<p class="reports-intro">
+  这里收录在本工作台完成的技术调研报告（RISC-V / Android / AI Agent / 基础软件等方向），共
+  <strong>{{ reports | size }}</strong> 份。每份报告都是完整的独立页面，图表内联、可直接打开阅读；
+  索引数据由 <code>_data/reports.yml</code> 维护，报告由 document skill 生成后自动发布。
+</p>
+
+<div class="report-stack">
+  {%- for report in reports -%}
+  <article class="report-item">
+    <div class="report-item__meta">
+      <time datetime="{{ report.date }}">{{ report.date }}</time>
+      <ul class="report-item__tags" aria-label="标签">
+        {%- for tag in report.tags -%}
+        <li>{{ tag }}</li>
+        {%- endfor -%}
+      </ul>
+    </div>
+    <h2 class="report-item__title">
+      <a href="{{ report.url | relative_url }}">{{ report.title }}</a><span class="report-item__arrow" aria-hidden="true">↗</span>
+    </h2>
+    <p class="report-item__summary">{{ report.summary }}</p>
+  </article>
+  {%- endfor -%}
+</div>

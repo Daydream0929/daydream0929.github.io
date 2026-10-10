@@ -35,3 +35,22 @@
     - XiangShan
   featured: true
   order: 20
+
+- id: tech-reports
+  title: 技术调研报告集
+  summary: >-
+    RISC-V 64、Android、AI Agent 与基础软件等方向的深度技术调研报告：
+    commit 级源码锚点、故障排查清单与图表全文可查。
+  type: documentation
+  type_label: 调研报告
+  status: live
+  status_label: 已上线
+  site_url: https://daydream0929.github.io/reports/
+  repo_url: https://github.com/Daydream0929/daydream0929.github.io/tree/master/reports
+  action_label: 打开报告集
+  tags:
+    - RISC-V
+    - Systems
+    - Research
+  featured: true
+  order: 30

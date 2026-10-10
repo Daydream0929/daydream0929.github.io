@@ -44,6 +44,7 @@ exclude:
   - README.md
   - no-style-please.gemspec
   - node_modules
+  - skills
   - vendor
   - _posts/2024-01-27-通用矩阵乘法.pdf
 

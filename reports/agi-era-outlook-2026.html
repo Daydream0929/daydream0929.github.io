@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AGI 时代技术展望：前沿模型能力与 Scaling 趋势</title>
+<style>
+:root {
+  --fg: #1a1a1a; --fg-soft: #4a4a4a; --bg: #ffffff; --bg-soft: #f6f7f9;
+  --border: #e3e6ea; --accent: #b8442e; --code-bg: #f4f5f7;
+  --c: #1f7a4d; --cstar: #2563a8; --s: #a86b1f; --p: #7a4fa3; --q: #a33a3a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6e6e6; --fg-soft: #a8a8a8; --bg: #14161a; --bg-soft: #1b1e24;
+    --border: #2c313a; --accent: #e0705a; --code-bg: #1e2229;
+    --c: #58c08a; --cstar: #6aa8e0; --s: #d8a45a; --p: #b088d8; --q: #e07a7a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px; line-height: 1.75; -webkit-font-smoothing: antialiased;
+}
+.layout { display: flex; max-width: 1400px; margin: 0 auto; }
+.toc {
+  width: 280px; flex: 0 0 280px; position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto; padding: 32px 20px 32px 28px;
+  border-right: 1px solid var(--border); font-size: 13.5px;
+}
+.toc h2 {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-soft); margin: 0 0 12px; font-weight: 600;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block; padding: 5px 0; color: var(--fg-soft); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 10px;
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+.toc-l1 a { font-weight: 600; color: var(--fg); }
+.toc-l2 a { padding-left: 10px; }
+.toc-l3 a { padding-left: 24px; font-size: 12.5px; }
+main { flex: 1 1 auto; min-width: 0; padding: 40px 56px 96px; max-width: 940px; }
+h1 {
+  font-size: 30px; line-height: 1.35; margin: 0 0 8px; font-weight: 650;
+  letter-spacing: -.01em;
+}
+h2 {
+  font-size: 21px; margin: 44px 0 14px; padding-bottom: 8px; font-weight: 620;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 17px; margin: 30px 0 10px; font-weight: 600; }
+h4 { font-size: 15px; margin: 22px 0 8px; font-weight: 600; color: var(--fg-soft); }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+code {
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .875em; background: var(--code-bg); padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 18px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+blockquote {
+  margin: 0 0 18px; padding: 12px 18px; background: var(--bg-soft);
+  border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+}
+blockquote p { margin: 0; }
+ul, ol { margin: 0 0 16px; padding-left: 26px; }
+li { margin: 5px 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+.badge {
+  display: inline-block; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+  color: #fff; vertical-align: 1px; letter-spacing: .02em;
+}
+.badge-c { background: var(--c); }
+.badge-cstar { background: var(--cstar); }
+.badge-s { background: var(--s); }
+.badge-p { background: var(--p); }
+.badge-q { background: var(--q); }
+figure.fig {
+  margin: 28px auto 20px;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+figure.fig figcaption {
+  font-size: 13px;
+  color: var(--soft, #666);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.mermaid {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; margin: 0 0 20px; text-align: center; overflow-x: auto;
+}
+.mermaid-fallback {
+  text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; white-space: pre-wrap; color: var(--fg-soft);
+}
+.doc-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px;
+  font-size: 13px; color: var(--fg-soft);
+}
+.doc-meta span {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+@media (max-width: 1000px) {
+  .toc { display: none; }
+  main { padding: 28px 20px 64px; }
+}
+@media print {
+  .toc { display: none; }
+  main { max-width: none; padding: 0; }
+  a { color: var(--fg); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc"><h2>目录</h2><ul><li class="toc-l1"><a href="#agi-时代技术展望-前沿模型能力与-scaling-趋势">AGI 时代技术展望：前沿模型能力与 Scaling 趋势</a></li><li class="toc-l2"><a href="#可靠性标注约定">可靠性标注约定</a></li><li class="toc-l2"><a href="#1-核心判断-tl-dr">1. 核心判断（TL;DR）</a></li><li class="toc-l2"><a href="#2-事实基线-当前前沿格局">2. 事实基线：当前前沿格局</a></li><li class="toc-l3"><a href="#2-1-gpt-6-astra">2.1 GPT-6 Astra</a></li><li class="toc-l3"><a href="#2-2-前沿模型格局-截至-2026-09">2.2 前沿模型格局（截至 2026-09）</a></li><li class="toc-l2"><a href="#3-scaling-的三条轴">3. Scaling 的三条轴</a></li><li class="toc-l3"><a href="#3-1-轴一-预训练算力-仍在增长-但增量变贵">3.1 轴一：预训练算力 —— 仍在增长，但增量变贵</a></li><li class="toc-l3"><a href="#3-2-轴二-后训练-rl-新主轴-但有实证天花板">3.2 轴二：后训练 RL —— 新主轴，但有实证天花板</a></li><li class="toc-l3"><a href="#3-3-轴三-推理时计算-成本可调-但有负收益区">3.3 轴三：推理时计算 —— 成本可调，但有负收益区</a></li><li class="toc-l2"><a href="#4-scaling-的硬约束">4. Scaling 的硬约束</a></li><li class="toc-l3"><a href="#4-1-数据墙-估算已过时">4.1 数据墙（估算已过时）</a></li><li class="toc-l3"><a href="#4-2-算力与电力-真正的瓶颈">4.2 算力与电力 —— 真正的瓶颈</a></li><li class="toc-l3"><a href="#4-3-硬件代际">4.3 硬件代际</a></li><li class="toc-l2"><a href="#5-架构范式转移">5. 架构范式转移</a></li><li class="toc-l2"><a href="#6-benchmark-失真">6. Benchmark 失真</a></li><li class="toc-l2"><a href="#7-对技术团队的落地判断">7. 对技术团队的落地判断</a></li><li class="toc-l2"><a href="#8-不确定性清单">8. 不确定性清单</a></li><li class="toc-l2"><a href="#9-参考来源">9. 参考来源</a></li><li class="toc-l2"><a href="#附-方法说明">附：方法说明</a></li></ul></nav>
+<main>
+<h1>AGI 时代技术展望：前沿模型能力与 Scaling 趋势</h1>
+<div class="doc-meta"><span>v1.0 · 2026-09-04</span><span>由 agi-era-outlook-2026.md 生成</span></div>
+<h1 id="agi-时代技术展望-前沿模型能力与-scaling-趋势">AGI 时代技术展望：前沿模型能力与 Scaling 趋势</h1>
+<p><strong>版本</strong>：v1.0 · 2026-09-04 <strong>读者定位</strong>：技术团队（深度版） <strong>范围</strong>：前沿模型能力演进与 Scaling 趋势。不含商业化、组织与合规章节。</p>
+<hr>
+<h2 id="可靠性标注约定">可靠性标注约定</h2>
+<p>本报告所有关键论断均标注证据等级，请勿把 <span class="badge badge-p" title="预测/估算">P</span> 级内容当作事实引用。</p>
+<div class="table-wrap"><table><thead><tr><th>标记</th><th>含义</th></tr></thead><tbody><tr><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td><td><strong>已核实</strong>：来自一手来源（官方页面 / arXiv / Epoch 数据库），已交叉验证</td></tr><tr><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td><td><strong>单一来源</strong>：仅一个来源支持，未交叉验证。多为二手博客聚合</td></tr><tr><td><span class="badge badge-p" title="预测/估算">P</span></td><td><strong>预测 / 估算</strong>：研究性外推，非既成事实</td></tr><tr><td><span class="badge badge-q" title="未能核实">?</span></td><td><strong>未能核实</strong>：来源不可达或数据缺口，报告中明确留空而非填充估计值</td></tr></tbody></table></div>
+<hr>
+<h2 id="1-核心判断-tl-dr">1. 核心判断（TL;DR）</h2>
+<ol><li><strong>Scaling 没有停，但主轴已经换了。</strong> 预训练算力仍在以 5×/年 增长 <span class="badge badge-c" title="源码/一手来源核实">C</span>，然而边际能力增量的主要来源已从预训练转移到 <strong>后训练 RL</strong> 与 <strong>推理时计算</strong> ——而这两条轴在 2025–2026 年都出现了公开的边际收益递减证据 <span class="badge badge-c" title="源码/一手来源核实">C</span>。这是本报告最重要的一条判断。</li><li><strong>"AGI 时代"目前是厂商叙事，不是技术结论。</strong> GPT-6 Astra 的发布口径由 OpenAI 高管给出 <span class="badge badge-c" title="源码/一手来源核实">C</span>，但参数量、训练数据、能力边界均未披露 <span class="badge badge-c" title="源码/一手来源核实">C</span>。技术团队应以<strong>实测</strong>替代叙事。</li><li><strong>真正的约束正在从数据转向电力。</strong> 数据墙的估算区间为 2026–2032 <span class="badge badge-c" title="源码/一手来源核实">C</span>（但估算本身已过时），而算力侧已出现 GW 级数据中心与 ~1 万亿美元年化 capex <span class="badge badge-c" title="源码/一手来源核实">C</span>。瓶颈的重心变了。</li><li><strong>Benchmark 已经失真。</strong> 主流榜单饱和且污染严重 <span class="badge badge-s" title="单一来源，未交叉验证">S</span>，能力评估必须转向自建 eval + 长程任务实测。这对工程团队是最直接、最可操作的结论。</li><li><strong>架构层面没有出现范式颠覆。</strong> MoE 已是事实标准 <span class="badge badge-s" title="单一来源，未交叉验证">S</span>，SSM/混合架构在长上下文与推理成本上占优 <span class="badge badge-c" title="源码/一手来源核实">C</span>，但前沿旗舰仍以 Transformer 变体为主。"Transformer 已死"的说法在 2026 年不成立。</li></ol>
+<hr>
+<h2 id="2-事实基线-当前前沿格局">2. 事实基线：当前前沿格局</h2>
+<h3 id="2-1-gpt-6-astra">2.1 GPT-6 Astra</h3>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>内容</th><th>等级</th></tr></thead><tbody><tr><td>发布日期</td><td>2026-09-03</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>代号</td><td>Astra</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>发布口径</td><td>Greg Brockman："Welcome to the AGI era"</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>上下文窗口</td><td>1M tokens</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>Artificial Analysis Index</td><td>57–61</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>定价</td><td>AA 页面列出 $7.7/M tokens，同时给出 $0.46–$1.67/task —— <strong>口径不一致，未核实</strong></td><td><span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>参数量 / 训练数据规模</td><td>未披露</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>放量策略</td><td>分阶段：Plus / Pro / Business / Enterprise / API "未来数日内"陆续开放</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>训练周期</td><td>训练于 2026 年 7–8 月结束</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr></tbody></table></div>
+<p><strong>关键技术事实</strong>：Astra 的发布被推迟出原定 8 月窗口，原因是模型触及 <strong>关键网络攻击能力（critical cyber capabilities）阈值</strong>，并具备发现零日漏洞的能力 <span class="badge badge-c" title="源码/一手来源核实">C</span>。OpenAI 为此发布了两篇安全说明（<em>Path to Astra: critical capabilities and frontier safeguards</em> 与 <em>Responding to the next frontier of critical cyber capabilities</em>）<span class="badge badge-c" title="源码/一手来源核实">C</span>。</p>
+<blockquote><strong>工程含义</strong>：这是前沿实验室首次因<strong>能力过强</strong>而非能力不足而延迟发布。安全阈值开始成为发布节奏的实际约束项 —— 这对依赖前沿模型 API 的团队意味着<strong>版本可用性变得不可预测</strong>，必须预留降级路径。</blockquote>
+<h3 id="2-2-前沿模型格局-截至-2026-09">2.2 前沿模型格局（截至 2026-09）</h3>
+<p>下表除 OpenAI / Google 两行外均来自单一聚合来源，等级 <span class="badge badge-s" title="单一来源，未交叉验证">S</span>，使用前请自行复核。</p>
+<div class="table-wrap"><table><thead><tr><th>厂商</th><th>模型</th><th>发布</th><th>架构要点</th><th>等级</th></tr></thead><tbody><tr><td>OpenAI</td><td>GPT-5.6（Sol / Terra / Luna 三档）</td><td>2026-07-09</td><td>~1M 上下文</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>OpenAI</td><td><strong>GPT-6 Astra</strong></td><td>2026-09-03</td><td>1M 上下文</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>Anthropic</td><td>Claude Opus 5</td><td>2026-05-28</td><td>代码能力领先</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Google</td><td>Gemini 3.6 Flash</td><td>2026-07-21</td><td>效率导向</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Google</td><td>Gemma 4</td><td>2026</td><td>西方阵营开放权重</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Meta</td><td>Llama 4</td><td>2026 年初</td><td>MoE，17B 激活参数</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>xAI</td><td>Grok 4.5</td><td>2026 年末</td><td>Agentic 工具调用</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>DeepSeek</td><td>V4</td><td>2026</td><td>MIT 许可</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>阿里</td><td>Qwen 系列</td><td>2026</td><td>Apache 2.0</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Moonshot</td><td>Kimi K3</td><td>2026-07</td><td>MoE，Agentic coding</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Z.ai</td><td>GLM-5.2</td><td>2026-06</td><td>长程 coding</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Mistral</td><td>Large 3</td><td>2025-12</td><td>MoE，Apache 2.0</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Microsoft</td><td>MAI</td><td>Build 2026</td><td>端侧 / Windows</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr></tbody></table></div>
+<p><strong>观察</strong>：前沿已<strong>不再是单一梯队</strong>。开源阵营（DeepSeek / Qwen / Kimi / GLM）在特定能力维度上已进入同一竞争面，且以宽松许可发布 —— 这改变了"必须用闭源旗舰"的默认假设。</p>
+<hr>
+<h2 id="3-scaling-的三条轴">3. Scaling 的三条轴</h2>
+<p>这是本报告的技术核心。<strong>三条轴的状态差异极大，混为一谈是 2026 年最常见的分析错误。</strong></p>
+<div class="mermaid">graph LR
+    A[&quot;Scaling 三轴&quot;] --&gt; B[&quot;轴一：预训练算力&quot;]
+    A --&gt; C[&quot;轴二：后训练 RL&quot;]
+    A --&gt; D[&quot;轴三：推理时计算&quot;]
+    B --&gt; B1[&quot;仍在增长 5x/年&lt;br/&gt;未观测到平台期&quot;]
+    C --&gt; C1[&quot;新主轴&lt;br/&gt;但存在 pass@k 天花板&quot;]
+    D --&gt; D1[&quot;成本-精度可调&lt;br/&gt;但高预算下负收益&quot;]
+    B1 --&gt; E[&quot;边际增量下降&quot;]
+    C1 --&gt; E
+    D1 --&gt; E</div>
+<h3 id="3-1-轴一-预训练算力-仍在增长-但增量变贵">3.1 轴一：预训练算力 —— 仍在增长，但增量变贵</h3>
+<p><strong>已核实数据</strong>（Epoch AI, <em>Trends in AI</em>，页面更新于 2026-02-05）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li>前沿训练算力增长 <strong>5×/年</strong></li><li>自 2020 年起 <strong>每 5.2 个月翻倍</strong></li><li><strong>0.7 个数量级 / 年</strong></li><li><strong>未观测到平台期</strong></li></ul>
+<p><strong>但成本侧同步恶化</strong>（arXiv 2405.21015，2025-02-07）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li>前沿模型训练成本自 2016 年起 <strong>2.4×/年</strong></li><li>摊销成本 <strong>2027 年初突破 $1B</strong>（该项为预测 <span class="badge badge-p" title="预测/估算">P</span>）</li></ul>
+<p><strong>判断</strong>：预训练轴在数学上没有断裂，但已进入<strong>收益/成本剪刀差</strong>区间。每翻一倍算力所换取的能力增量在下降，而成本在加速上升。这解释了为什么实验室把重心转向后训练 —— 不是因为预训练失效，而是因为<strong>性价比失效</strong>。</p>
+<h3 id="3-2-轴二-后训练-rl-新主轴-但有实证天花板">3.2 轴二：后训练 RL —— 新主轴，但有实证天花板</h3>
+<p>这是 2025–2026 年最重要的技术变化，也是<strong>最容易被过度宣传的一条</strong>。</p>
+<p><strong>关键反面证据</strong>（Yue et al., <em>Does RL Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?</em>，arXiv 2504.13837，2025-04-18 提交 / v5 2025-11-24，NeurIPS 2025）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<blockquote><strong>"base models achieve a higher pass@k score when k is large."</strong></blockquote>
+<p>即：在大 k 下，<strong>基座模型的 pass@k 高于 RL 后模型</strong>。结论是 RLVR <strong>收窄了采样分布</strong>而非扩展能力边界 —— RL 把模型的能力集中到它已经会的那部分，而不是教会它新的东西。</p>
+<p>这是目前公开发表的<strong>最强 "RL scaling wall" 证据</strong>，且来自 NeurIPS 正会，不是预印本孤证。</p>
+<p><strong>支撑证据</strong>：</p>
+<ul><li><em>RL Squeezes, SFT Expands</em>（ICLR 2026 正会）<span class="badge badge-c" title="源码/一手来源核实">C</span>（标题与会议已核实；<strong>摘要中的定量结果未核实</strong> <span class="badge badge-q" title="未能核实">?</span>，PDF 抓取超时）—— 标题本身与 Yue et al. 结论方向一致</li><li><em>The Landscape of Agentic RL for LLMs: A Survey</em>（arXiv 2509.02547，2025-09-02）<span class="badge badge-c" title="源码/一手来源核实">C</span>：将 agentic RL 描述为范式转移 —— "reframing LLMs from passive sequence generators into autonomous, decision-making agents"</li><li><em>Beyond Verifiable Rewards</em>（arXiv 2503.19618，NeurIPS 2025）<span class="badge badge-c" title="源码/一手来源核实">C</span>：RLVR 向数学/代码之外的领域扩展</li></ul>
+<p><strong>未能核实</strong> <span class="badge badge-q" title="未能核实">?</span>：RL 在前沿后训练算力中所占比例的<strong>任何定量测量</strong>。业界"RL 已成为主导 scaling 轴"的说法属于评论性表述，不是测量结果。</p>
+<p><strong>工程判断</strong>：RL 后训练在<strong>分布收窄与稳定性</strong>上确实有效 —— 这正是产品化需要的。但不要期待它带来能力边界的实质外扩。如果你的任务需要<strong>探索性 / 新颖解法</strong>，基座模型的宽采样反而更有价值 —— 这是一个可实测的反直觉结论。</p>
+<h3 id="3-3-轴三-推理时计算-成本可调-但有负收益区">3.3 轴三：推理时计算 —— 成本可调，但有负收益区</h3>
+<p><strong>关键证据</strong>（Zhou et al., <em>When More Thinking Hurts: Overthinking in LLM Test-Time Compute</em>，arXiv 2604.10739，2026-04-12）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<p>摘要原文：<strong>"marginal returns diminish substantially at higher budgets… models exhibit 'overthinking'… stopping at moderate budgets can reduce computation significantly while maintaining comparable accuracy."</strong></p>
+<p>即：高预算下边际收益显著递减，模型出现 <strong>overthinking</strong>；在<strong>中等预算</strong>处停止可大幅降低算力消耗而保持可比精度。</p>
+<p><strong>近似阈值</strong>（来自该论文 HTML v1，标注为近似值，非摘要原文）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li>边际效用转为负值：<strong>约 &gt;12K tokens</strong></li><li>flip ratio &gt; 1：<strong>约 ~7K tokens</strong></li></ul>
+<p><strong>基线参考</strong>：Snell et al.（arXiv 2408.03314，2024-08）给出 compute-optimal test-time scaling 框架 <span class="badge badge-c" title="源码/一手来源核实">C</span>。</p>
+<p><strong>工程判断</strong>：这是三条轴中<strong>对工程团队最直接可操作</strong>的一条。推理预算是一个可调节旋钮，且存在明确的<strong>最优区间</strong>。生产系统中的正确做法不是"永远拉满 reasoning effort"，而是：</p>
+<ul><li>建立<strong>任务难度 → 推理预算</strong>的映射（路由）</li><li>对简单任务强制低预算，避免 overthinking 带来的成本浪费与延迟</li><li>对高不确定性任务设置预算上限而非无限扩展</li></ul>
+<hr>
+<h2 id="4-scaling-的硬约束">4. Scaling 的硬约束</h2>
+<h3 id="4-1-数据墙-估算已过时">4.1 数据墙（估算已过时）</h3>
+<p>Epoch AI, <em>Will we run out of data?</em>（2024-06-06）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li>人类生成文本存量将在 <strong>2026–2032 年间被完全利用</strong></li><li>同一页面明确指出：合成数据 <strong>"not yet well understood"</strong></li></ul>
+<p><strong>重要缺口</strong> <span class="badge badge-q" title="未能核实">?</span>：未找到该估算在 2025–2026 年的任何修订版本，也未找到人类数据 vs 合成数据的拆分比例。<strong>该区间基于 2024 年数据，应视为下限参考而非当前判断。</strong></p>
+<h3 id="4-2-算力与电力-真正的瓶颈">4.2 算力与电力 —— 真正的瓶颈</h3>
+<p><strong>已核实数据</strong>（Epoch AI, <em>Frontier labs don't use most AI compute (yet)</em>，Josh You，2026-05-20）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<div class="table-wrap"><table><thead><tr><th>指标</th><th>数值</th></tr></thead><tbody><tr><td>Anthropic + OpenAI 占全球在运行 AI 算力比例（2025 年末）</td><td><strong>15–20%</strong></td></tr><tr><td>全球算力存量（2025 年末，H100e 折算）</td><td><strong>&lt; 4M</strong></td></tr><tr><td>2025 年存量增长（H100e 折算）</td><td><strong>3×</strong></td></tr><tr><td>新增装机算力增长（2025 vs 2024）</td><td><strong>2.7×</strong></td></tr><tr><td>前沿实验室算力增速</td><td><strong>~4×/年</strong></td></tr><tr><td>推论</td><td>前沿实验室将在<strong>五年内</strong>使用约 <strong>80%</strong> 的算力</td></tr></tbody></table></div>
+<p><strong>电力与 capex</strong>（同一来源，2026-05-20）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li>OpenAI 数据中心电力在 <strong>2024 与 2025 年各增长 3×</strong></li><li><strong>2025 年 1.9 GW → 2027 年 "low double-digit GW"</strong></li><li>OpenAI <strong>2026 年算力支出 $50B</strong>（约为 2025 年的 3×）</li><li><strong>2026 年 AI 总 capex ≈ $1T 年化</strong>（约占全球 GDP 1%，美国 GDP 3%）</li></ul>
+<p><strong>数据中心实况</strong>（Epoch 最大数据中心图表，更新于 <strong>2026-09-03</strong>）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li><strong>Colossus 2：946 MW 在运行</strong></li><li><strong>Fairwater (WI)：2,263 MW 规划中</strong></li></ul>
+<p><strong>历史对照</strong>（arXiv 2504.16026v2，2025-04-23）<span class="badge badge-c" title="源码/一手来源核实">C</span>：Colossus 约 <strong>200k 芯片 / ~$7B / ~300 MW</strong>；2030 年预测约 <strong>2M 芯片 / ~$200B / ~9 GW</strong>（该项为预测 <span class="badge badge-p" title="预测/估算">P</span>）。</p>
+<p><strong>判断</strong>：从 300 MW（2025）到 946 MW 在运行 + 2,263 MW 规划（2026-09），<strong>电力已经取代数据成为首要物理约束</strong>。注意那条 "前沿实验室五年内吃掉 80% 算力" 的推论 —— 它意味着<strong>算力供给的再分配</strong>会成为未来几年的主要竞争面。</p>
+<h3 id="4-3-硬件代际">4.3 硬件代际</h3>
+<p><strong>NVIDIA Vera Rubin NVL72</strong>（NVIDIA 开发者博客，2026-01-05）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>规格</th></tr></thead><tbody><tr><td>每机柜 GPU</td><td>72</td></tr><tr><td>FP4 推理 / 训练</td><td>50 PF / 35 PF</td></tr><tr><td>HBM4</td><td>288 GB @ <strong>22 TB/s</strong></td></tr><tr><td>NVLink6</td><td><strong>3.6 TB/s per GPU</strong></td></tr><tr><td>ConnectX-9</td><td>800 Gb/s</td></tr><tr><td>Vera CPU</td><td>88 cores</td></tr></tbody></table></div>
+<p><strong>AMD MI400 / Helios</strong>（TechPowerUp 预览，2025-06-13）<span class="badge badge-s" title="单一来源，未交叉验证">S</span>：MI400 432 GB HBM4 / ~19.6 TB/s / 40 PF FP4；Helios 72 GPU / 3.1 EFLOPS；MI450X 预计 2026 年末。<strong>最终出货规格未核实</strong> <span class="badge badge-q" title="未能核实">?</span>（amd.com 抓取超时）。</p>
+<p><strong>推理侧瓶颈</strong>：Rubin 22 TB/s 与 MI400 ~19.6 TB/s 的 HBM4 带宽，相较 HBM3e 世代约提升 10×。<strong>内存带宽而非算力，是长上下文推理的实际约束。</strong></p>
+<hr>
+<h2 id="5-架构范式转移">5. 架构范式转移</h2>
+<p><strong>结论先行：2026 年没有出现架构颠覆。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>方向</th><th>状态</th><th>等级</th></tr></thead><tbody><tr><td>MoE</td><td>已是事实标准（Llama 4 / Kimi K3 / Mistral Large 3 均采用）</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>混合注意力 / 稀疏注意力</td><td>前沿模型中普遍采用，用于长上下文成本优化</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>SSM / Mamba 混合</td><td>研究进展明确，但<strong>尚未成为前沿旗舰主干</strong></td><td><span class="badge badge-c" title="源码/一手来源核实">C</span>（研究）/ <span class="badge badge-s" title="单一来源，未交叉验证">S</span>（产品采用面）</td></tr><tr><td>线性注意力变体</td><td>研究阶段</td><td><span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>超越 next-token prediction 的目标函数</td><td>无前沿产品级证据</td><td><span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>持续学习 / 灾难性遗忘</td><td>未解决</td><td><span class="badge badge-q" title="未能核实">?</span></td></tr></tbody></table></div>
+<p><strong>SSM vs Transformer 的实证结论</strong>（arXiv 2507.12442v4，<em>Characterizing State Space Model and Hybrid Language Models</em>）<span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<ul><li><strong>SSM 在长上下文上占优</strong></li><li><strong>Transformer 在短序列上领先</strong></li><li><strong>混合架构在效率与精度间取得平衡</strong>，被证明适用于高效推理</li></ul>
+<p><strong>Mamba-3</strong> 已进入公开生态（Princeton PLI / Together AI 等有覆盖）<span class="badge badge-s" title="单一来源，未交叉验证">S</span>。</p>
+<p><strong>工程判断</strong>：对绝大多数团队，架构选择<strong>不是当前的决策点</strong> —— 你消费的是 API，架构由供应商决定。唯一需要关注的架构信号是 <strong>MoE + 稀疏注意力带来的推理成本下降</strong>，它直接影响你的单位 token 成本曲线。</p>
+<hr>
+<h2 id="6-benchmark-失真">6. Benchmark 失真</h2>
+<p><strong>现状</strong> <span class="badge badge-s" title="单一来源，未交叉验证">S</span>：主流榜单（MMLU 92%+、HumanEval、SWE-bench 等）已饱和，且存在严重的<strong>训练集污染</strong>问题。业界已有 "leaderboards are dead" 的公开讨论。</p>
+<p><strong>仍有区分度的方向</strong>：ARC-AGI-2（arXiv 2505.11831）、FrontierMath 等开放研究问题类基准 <span class="badge badge-s" title="单一来源，未交叉验证">S</span>。</p>
+<p><strong>未能核实</strong> <span class="badge badge-q" title="未能核实">?</span>：GPT-6 Astra 在具体 benchmark 上的分项成绩 —— Artificial Analysis 仅给出聚合指数 57–61 <span class="badge badge-c" title="源码/一手来源核实">C</span>，分项数据未获取。</p>
+<p><strong>这是本报告中最可操作的一条结论</strong>：</p>
+<blockquote><strong>不要以公开榜单作为选型依据。</strong> 建立自建 eval 集，并在真实长程任务上做实测。榜单分数与你系统中的实际表现之间的相关性，在 2026 年已经低到不可用于决策。</blockquote>
+<hr>
+<h2 id="7-对技术团队的落地判断">7. 对技术团队的落地判断</h2>
+<p>按可操作性排序：</p>
+<ol><li><strong>推理预算路由</strong>（高优先级，立即可做）</li></ol>
+<p>基于 §3.3 的 overthinking 证据，建立任务难度分级与推理预算映射。预期收益：成本下降 + 延迟下降，精度基本不变。<strong>这是当前 ROI 最高的优化点。</strong></p>
+<ol><li><strong>多供应商降级路径</strong>（高优先级）</li></ol>
+<p>§2.1 表明前沿模型发布节奏已被安全阈值约束，版本可用性不可预测。任何硬绑定单一前沿模型的生产链路都需要降级方案。</p>
+<ol><li><strong>自建 eval</strong>（高优先级）</li></ol>
+<p>§6。替代公开榜单作为选型与回归依据。</p>
+<ol><li><strong>重新评估开源选项</strong>（中优先级）</li></ol>
+<p>§2.2。DeepSeek V4 / Qwen / Kimi K3 以宽松许可发布，在特定能力维度已进入同一竞争面。对成本敏感与非极端能力场景，闭源旗舰不再是默认答案。</p>
+<ol><li><strong>长上下文成本核算</strong>（中优先级）</li></ol>
+<p>1M 上下文已成前沿标配 <span class="badge badge-c" title="源码/一手来源核实">C</span>。但内存带宽是实际约束（§4.3），长上下文的成本曲线非线性 —— 需实测而非按线性外推。</p>
+<ol><li><strong>基座模型宽采样的保留价值</strong>（低优先级，但值得实验）</li></ol>
+<p>§3.2 的 pass@k 证据表明，探索性任务上基座模型可能优于 RL 后模型。如果你的场景涉及新颖解法生成，值得做对照实验。</p>
+<hr>
+<h2 id="8-不确定性清单">8. 不确定性清单</h2>
+<p>以下内容<strong>已核查但无法确认</strong>，请勿在下游文档中填充估计值：</p>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>状态</th></tr></thead><tbody><tr><td>GPT-6 Astra 参数量 / 训练数据规模</td><td>官方未披露 <span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>GPT-6 Astra 定价口径</td><td>AA 页面数据自相矛盾（$7.7/M tokens vs $0.46–$1.67/task）<span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>GPT-6 Astra 分项 benchmark</td><td>未获取 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>RL 在前沿后训练算力中的占比</td><td>无公开定量测量 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td><em>RL Squeezes, SFT Expands</em> 的定量结果</td><td>PDF 抓取超时，仅核实标题与会议 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>数据墙估算的 2025–2026 修订</td><td>未找到；原估算基于 2024 年数据 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>AMD MI400/MI450X 最终出货规格</td><td>amd.com 不可达 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>Anthropic–Google–Broadcom &gt;1GW TPU 产能</td><td>仅二手报道，一手页面不可达 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>Stargate 5 站点 / $500B 细节</td><td>Reuters 与 openai.com 均不可达 <span class="badge badge-q" title="未能核实">?</span></td></tr></tbody></table></div>
+<p><strong>一处主动纠错</strong>：Epoch AI <strong>不存在</strong>题为 <em>Compute Trends Across the Frontier of AI</em> 的出版物；也<strong>未能核实</strong>任何"约 6 年算力余量"的估算及其修订。网络上流传的该表述不应引用。当前可用的余量表述是 2026-05-20 的"五年内约 80%"<span class="badge badge-c" title="源码/一手来源核实">C</span>。</p>
+<p><strong>抓取受限来源</strong>：openai.com、datacenterdynamics.com、phoronix.com 返回 403；amd.com 超时；reuters.com、anthropic.com 被拦截。上述缺口由此产生。</p>
+<hr>
+<h2 id="9-参考来源">9. 参考来源</h2>
+<p><strong>一手来源 / 高可信</strong></p>
+<ul><li><a href="https://epoch.ai/trends" rel="noopener">Epoch AI — Trends in AI</a>（更新于 2026-02-05）</li><li><a href="https://epoch.ai/gradient-updates/frontier-labs-dont-use-most-ai-compute" rel="noopener">Epoch AI — Frontier labs don't use most AI compute (yet)</a>（2026-05-20）</li><li><a href="https://epoch.ai/graphs/largest-ai-data-centers-by-power-capacity" rel="noopener">Epoch AI — Largest AI data centers by power capacity</a>（更新于 2026-09-03）</li><li><a href="https://epoch.ai/publications/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data" rel="noopener">Epoch AI — Will we run out of data?</a>（2024-06-06）</li><li><a href="https://epoch.ai/publications/can-ai-scaling-continue-through-2030" rel="noopener">Epoch AI — Can AI scaling continue through 2030?</a>（2024-08-20，预测性）</li><li><a href="https://arxiv.org/abs/2504.13837" rel="noopener">Yue et al. — Does RL Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?</a>（NeurIPS 2025）</li><li><a href="https://arxiv.org/abs/2604.10739" rel="noopener">Zhou et al. — When More Thinking Hurts: Overthinking in LLM Test-Time Compute</a>（2026-04-12）</li><li><a href="https://arxiv.org/abs/2408.03314" rel="noopener">Snell et al. — Compute-Optimal Test-Time Scaling</a>（2024-08）</li><li><a href="https://arxiv.org/abs/2509.02547" rel="noopener">The Landscape of Agentic RL for LLMs: A Survey</a>（2025-09-02）</li><li><a href="https://arxiv.org/abs/2503.19618" rel="noopener">Beyond Verifiable Rewards</a>（NeurIPS 2025）</li><li><a href="https://proceedings.iclr.cc/paper_files/paper/2026/file/e52554a70e0df57a0bea11d1eca0c9b5-Paper-Conference.pdf" rel="noopener">RL Squeezes, SFT Expands</a>（ICLR 2026）</li><li><a href="https://arxiv.org/html/2507.12442v4" rel="noopener">Characterizing State Space Model and Hybrid Language Models</a></li><li><a href="https://arxiv.org/html/2505.11831v2" rel="noopener">ARC-AGI-2: A New Challenge for Frontier AI Reasoning Systems</a></li><li><a href="https://arxiv.org/abs/2405.21015" rel="noopener">Rising costs of training frontier AI models</a>（2025-02-07）</li><li><a href="https://arxiv.org/html/2504.16026v2" rel="noopener">Trends in AI Supercomputers</a>（2025-04-23）</li><li><a href="https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/" rel="noopener">NVIDIA — Inside the Rubin Platform</a>（2026-01-05）</li></ul>
+<p><strong>GPT-6 Astra 相关</strong></p>
+<ul><li><a href="https://openai.com/index/path-to-astra/" rel="noopener">OpenAI — Path to Astra: critical capabilities and frontier safeguards</a></li><li><a href="https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/" rel="noopener">OpenAI — Responding to the next frontier of critical cyber capabilities</a></li><li><a href="https://the-decoder.com/gpt-6-astra-is-the-first-model-making-openai-willing-to-declare-the-agi-era/" rel="noopener">The Decoder — GPT-6 Astra is the first model making OpenAI willing to declare the AGI era</a></li><li><a href="https://artificialanalysis.ai/models/releases/gpt-6-astra" rel="noopener">Artificial Analysis — GPT-6 Astra</a></li><li><a href="https://lifearchitect.ai/gpt-6/" rel="noopener">LifeArchitect.ai — GPT-6 (2026)</a>（更新于 2026-09-04）</li><li><a href="https://thenewstack.io/openai-gpt6-astra-benchmarks/" rel="noopener">The New Stack — OpenAI launches GPT-6 Astra</a></li><li><a href="https://meetcody.ai/blog/gpt-6-astra-release-date-rumors/" rel="noopener">Cody AI — GPT-6 Astra Released: Access, Features &amp; Latest News</a></li></ul>
+<p><strong>单一来源 / 需复核（<span class="badge badge-s" title="单一来源，未交叉验证">S</span> 级）</strong></p>
+<ul><li><a href="https://datalakehousehub.com/blog/ai-model-families-2026" rel="noopener">DataLakeHouseHub — Every AI Model Family That Matters in Mid-2026</a></li><li><a href="https://aireiter.com/zh/blog/gpt-6-what-we-know-so-far" rel="noopener">AIReiter — GPT-6：截至 2026 年 8 月我们知道些什么</a>（2026-08-10）</li><li><a href="https://www.buildmvpfast.com/blog/ai-benchmark-saturation-2026" rel="noopener">BuildMVPFast — AI Benchmark Saturation 2026: Leaderboards Are Dead</a></li><li><a href="https://www.together.ai/blog/mamba-3" rel="noopener">Together AI — Mamba-3</a></li><li><a href="https://pli.princeton.edu/blog/2026/mamba-3-improved-sequence-modeling-using-state-space-principles" rel="noopener">Princeton PLI — Mamba-3</a></li><li><a href="https://www.techpowerup.com/" rel="noopener">TechPowerUp — AMD MI400 / Helios preview</a>（2025-06-13）</li></ul>
+<hr>
+<h2 id="附-方法说明">附：方法说明</h2>
+<p>本报告通过 Web 检索 + 一手来源交叉验证生成，未使用任何模型内部先验知识填充数据缺口。<strong>所有 <span class="badge badge-q" title="未能核实">?</span> 级条目均为真实的核查失败，而非省略。</strong> 若需将任一 <span class="badge badge-s" title="单一来源，未交叉验证">S</span> 级条目提升为 <span class="badge badge-c" title="源码/一手来源核实">C</span>，建议对该条目做独立的第二来源验证后再引用。</p>
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js" integrity="sha384-N3QqR/7q+xm3BGX+CBbNI8AUmRRqcsDzToy+0z1NLDI0QmTKW8zvwLvqulJgk3dP" crossorigin="anonymous" onerror="window.__mermaidMissing=true"></script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  function fallback() {
+    nodes.forEach(function (n) {
+      if (n.getAttribute('data-processed')) return;
+      var pre = document.createElement('pre');
+      pre.className = 'mermaid-fallback';
+      pre.textContent = n.textContent;
+      n.textContent = '';
+      n.appendChild(pre);
+    });
+  }
+  if (window.__mermaidMissing || typeof mermaid === 'undefined') { fallback(); return; }
+  try {
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+    mermaid.run({ nodes: nodes }).catch(fallback);
+  } catch (e) { fallback(); }
+})();
+</script>
+</body>
+</html>

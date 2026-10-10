@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>国内外 RISC-V 峰会中的 Android 发展与趋势调研：欧洲、中国与全球视角</title>
+<style>
+:root {
+  --fg: #1a1a1a; --fg-soft: #4a4a4a; --bg: #ffffff; --bg-soft: #f6f7f9;
+  --border: #e3e6ea; --accent: #b8442e; --code-bg: #f4f5f7;
+  --c: #1f7a4d; --cstar: #2563a8; --s: #a86b1f; --p: #7a4fa3; --q: #a33a3a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6e6e6; --fg-soft: #a8a8a8; --bg: #14161a; --bg-soft: #1b1e24;
+    --border: #2c313a; --accent: #e0705a; --code-bg: #1e2229;
+    --c: #58c08a; --cstar: #6aa8e0; --s: #d8a45a; --p: #b088d8; --q: #e07a7a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px; line-height: 1.75; -webkit-font-smoothing: antialiased;
+}
+.layout { display: flex; max-width: 1400px; margin: 0 auto; }
+.toc {
+  width: 280px; flex: 0 0 280px; position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto; padding: 32px 20px 32px 28px;
+  border-right: 1px solid var(--border); font-size: 13.5px;
+}
+.toc h2 {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-soft); margin: 0 0 12px; font-weight: 600;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block; padding: 5px 0; color: var(--fg-soft); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 10px;
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+.toc-l1 a { font-weight: 600; color: var(--fg); }
+.toc-l2 a { padding-left: 10px; }
+.toc-l3 a { padding-left: 24px; font-size: 12.5px; }
+main { flex: 1 1 auto; min-width: 0; padding: 40px 56px 96px; max-width: 940px; }
+h1 {
+  font-size: 30px; line-height: 1.35; margin: 0 0 8px; font-weight: 650;
+  letter-spacing: -.01em;
+}
+h2 {
+  font-size: 21px; margin: 44px 0 14px; padding-bottom: 8px; font-weight: 620;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 17px; margin: 30px 0 10px; font-weight: 600; }
+h4 { font-size: 15px; margin: 22px 0 8px; font-weight: 600; color: var(--fg-soft); }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+code {
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .875em; background: var(--code-bg); padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 18px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+blockquote {
+  margin: 0 0 18px; padding: 12px 18px; background: var(--bg-soft);
+  border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+}
+blockquote p { margin: 0; }
+ul, ol { margin: 0 0 16px; padding-left: 26px; }
+li { margin: 5px 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+.badge {
+  display: inline-block; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+  color: #fff; vertical-align: 1px; letter-spacing: .02em;
+}
+.badge-c { background: var(--c); }
+.badge-cstar { background: var(--cstar); }
+.badge-s { background: var(--s); }
+.badge-p { background: var(--p); }
+.badge-q { background: var(--q); }
+figure.fig {
+  margin: 28px auto 20px;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+figure.fig figcaption {
+  font-size: 13px;
+  color: var(--soft, #666);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.mermaid {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; margin: 0 0 20px; text-align: center; overflow-x: auto;
+}
+.mermaid-fallback {
+  text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; white-space: pre-wrap; color: var(--fg-soft);
+}
+.doc-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px;
+  font-size: 13px; color: var(--fg-soft);
+}
+.doc-meta span {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+@media (max-width: 1000px) {
+  .toc { display: none; }
+  main { padding: 28px 20px 64px; }
+}
+@media print {
+  .toc { display: none; }
+  main { max-width: none; padding: 0; }
+  a { color: var(--fg); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc"><h2>目录</h2><ul><li class="toc-l1"><a href="#国内外-risc-v-峰会中的-android-发展与趋势调研-欧洲-中国与全球视角">国内外 RISC-V 峰会中的 Android 发展与趋势调研：欧洲、中国与全球视角</a></li><li class="toc-l2"><a href="#版本历史">版本历史</a></li><li class="toc-l2"><a href="#术语与缩略语">术语与缩略语</a></li><li class="toc-l2"><a href="#可靠性标记">可靠性标记</a></li><li class="toc-l2"><a href="#1-核心判断-tl-dr">1. 核心判断（TL;DR）</a></li><li class="toc-l2"><a href="#2-问题-范围与方法">2. 问题、范围与方法</a></li><li class="toc-l2"><a href="#3-全球技术基线">3. 全球技术基线</a></li><li class="toc-l3"><a href="#3-1-北美峰会-android-从主题演讲进入兼容与产品化问题">3.1 北美峰会：Android 从主题演讲进入兼容与产品化问题</a></li><li class="toc-l3"><a href="#3-2-rva23-是-abi-前提-不是-android-产品保证">3.2 RVA23 是 ABI 前提，不是 Android 产品保证</a></li><li class="toc-l3"><a href="#3-3-模拟器和二进制翻译是风险收敛工具-不是实机替身">3.3 模拟器和二进制翻译是风险收敛工具，不是实机替身</a></li><li class="toc-l2"><a href="#4-国内发展-差距与机会">4. 国内发展、差距与机会</a></li><li class="toc-l3"><a href="#4-1-中国峰会-系统软件-ai-与汽车更显性-android-证据需严格收敛">4.1 中国峰会：系统软件、AI 与汽车更显性，Android 证据需严格收敛</a></li><li class="toc-l3"><a href="#4-2-欧洲峰会-以主权软件栈和基础设施强化-android-的前置条件">4.2 欧洲峰会：以主权软件栈和基础设施强化 Android 的前置条件</a></li><li class="toc-l3"><a href="#4-3-三区域的互补关系">4.3 三区域的互补关系</a></li><li class="toc-l2"><a href="#5-关键机制深挖">5. 关键机制深挖</a></li><li class="toc-l3"><a href="#5-1-abi-与应用生态-从-isa-profile-到-apk-aab-的断点">5.1 ABI 与应用生态：从 ISA profile 到 APK/AAB 的断点</a></li><li class="toc-l3"><a href="#5-2-aosp-cuttlefish-与二进制翻译-让兼容问题可定位">5.2 AOSP、Cuttlefish 与二进制翻译：让兼容问题可定位</a></li><li class="toc-l3"><a href="#5-3-soc-异构加速与产品化-把峰会路线变成可发布体验">5.3 SoC、异构加速与产品化：把峰会路线变成可发布体验</a></li><li class="toc-l2"><a href="#6-演进方向与情景">6. 演进方向与情景</a></li><li class="toc-l3"><a href="#6-1-对中国团队的机会">6.1 对中国团队的机会</a></li><li class="toc-l3"><a href="#6-2-对全球合作的含义">6.2 对全球合作的含义</a></li><li class="toc-l2"><a href="#7-建议与验收">7. 建议与验收</a></li><li class="toc-l3"><a href="#7-1-建立-峰会信号-产品证据-双账本">7.1 建立“峰会信号—产品证据”双账本</a></li><li class="toc-l3"><a href="#能力成熟度对比矩阵">能力成熟度对比矩阵</a></li><li class="toc-l3"><a href="#主张-证据矩阵">主张—证据矩阵</a></li><li class="toc-l3"><a href="#7-2-团队机制建议">7.2 团队机制建议</a></li><li class="toc-l3"><a href="#建议-验收矩阵">建议—验收矩阵</a></li><li class="toc-l2"><a href="#8-不确定性与研究限制">8. 不确定性与研究限制</a></li><li class="toc-l2"><a href="#参考来源">参考来源</a></li><li class="toc-l2"><a href="#附录-研究方法">附录：研究方法</a></li><li class="toc-l3"><a href="#a-资料采集与判定规则">A. 资料采集与判定规则</a></li><li class="toc-l3"><a href="#b-建议的复核清单">B. 建议的复核清单</a></li><li class="toc-l3"><a href="#c-可复现实验最小记录">C. 可复现实验最小记录</a></li></ul></nav>
+<main>
+<h1>国内外 RISC-V 峰会中的 Android 发展与趋势调研：欧洲、中国与全球视角</h1>
+<div class="doc-meta"><span>由 riscv-summits-android-domestic-global-trends-research.md 生成</span></div>
+<h1 id="国内外-risc-v-峰会中的-android-发展与趋势调研-欧洲-中国与全球视角">国内外 RISC-V 峰会中的 Android 发展与趋势调研：欧洲、中国与全球视角</h1>
+<div class="table-wrap"><table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody><tr><td>文档类型</td><td>技术调研报告</td></tr><tr><td>版本</td><td>v1.0</td></tr><tr><td>状态</td><td>已完成（公开资料核验）</td></tr><tr><td>密级</td><td>公开资料整理</td></tr><tr><td>作者</td><td>Qoder</td></tr><tr><td>生成日期</td><td>2026-09-08</td></tr><tr><td>研究截点</td><td>2026-09-08；2026 年中国峰会尚未举行，不将预告当作成果</td></tr><tr><td>目标读者</td><td>Android 平台、SoC、内核/GKI、编译器、系统性能与生态合作团队</td></tr><tr><td>调研问题</td><td>欧洲、中国和全球 RISC-V 峰会释放了哪些 Android 相关信号；哪些已是上游工程事实，哪些仍不能外推为量产能力？</td></tr><tr><td>覆盖范围</td><td>RISC-V Summit North America、RISC-V Summit Europe、RISC-V 中国峰会；AOSP、NDK ABI、RVA23、模拟器、二进制翻译、Linux/工具链与产品化议题</td></tr><tr><td>排除范围</td><td>不统计参会人数、融资、出货量或市场份额；不将会议演讲、可启动镜像、ISA profile 或单项演示写成 Android 认证、NDK 发布或手机量产</td></tr></tbody></table></div>
+<h2 id="版本历史">版本历史</h2>
+<div class="table-wrap"><table><thead><tr><th>版本</th><th>日期</th><th>变更</th><th>结论状态</th></tr></thead><tbody><tr><td>v1.0</td><td>2026-09-08</td><td>建立跨区域峰会信号、AOSP 上游状态与 Android 交付门槛的证据框架</td><td>已完成</td></tr></tbody></table></div>
+<h2 id="术语与缩略语">术语与缩略语</h2>
+<div class="table-wrap"><table><thead><tr><th>术语</th><th>含义</th><th>本文语境</th></tr></thead><tbody><tr><td>RISC-V Summit North America</td><td>RISC-V International 的北美峰会</td><td>本文将其作为用户所称“全球峰会”的最接近对象；RVI 官方并未把它命名为“全球峰会” [S01]</td></tr><tr><td>AOSP</td><td>Android Open Source Project</td><td>代码上游、系统组件和开发验证的基础，不等于某设备已获认证</td></tr><tr><td>NDK ABI</td><td>Android Native Development Kit 的应用二进制接口</td><td>决定含原生库的 APK/AAB 能否按架构构建、打包与分发</td></tr><tr><td>RVA23</td><td>RISC-V 64 位应用处理器 profile</td><td>RVI 将其定位为 Android RISC-V ABI 的基线之一；profile 不是 Android 产品认证 [S04]</td></tr><tr><td>RVV</td><td>RISC-V Vector Extension</td><td>RVA23 的必需扩展之一；需要编译器、运行时和硬件共同受理</td></tr><tr><td>Cuttlefish</td><td>Android 的虚拟设备/参考设备环境</td><td>可用于系统与兼容路径开发，不能替代真实 SoC、驱动和热设计验证</td></tr><tr><td>Berberis</td><td>Android 二进制翻译项目</td><td>用于在 x86_64 设备上运行带 riscv64 原生代码的 Android 应用的动态翻译器 [S08]</td></tr><tr><td>CTS/VTS/GTS</td><td>Android 兼容性、Vendor Test Suite、Google Test Suite</td><td>兼容与认证流程的一部分；本文不声称任何 RISC-V Android 设备已据此通过</td></tr><tr><td>GKI</td><td>Generic Kernel Image</td><td>Android 内核模块化和通用内核治理方法；RISC-V 内核可构建不等于完整 Android 产品支持</td></tr></tbody></table></div>
+<h2 id="可靠性标记">可靠性标记</h2>
+<ul><li>【C】可由峰会官方议程、RISC-V International、Android/AOSP 上游或项目仓库直接核验的事实。</li><li>【C*】由两个或更多独立一手来源共同支持的稳定结论。</li><li>【S】由有限峰会样本和公开资料形成的趋势判断，不代表全部厂商或地区。</li><li>【P】面向平台、芯片和生态团队的工程建议，不是厂商承诺。</li><li>【?】公开资料没有披露、资料不可稳定复核，或不能安全外推的内容。</li></ul>
+<h2 id="1-核心判断-tl-dr">1. 核心判断（TL;DR）</h2>
+<ul><li>【C*】三大区域峰会不是同一“全球峰会”的不同站点，而是 RISC-V International 所列的北美、欧洲、中国区域活动；Android 的直接公开信号最集中出现在 2024 北美峰会：Google 展示 Berberis 路径，阿里达摩院给出“Android on RISC-V 产品化探索”议题 [S01][S02][S03]。</li><li>【C*】峰会与上游资料显示 Android RISC-V 已从纯 ISA 讨论进入 ABI、模拟器、ART 和跨 ISA 兼容准备：RVA23 含向量扩展并被定位为 Android RISC-V ABI 基线；Google 的公开仓库记录 ART 已在 Cuttlefish 启动，但明确指出 NDK ABI 尚未最终确定 [S04][S06]。</li><li>【C】截至研究截点，Android NDK 官方 ABI 页面仅列 armeabi-v7a、arm64-v8a、x86、x86_64，未列 riscv64；因此不能把峰会演讲或 AOSP 组件进展写成面向第三方原生应用的稳定 riscv64 NDK 交付 [S07]。</li><li>【S】欧洲和中国峰会的公开重点更多落在 RVA23、Linux、编译器、开源软件、AI、汽车及芯片系统；本次可访问的欧洲 2024–2026 议程页、中国 2024–2025 回顾及 2025 演讲库未呈现与北美 2024 同等清晰的 Android/AOSP 专题证据。这是公开可见度差异，而不是区域 Android 工作不存在的证明 [S10][S11][S12][S13][S14][S15]。</li><li>【P】下一阶段的判定单位应从“是否有 Android on RISC-V 演讲”升级为可复现交付链：RVA23/SoC、内核与系统组件、NDK ABI、APK/AAB 原生库、CTS/VTS、图形/相机/安全、功耗和应用兼容性必须分别验收；任一前置层达成均不能替代下一层 [S04][S06][S07]。</li></ul>
+<h2 id="2-问题-范围与方法">2. 问题、范围与方法</h2>
+<p>用户所说的“全球峰会”在 RISC-V International 的公开活动页中并不是一个正式的单独名称。该页面列出 North America、Europe 与 China 等区域峰会，故本文以 North America 作为全球生态和上游项目最密集的观测窗口，同时单列欧洲与中国，不把三者的议程混为同一个产品路线 [S01]。研究范围是峰会能够释放的工程信号，而不是宣传热度：直接 Android/AOSP/NDK/Cuttlefish/Berberis 题名或上游状态属于高相关证据；RVA23、Linux、LLVM、AI、汽车与开源软件属于必要但间接的基础设施证据。</p>
+<p>研究按四层进行。第一层核验主办方或公开议程的题名、讲者和时间，尤其检查是否明确出现 Android、AOSP、Android Automotive、NDK 或 ABI。第二层用 Android Developers、AOSP 与 Google 维护仓库校正峰会结论，防止将演讲标题当成代码可用性。第三层把 ISA profile、系统可启动、原生应用 ABI、兼容认证和实机产品拆开。第四层只在多个来源一致时形成趋势判断；未查到的事项统一表述为“本次可访问资料未显示”，而非“世界上不存在”。</p>
+<div class="table-wrap"><table><thead><tr><th>证据层</th><th>主要来源</th><th>可以支持的结论</th><th>不能支持的结论</th></tr></thead><tbody><tr><td>峰会议程/演讲</td><td>RVI、峰会官方页、公开演讲库</td><td>某项议题在某届峰会被公开讨论</td><td>某方案已经商用、认证或覆盖全部设备</td></tr><tr><td>上游系统资料</td><td>Android Developers、AOSP、Google 项目仓库</td><td>当前公开组件、ABI 或模拟器状态</td><td>特定 OEM 的实际产品路线</td></tr><tr><td>ISA/profile 资料</td><td>RVI RVA23 说明</td><td>架构基线与扩展要求</td><td>token/s、功耗、图形/相机体验或 APK 兼容率</td></tr><tr><td>跨样本归纳</td><td>三个区域的多届公开资料</td><td>议程和协作重心的变化</td><td>地区技术实力、出货量或市场份额排名</td></tr></tbody></table></div>
+<p>见图 1，它将三个区域峰会的直接 Android 议题与通用软件基础设施分开，避免将 Linux 或 AI 议程自动归类为 Android 量产证据。</p>
+<figure class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9Ijc2MCIgdmlld0JveD0iMCAwIDE0MDAgNzYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+PHRpdGxlIGlkPSJ0aXRsZSI+UklTQy1W5bOw5LyaQW5kcm9pZOivgeaNruWcsOWbvjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPuaMieWMl+e+juWFqOeQg+OAgeasp+a0suOAgeS4reWbveWzsOS8muWxleekukFuZHJvaWTnm7TmjqXorq7popjkuI7pgJrnlKjova/ku7borq7popjnmoTor4Hmja7liIblsYLjgII8L2Rlc2M+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMwNzE4MjciLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxMDM4NGEiLz48L2xpbmVhckdyYWRpZW50PjxzdHlsZT4udHtmb250LWZhbWlseTotYXBwbGUtc3lzdGVtLEJsaW5rTWFjU3lzdGVtRm9udCwnTm90byBTYW5zIENKSyBTQycsJ01pY3Jvc29mdCBZYUhlaScsc2Fucy1zZXJpZjtmaWxsOiNlOWY1ZmF9Lm17Zm9udC1mYW1pbHk6LWFwcGxlLXN5c3RlbSxCbGlua01hY1N5c3RlbUZvbnQsJ05vdG8gU2FucyBDSksgU0MnLCdNaWNyb3NvZnQgWWFIZWknLHNhbnMtc2VyaWY7ZmlsbDojOWZjMWQwfS5oe2ZvbnQtZmFtaWx5Oi1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCdOb3RvIFNhbnMgQ0pLIFNDJywnTWljcm9zb2Z0IFlhSGVpJyxzYW5zLXNlcmlmO2ZpbGw6I2ZmZjtmb250LXdlaWdodDo3MDB9LmNhcmR7ZmlsbDojMTAyYjNiO3N0cm9rZTojMzI2NDc2O3N0cm9rZS13aWR0aDoyfS5kaXJlY3R7ZmlsbDojMTc2YzY3O3N0cm9rZTojNTVkNmJkO3N0cm9rZS13aWR0aDoyfS5pbmRpcmVjdHtmaWxsOiM2MjRhMWM7c3Ryb2tlOiNmMWJkNTA7c3Ryb2tlLXdpZHRoOjJ9LmxpbmV7c3Ryb2tlOiM3NWFlYmQ7c3Ryb2tlLXdpZHRoOjM7ZmlsbDpub25lfS5waWxse2ZpbGw6IzEyMjIzMDtzdHJva2U6IzQ3Nzg4YX08L3N0eWxlPjwvZGVmcz48cmVjdCB3aWR0aD0iMTQwMCIgaGVpZ2h0PSI3NjAiIGZpbGw9InVybCgjYmcpIi8+PHRleHQgeD0iNzAiIHk9Ijc4IiBjbGFzcz0iaCIgZm9udC1zaXplPSIzNCI+UklTQy1WIOWzsOS8muS4reeahCBBbmRyb2lkIOivgeaNruWcsOWbvjwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMTE2IiBjbGFzcz0ibSIgZm9udC1zaXplPSIxOSI+57uT6K6655Sx5YWs5byA6K6u56iL44CB5ryU6K6y5LiO5LiK5ri46LWE5paZ6ZmQ5a6a77yb4oCc5peg5LiT6aKY4oCd5LiN5Luj6KGo4oCc5peg5bel5L2c4oCd44CCPC90ZXh0PjxsaW5lIHgxPSIxNjAiIHkxPSIxODUiIHgyPSIxMjQwIiB5Mj0iMTg1IiBjbGFzcz0ibGluZSIvPjxjaXJjbGUgY3g9IjE2MCIgY3k9IjE4NSIgcj0iMTQiIGZpbGw9IiM1NWQ2YmQiLz48Y2lyY2xlIGN4PSI3MDAiIGN5PSIxODUiIHI9IjE0IiBmaWxsPSIjZjFiZDUwIi8+PGNpcmNsZSBjeD0iMTI0MCIgY3k9IjE4NSIgcj0iMTQiIGZpbGw9IiM3ODk3ZmYiLz48dGV4dCB4PSIxMTIiIHk9IjE2MCIgY2xhc3M9ImgiIGZvbnQtc2l6ZT0iMjEiPuWFqOeQgyAvIOWMl+e+jjwvdGV4dD48dGV4dCB4PSI2NTciIHk9IjE2MCIgY2xhc3M9ImgiIGZvbnQtc2l6ZT0iMjEiPuasp+a0sjwvdGV4dD48dGV4dCB4PSIxMTk1IiB5PSIxNjAiIGNsYXNzPSJoIiBmb250LXNpemU9IjIxIj7kuK3lm708L3RleHQ+PHJlY3QgeD0iNzAiIHk9IjI0NSIgd2lkdGg9IjM5MCIgaGVpZ2h0PSIzMzAiIHJ4PSIyMCIgY2xhc3M9ImNhcmQiLz48dGV4dCB4PSIxMDUiIHk9IjI5NSIgY2xhc3M9ImgiIGZvbnQtc2l6ZT0iMjUiPjIwMjQgU3VtbWl0IE5vcnRoIEFtZXJpY2E8L3RleHQ+PHJlY3QgeD0iMTA1IiB5PSIzMjUiIHdpZHRoPSIzMjAiIGhlaWdodD0iODgiIHJ4PSIxNCIgY2xhc3M9ImRpcmVjdCIvPjx0ZXh0IHg9IjEzMCIgeT0iMzYyIiBjbGFzcz0iaCIgZm9udC1zaXplPSIyMCI+55u05o6lIEFuZHJvaWQg6K6u6aKYPC90ZXh0Pjx0ZXh0IHg9IjEzMCIgeT0iMzk0IiBjbGFzcz0idCIgZm9udC1zaXplPSIxOCI+R29vZ2xlIEJlcmJlcmlz77yb6Zi/6YeMIEFuZHJvaWQg5Lqn5ZOB5YyW5o6i57SiPC90ZXh0PjxyZWN0IHg9IjEwNSIgeT0iNDQwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjkwIiByeD0iMTQiIGNsYXNzPSJpbmRpcmVjdCIvPjx0ZXh0IHg9IjEzMCIgeT0iNDc2IiBjbGFzcz0iaCIgZm9udC1zaXplPSIyMCI+5Z+656GA5p2h5Lu2PC90ZXh0Pjx0ZXh0IHg9IjEzMCIgeT0iNTA4IiBjbGFzcz0idCIgZm9udC1zaXplPSIxOCI+UlZBMjMgLyBBQknjgIHkuIrmuLjlt6Xlhbfpk77kuI7mqKHmi5/lmag8L3RleHQ+PHJlY3QgeD0iNTA1IiB5PSIyNDUiIHdpZHRoPSIzOTAiIGhlaWdodD0iMzMwIiByeD0iMjAiIGNsYXNzPSJjYXJkIi8+PHRleHQgeD0iNTQwIiB5PSIyOTUiIGNsYXNzPSJoIiBmb250LXNpemU9IjI1Ij4yMDI04oCTMjAyNiBFdXJvcGU8L3RleHQ+PHJlY3QgeD0iNTQwIiB5PSIzMjUiIHdpZHRoPSIzMjAiIGhlaWdodD0iODgiIHJ4PSIxNCIgY2xhc3M9ImluZGlyZWN0Ii8+PHRleHQgeD0iNTY1IiB5PSIzNjIiIGNsYXNzPSJoIiBmb250LXNpemU9IjIwIj7lhazlvIDkuLvnur88L3RleHQ+PHRleHQgeD0iNTY1IiB5PSIzOTQiIGNsYXNzPSJ0IiBmb250LXNpemU9IjE4Ij5SVkEyM+OAgUxpbnV444CBTExWTeOAgVJJU0XjgIHmsb3ovaY8L3RleHQ+PHJlY3QgeD0iNTQwIiB5PSI0NDAiIHdpZHRoPSIzMjAiIGhlaWdodD0iOTAiIHJ4PSIxNCIgY2xhc3M9InBpbGwiLz48dGV4dCB4PSI1NjUiIHk9IjQ3NiIgY2xhc3M9ImgiIGZvbnQtc2l6ZT0iMjAiPkFuZHJvaWQg6K+B5o2u6L6555WMPC90ZXh0Pjx0ZXh0IHg9IjU2NSIgeT0iNTA4IiBjbGFzcz0idCIgZm9udC1zaXplPSIxOCI+5YWs5byA6K6u56iL5pyq6KeB5Y+v5aSN5qC455qEIEFuZHJvaWQg5LiT6aKYPC90ZXh0PjxyZWN0IHg9Ijk0MCIgeT0iMjQ1IiB3aWR0aD0iMzkwIiBoZWlnaHQ9IjMzMCIgcng9IjIwIiBjbGFzcz0iY2FyZCIvPjx0ZXh0IHg9Ijk3NSIgeT0iMjk1IiBjbGFzcz0iaCIgZm9udC1zaXplPSIyNSI+MjAyNOKAkzIwMjUgQ2hpbmE8L3RleHQ+PHJlY3QgeD0iOTc1IiB5PSIzMjUiIHdpZHRoPSIzMjAiIGhlaWdodD0iODgiIHJ4PSIxNCIgY2xhc3M9ImluZGlyZWN0Ii8+PHRleHQgeD0iMTAwMCIgeT0iMzYyIiBjbGFzcz0iaCIgZm9udC1zaXplPSIyMCI+5YWs5byA5Li757q/PC90ZXh0Pjx0ZXh0IHg9IjEwMDAiIHk9IjM5NCIgY2xhc3M9InQiIGZvbnQtc2l6ZT0iMTgiPkxpbnV4IC8gb3BlbkV1bGVy44CBQUnjgIHmsb3ovabkuI7oiq/niYfns7vnu588L3RleHQ+PHJlY3QgeD0iOTc1IiB5PSI0NDAiIHdpZHRoPSIzMjAiIGhlaWdodD0iOTAiIHJ4PSIxNCIgY2xhc3M9InBpbGwiLz48dGV4dCB4PSIxMDAwIiB5PSI0NzYiIGNsYXNzPSJoIiBmb250LXNpemU9IjIwIj5BbmRyb2lkIOivgeaNrui+ueeVjDwvdGV4dD48dGV4dCB4PSIxMDAwIiB5PSI1MDgiIGNsYXNzPSJ0IiBmb250LXNpemU9IjE4Ij7lhazlvIDorq7nqIvkuI7mvJTorrLlupPmnKrop4EgQU9TUCDkuJPpopg8L3RleHQ+PHJlY3QgeD0iMjQ1IiB5PSI2NDAiIHdpZHRoPSI5MTAiIGhlaWdodD0iNjIiIHJ4PSIzMCIgZmlsbD0iIzBiMjMzMSIgc3Ryb2tlPSIjNTVkNmJkIi8+PHRleHQgeD0iMjkwIiB5PSI2ODAiIGNsYXNzPSJ0IiBmb250LXNpemU9IjIyIj7lhbHlkIzotovlir/vvJrku44gSVNBL+WGheaguC/nvJbor5Hlmajln7rnur8g4oaSIEFCSeOAgeWFvOWuueaAp+OAgeaooeaLn+WZqOS4juS6p+WTgeWMlumqjOivgTwvdGV4dD48L3N2Zz4=" alt="图 1：RISC-V 峰会中的 Android 证据地图"><figcaption>图 1：RISC-V 峰会中的 Android 证据地图</figcaption></figure>
+<p>图 1：RISC-V 峰会中的 Android 证据地图。来源：依据 North America 2024 的 Android 专题、RVA23 发布、欧洲 2024–2026 演讲页与中国 2024–2025 官方回顾/演讲库综合绘制；“未见专题”仅表示本次可访问资料范围内的公开证据 [S02][S03][S04][S10][S11][S12][S13][S14][S15]。</p>
+<h2 id="3-全球技术基线">3. 全球技术基线</h2>
+<h3 id="3-1-北美峰会-android-从主题演讲进入兼容与产品化问题">3.1 北美峰会：Android 从主题演讲进入兼容与产品化问题</h3>
+<p>2024 RISC-V Summit North America 的公开日程提供了最直接的 Android 证据。阿里达摩院的议题题名为“Exploration of Productization of Android on RISC-V”，语义是产品化探索，而非宣称某一量产 Android 设备已完成认证 [S02]。Google 的 Berberis 议题则直接面向 Android 的跨 ISA 兼容：其 AOSP 仓库将项目描述为在 x86_64 设备上运行带 riscv64 原生代码的 Android 应用的动态二进制翻译器，并列出部分 Zb 与 Zv 扩展支持 [S03][S08]。两者共同说明，峰会讨论已从“RISC-V 能否启动系统”推进到原生代码、二进制翻译和应用生态如何过渡。</p>
+<p>这种信号必须与上游状态一起读。Google 在 2023 年的 Android RISC-V 文章把工作定位为实验与协作准备，并表示首个可用形态瞄准穿戴设备；它并未承诺通用手机的即时商用 [S05]。Google 的 android-riscv64 仓库进一步说明所有 Android/riscv64 工作转入 AOSP，ART 已能在 Cuttlefish 启动，同时将 NDK ABI 表述为尚未最终确定、临时实现可能改变的状态 [S06]。因此，峰会给出的高价值不是某个“Android 已支持”的二元结论，而是明确了 ABI、运行时、模拟器和翻译器是实现生态迁移的关键工作包。</p>
+<p>2025 North America 峰会的公开软件日程继续显示 RVA23、工具链和系统软件是公共主线 [S09]。本次可访问资料没有提供与 2024 两场 Android 专题同等明确的 Android 标题或产品发布，因此不能用“2025 未见标题”推导 Android 工作停滞。更合理的读法是：直接 Android 公开叙事在 2024 已展示问题域，而此后峰会公开页更多呈现通用软件和 profile 落地；真实进度应回到 AOSP、NDK 与设备验证来判断。</p>
+<h3 id="3-2-rva23-是-abi-前提-不是-android-产品保证">3.2 RVA23 是 ABI 前提，不是 Android 产品保证</h3>
+<p>RISC-V International 在 RVA23 批准公告中说明，该 profile 为 Android RISC-V ABI 提供基线，并要求 Vector 与 Hypervisor 等扩展 [S04]。这解决的是“目标软件可假定哪些 ISA 能力”的共同约束：应用、运行时和编译器不必为每颗 RV64 核单独猜测基础扩展集合。对于 Android 这类含 ART、Bionic、动态链接、JNI、图形及大量第三方 native 库的系统，稳定的 profile 是压缩兼容矩阵的必要条件。</p>
+<p>但 profile 不会自动产生 NDK ABI、APK 打包、驱动、GKI 适配、Google 移动服务资格或 CTS 结果。2026-05-15 版本的 NDK ABI 官方页面依旧只列出四类 ABI，未列 riscv64 [S07]。这与“RVA23 是 Android ABI 基线”并不矛盾：前者说的是 RISC-V 侧的目标架构契约，后者说的是 Android 开发者公开分发接口的当前清单。工程团队若把二者混为一谈，最常见的后果是在平台镜像可启动后才发现第三方 JNI 库、构建系统、预编译 SDK、崩溃收集和商店分发没有稳定路径。</p>
+<h3 id="3-3-模拟器和二进制翻译是风险收敛工具-不是实机替身">3.3 模拟器和二进制翻译是风险收敛工具，不是实机替身</h3>
+<p>Cuttlefish 与 Berberis 表明 Android RISC-V 工作具有两条互补路径。前者使 ART、framework、system image 及自动化测试可以在虚拟环境中较早推进；后者处理开发或兼容场景中 riscv64 原生代码与 x86_64 执行环境之间的转换 [S06][S08]。其共同价值是将 ISA 迁移中的编译、链接、JNI、运行时和测试问题提前暴露，降低必须等待最终 SoC 才能开始软件开发的风险。</p>
+<p>失效边界同样明确。虚拟设备无法证明真实 NPU/GPU/ISP 驱动、DMA 一致性、相机时间线、音频低时延、调度抖动、峰值功耗、温控、待机和射频共存；二进制翻译也会改变指令路径与性能特征。任何引用 Cuttlefish 启动或 Berberis 演讲来论证“Android 手机体验已成熟”的写法，均超出公开证据。实际项目应把它们用于 CI、回归和 ISA 兼容问题定位，而不是用于代替实机性能或认证结论。</p>
+<div class="table-wrap"><table><thead><tr><th>能力信号</th><th>已公开证据</th><th>可以得出的结论</th><th>不能得出的结论</th></tr></thead><tbody><tr><td>RVA23</td><td>Android RISC-V ABI baseline、Vector 等扩展 [S04]</td><td>硬件/工具链可围绕更明确的 ISA 基线对齐</td><td>Android 设备、应用或性能已经可交付</td></tr><tr><td>AOSP/Cuttlefish</td><td>ART 在 Cuttlefish 启动 [S06]</td><td>系统与运行时可在虚拟环境持续开发</td><td>某 SoC 的完整驱动、功耗和用户体验已达标</td></tr><tr><td>Berberis</td><td>Android 中 riscv64→x86_64 动态翻译 [S08]</td><td>有跨 ISA 兼容和调试路径</td><td>所有 native 库无损兼容或性能等价</td></tr><tr><td>NDK ABI 页面</td><td>当前未列 riscv64 [S07]</td><td>对公开开发者 ABI 的判断需谨慎</td><td>内部原型或 AOSP 工作不存在</td></tr></tbody></table></div>
+<h2 id="4-国内发展-差距与机会">4. 国内发展、差距与机会</h2>
+<h3 id="4-1-中国峰会-系统软件-ai-与汽车更显性-android-证据需严格收敛">4.1 中国峰会：系统软件、AI 与汽车更显性，Android 证据需严格收敛</h3>
+<p>2024 RISC-V 中国峰会在杭州举行，RISC-V International 的官方回顾描述了开源 IP、生态和软件主题，并提及 openEuler 等系统软件方向 [S13]。2025 峰会在上海举办，官方与公开演讲材料将软件、AI、嵌入式、高性能计算、汽车和芯片系统作为可见重点；RVI 的软件贡献者回顾特别讨论 CUDA、Linux kernel 与 RVA profile [S14][S15][S16]。这些方向对 Android on RISC-V 很重要：它们决定可用内核、工具链、调试环境、异构计算和 SoC 软件供给。</p>
+<p>不过，OpenHarmony、openEuler、Linux、AI runtime 或汽车电子都不是 AOSP 的同义词。针对中国 2024 官方回顾、2025 RVI 回顾、2025 演讲仓库及官方议程进行核验后，本次可访问材料没有出现可与 2024 北美“Android 产品化探索”相当的 Android/AOSP 专题标题 [S13][S14][S15][S16]。正确结论是公开可复核的 Android 专题证据较少；不能据此否定厂商内部项目、合作伙伴工作或未来发布。</p>
+<p>中国生态的机会在于把已高频出现的 RISC-V 软件工作转为 Android 的可交付输入：为目标 SoC 固化 RVA23/扩展发现策略；将 Linux 内核、BSP、图形与多媒体驱动的版本关系记录为 device matrix；让 AI/NPU 编译链和 Android HAL/权限/内存模型共测；以 JNI、WebView、ART、相机和安全组件的真实 workload 检查 ABI 与调度问题。风险则是将“芯片能跑 Linux”“AI 演示能运行”或“开源 OS 已适配”直接包装成 Android 产品化，导致第三方应用、应用商店、认证和升级链路在后期暴露。</p>
+<h3 id="4-2-欧洲峰会-以主权软件栈和基础设施强化-android-的前置条件">4.2 欧洲峰会：以主权软件栈和基础设施强化 Android 的前置条件</h3>
+<p>欧洲峰会公开材料在 2024–2026 连续覆盖 Linux on RISC-V、RVA23、LLVM、RISE 项目、开放软件、功能安全和汽车等主题 [S10][S11][S12]。这些议题反映欧洲的关注点偏向可维护的软件栈、开放处理器生态和汽车/工业部署，而不是将 Android 作为唯一应用层。2025 演讲材料还将 RVA23 和 RISE 作为软件生态协同的重要锚点 [S11]，说明 profile、编译器、发行版、调试工具和上游治理被放在共同问题中处理。</p>
+<p>在本次可访问的欧洲 2024 conference 页、2025/2026 presentations 页中，未检索到可直接复核的 Android 或 AOSP 专题标题 [S10][S11][S12]。这个“未检索到”是资料范围限制，而非对欧洲公司或项目实际工作的否定。它可支持的趋势判断是，欧洲公开峰会叙事优先投资下游 Android 所依赖的通用基础层；它不能支持“欧洲没有 Android RISC-V”或“欧洲 Android 已完成产品化”两种相反断言。</p>
+<h3 id="4-3-三区域的互补关系">4.3 三区域的互补关系</h3>
+<p>北美公开材料把 Android 兼容和产品化问题直接放到议程中，欧洲强调 profile 与开源软件基础设施，中国展示系统软件、AI、汽车和本地生态连接。三者并非竞争性的成熟度排名：Android 设备最终同时需要北美所暴露的 ABI/兼容问题、欧洲所推进的 profile/工具链上游协作，以及中国具备的 SoC、系统软件、AI 和终端集成能力。真正的差距是这些层是否被同一套可复现 workload、版本矩阵和发布门禁连接，而不是某场峰会是否出现更多 Android 关键词。见图 2，交付能力必须跨越 ISA、系统、应用 ABI、认证和实机产品五层门槛。</p>
+<figure class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjcyMCIgdmlld0JveD0iMCAwIDE0MDAgNzIwIj48c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCwnTWljcm9zb2Z0IFlhSGVpJyxzYW5zLXNlcmlmO2ZpbGw6I2VkZjNmZn0uaHtmb250LXNpemU6MzRweDtmb250LXdlaWdodDpib2xkfS5ze2ZvbnQtc2l6ZToyMHB4fS5te2ZvbnQtc2l6ZToxN3B4O2ZpbGw6I2I3YzhlZH0uYntmaWxsOiMxYTMxNTQ7c3Ryb2tlOiM3NzlkZjE7c3Ryb2tlLXdpZHRoOjJ9LmF7c3Ryb2tlOiM5MWI1ZmY7c3Ryb2tlLXdpZHRoOjR9PC9zdHlsZT48cmVjdCB3aWR0aD0iMTQwMCIgaGVpZ2h0PSI3MjAiIGZpbGw9IiMxNjJhNGMiLz48dGV4dCB4PSI2MCIgeT0iNzAiIGNsYXNzPSJoIj5BbmRyb2lkIG9uIFJJU0MtVu+8muS7juKAnOWPr+WQr+WKqOKAneWIsOKAnOWPr+S6pOS7mOKAneeahOS6lOmBk+mXqOanmzwvdGV4dD48dGV4dCB4PSI2MCIgeT0iMTA4IiBjbGFzcz0ibSI+UlZBMjPjgIHns7vnu5/nu4Tku7bjgIHlupTnlKggQUJJ44CB6K6k6K+B44CB5a6e5py65Lqn5ZOB5piv55u45LqS54us56uL55qE5Lqk5LuY6K+B5o2u44CCPC90ZXh0PjxsaW5lIHgxPSIxNjAiIHkxPSIzNDUiIHgyPSIxMjQ1IiB5Mj0iMzQ1IiBjbGFzcz0iYSIvPjxwYXRoIGQ9Ik0xMjQ1IDM0NWwtMjUtMTR2Mjh6IiBmaWxsPSIjOTFiNWZmIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTUgMjEwKSI+PHJlY3Qgd2lkdGg9IjIzNSIgaGVpZ2h0PSIyNzAiIHJ4PSIxOCIgY2xhc3M9ImIiLz48dGV4dCB4PSIyNSIgeT0iNTUiIGNsYXNzPSJzIj4xIMK3IElTQSDln7rnur88L3RleHQ+PHRleHQgeD0iMjUiIHk9Ijk4IiBjbGFzcz0ibSI+UlZBMjMgLyBSVlYgLyBBQkk8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE0MCIgY2xhc3M9Im0iPuivgeaYju+8muWPr+enu+akjeebruaghzwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTcyIiBjbGFzcz0ibSI+5LiN6K+B5piO77ya6K6+5aSH5L2T6aqMPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMjAgMjEwKSI+PHJlY3Qgd2lkdGg9IjIzNSIgaGVpZ2h0PSIyNzAiIHJ4PSIxOCIgY2xhc3M9ImIiLz48dGV4dCB4PSIyNSIgeT0iNTUiIGNsYXNzPSJzIj4yIMK3IOezu+e7n+WfuuehgDwvdGV4dD48dGV4dCB4PSIyNSIgeT0iOTgiIGNsYXNzPSJtIj5LZXJuZWzjgIFBUlTjgIFCaW9uaWM8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE0MCIgY2xhc3M9Im0iPuivgeaYju+8mue7hOS7tui/m+WxlTwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTcyIiBjbGFzcz0ibSI+5LiN6K+B5piO77ya5bqU55So5Lqk5LuYPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1ODUgMjEwKSI+PHJlY3Qgd2lkdGg9IjIzNSIgaGVpZ2h0PSIyNzAiIHJ4PSIxOCIgY2xhc3M9ImIiLz48dGV4dCB4PSIyNSIgeT0iNTUiIGNsYXNzPSJzIj4zIMK3IOW6lOeUqCBBQkk8L3RleHQ+PHRleHQgeD0iMjUiIHk9Ijk4IiBjbGFzcz0ibSI+TkRL44CBQVBLL0FBQiDljp/nlJ/lupM8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE0MCIgY2xhc3M9Im0iPuivgeaYju+8muW8gOWPkeiAheWPr+WIhuWPkTwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTcyIiBjbGFzcz0ibSI+5LiN6K+B5piO77ya5a6M5pW05YW85a65PC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4NTAgMjEwKSI+PHJlY3Qgd2lkdGg9IjIzNSIgaGVpZ2h0PSIyNzAiIHJ4PSIxOCIgY2xhc3M9ImIiLz48dGV4dCB4PSIyNSIgeT0iNTUiIGNsYXNzPSJzIj40IMK3IOWFvOWuueiupOivgTwvdGV4dD48dGV4dCB4PSIyNSIgeT0iOTgiIGNsYXNzPSJtIj5DVFMvVlRTL0dUU+OAgeWuieWFqDwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTQwIiBjbGFzcz0ibSI+6K+B5piO77ya54mI5pys5Y+v5Lqk5LuYPC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSIxNzIiIGNsYXNzPSJtIj7kuI3or4HmmI7vvJrllYbkuJrmiJDlip88L3RleHQ+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMTUgMjEwKSI+PHJlY3Qgd2lkdGg9IjIzNSIgaGVpZ2h0PSIyNzAiIHJ4PSIxOCIgY2xhc3M9ImIiLz48dGV4dCB4PSIyNSIgeT0iNTUiIGNsYXNzPSJzIj41IMK3IOS6p+WTgeeUn+aAgTwvdGV4dD48dGV4dCB4PSIyNSIgeT0iOTgiIGNsYXNzPSJtIj5Tb0PjgIHpqbHliqjjgIHlip/ogJfjgIHlupTnlKg8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE0MCIgY2xhc3M9Im0iPuivgeaYju+8muecn+WunuiuvuWkh+S9k+mqjDwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMTcyIiBjbGFzcz0ibSI+5LiN55Sx5Y2V5Zy65ryU6K6y6K+B5piOPC90ZXh0PjwvZz48cmVjdCB4PSIxNzUiIHk9IjU4MCIgd2lkdGg9IjEwNTAiIGhlaWdodD0iNjQiIHJ4PSIyMCIgZmlsbD0iIzEwMjEzZCIgc3Ryb2tlPSIjNzc5ZGYxIi8+PHRleHQgeD0iMjEyIiB5PSI2MjEiIGNsYXNzPSJzIj7pqozmlLbpk77vvJpSVkEyMyDihpIgQU9TUC/mqKHmi5/lmagg4oaSIE5ESyBBQkkg4oaSIENUUy9WVFMg4oaSIOWunuacuuaAp+iDveOAgeWKn+iAl+S4juW6lOeUqOimhuebluOAgjwvdGV4dD48L3N2Zz4=" alt="图 2：Android on RISC-V 的交付门槛"><figcaption>图 2：Android on RISC-V 的交付门槛</figcaption></figure>
+<p>图 2：Android on RISC-V 的交付门槛。来源：基于 RVA23、Google Android RISC-V 项目、Android NDK ABI 文档及峰会 Android 议题形成的工程分层；图中每层为独立验收条件，不表示任何厂商已完成全部门槛 [S02][S04][S06][S07]。</p>
+<h2 id="5-关键机制深挖">5. 关键机制深挖</h2>
+<h3 id="5-1-abi-与应用生态-从-isa-profile-到-apk-aab-的断点">5.1 ABI 与应用生态：从 ISA profile 到 APK/AAB 的断点</h3>
+<p><strong>接口与实现依据。</strong> Android 的 Java/Kotlin 代码可经 ART 执行，但大量应用和 SDK 仍携带 JNI、媒体、图形、加密、AI 或游戏引擎的原生库。因而 Android on RISC-V 的应用接口不仅是编译器能否接受 <code>-march</code>，还包括 NDK ABI 名称、ELF 约定、动态链接器、C/C++ runtime、构建插件、APK/AAB 中的 ABI 目录、预编译依赖和崩溃符号链。RVA23 提供 RISC-V 侧的基线约束，Google 的项目记录了 AOSP/ART/Cuttlefish 进展，但 Android NDK 官方 ABI 页面截至研究截点尚未列 riscv64 [S04][S06][S07]。</p>
+<p><strong>失效边界。</strong> 将“RVA23 已批准”“系统镜像可启动”或“某个应用源码可交叉编译”视为应用生态就绪会失效。一个应用可能在 Java 层正常启动，却因一个闭源 JNI <code>.so</code>、未支持的 Gradle 预编译产物、动态加载路径或错误收集 SDK 缺少 riscv64 而失去核心功能。二进制翻译可帮助兼容或开发，但会改变性能和调试路径，不能自动满足商店分发和长期支持要求 [S08]。当前公开 NDK ABI 清单未含 riscv64，也不能被反向解释为 AOSP 内部原型不存在。</p>
+<p><strong>验证条件。</strong> 团队应建立应用 ABI inventory：统计自研与第三方 native 库、源码/预编译比例、构建工具版本、许可证、动态加载位置和升级 owner。以真实 APK/AAB 运行自动化安装、冷启动、JNI 调用、WebView、媒体、图形、崩溃符号和升级回滚测试；记录每个库的实际 ELF <code>e_machine</code>、依赖、重定位和性能路径。只有公开的 NDK ABI、构建和打包链稳定后，才把“开发者可分发”作为结论。</p>
+<p><strong>成本与权衡。</strong> 越早支持 riscv64 原生库，越早暴露供应链和工具链缺口，但会增加 CI 架构、设备池、SDK 适配和版本维护成本。长期依赖翻译或仅保留 Java 路径可降低短期接入成本，却可能在热路径、内存、能耗、调试和安全更新上累积债务。应依据核心 workload 的 native 占比、性能目标和合作方控制力决定迁移节奏，而非由峰会演讲热度决定。</p>
+<h3 id="5-2-aosp-cuttlefish-与二进制翻译-让兼容问题可定位">5.2 AOSP、Cuttlefish 与二进制翻译：让兼容问题可定位</h3>
+<p><strong>接口与实现依据。</strong> Google 公开文章将 Android RISC-V 定位为实验和协作方向，android-riscv64 仓库说明工作已进入 AOSP，并记录 ART 可在 Cuttlefish 启动 [S05][S06]。Berberis 则在 AOSP 中提供 riscv64 原生代码在 x86_64 环境执行的动态翻译功能 [S08]。这三类机制分别覆盖上游协作入口、虚拟化系统验证和跨 ISA 原生库兼容，适合在缺少最终实机或生态尚不完整时缩小问题空间。</p>
+<p><strong>失效边界。</strong> Cuttlefish 的 CPU、内存、I/O 和设备模型无法复刻量产 SoC 的核簇、缓存、DVFS、GPU/NPU/ISP、驱动中断和共享内存行为。二进制翻译也会影响 signal、异常、调试器、性能采样和自修改代码等边界。若只报告“ART booted”或“translator initialized”，会掩盖 JNI 密集 workload、视频管线、相机预览、图形帧时间和长期热稳态中的问题。峰会演示应被视为问题发现和合作入口，而不是最终兼容性报告。</p>
+<p><strong>验证条件。</strong> 使用同一份版本化 workload 在 Cuttlefish、翻译路径、原生 riscv64 路径和最终 SoC 上运行；收集安装成功率、ART/JNI 崩溃、native bridge 命中、首次帧、P50/P99 时延、RSS、功耗代理、内核日志和 tombstone。对于每个翻译成功的库，还应在真正 riscv64 构建下进行数值/功能比对。CI 的关键产物是可比较的 trace 和失败最小复现，而不是单一启动截图。</p>
+<p><strong>成本与权衡。</strong> 虚拟化与翻译加速早期开发、提高设备可得性，却需要维护多路径一致性和额外回归矩阵；越晚接入实机验证，驱动和热问题越可能集中爆发。平台负责人应将 Cuttlefish 作为软件 gate，将实机作为体验和硬件 gate，并规定任何翻译结果都不能覆盖原生路径验收。</p>
+<h3 id="5-3-soc-异构加速与产品化-把峰会路线变成可发布体验">5.3 SoC、异构加速与产品化：把峰会路线变成可发布体验</h3>
+<p><strong>接口与实现依据。</strong> 中国和欧洲峰会中频繁出现 Linux、AI、汽车、编译器和系统软件，说明 RISC-V 的落地日益是异构系统问题，而非孤立 CPU ISA 问题 [S11][S12][S14][S15]。对 Android 设备而言，CPU/RVV、GPU、NPU、DSP、ISP、内存控制器和电源管理需要通过内核、HAL、用户态驱动、编译器和应用 API 共同服务。RVA23 是 CPU 软件的前提之一，却不能描述 NPU 图受理率、GPU 驱动质量、相机同步或热设计。</p>
+<p><strong>失效边界。</strong> TOPS、峰会 demo、Linux benchmark 或单核 RVV 吞吐不能推出 Android 的首帧、滚动流畅度、相机稳定性、端侧模型 token/s 或续航。动态频率、内存带宽竞争、驱动回退、设备温度和后台任务会使实验室短测失效。汽车议题也不能自动等同 Android Automotive；二者在系统许可、兼容性、功能安全、更新和集成边界上需要单独验证。</p>
+<p><strong>验证条件。</strong> 从目标用户任务定义 workload：启动、解锁、WebView、视频、相机、游戏、端侧 AI、弱网、低电量和长时间热稳态都要涵盖。记录芯片/固件/内核/驱动/Android build、CPU feature、实际加速后端、CPU/GPU/NPU 利用率、帧时间、端到端时延、RSS、温升、电量与错误率。将禁用加速器、强制回退和不同 ISA/翻译路径作为对照，防止把某一后端初始化日志当成体验改善。</p>
+<p><strong>成本与权衡。</strong> 更早统一 SoC 与 Android 版本矩阵可降低后期集成成本，但要求芯片、BSP、系统、AI、图形和应用团队共享设备与数据；只在发布末期联调看似节约资源，却会扩大问题定位面。最有效的投入不是扩大峰会 demo，而是为主设备、关键应用和固件建立可回归的性能、功耗、安全与兼容门禁。</p>
+<h2 id="6-演进方向与情景">6. 演进方向与情景</h2>
+<p>三个区域峰会的公开信号指向同一条演进路径：RISC-V Android 的竞争重心正在由“是否能为 RV64 编译”移向可治理的 ABI、运行时、系统软件和设备验证。北美 2024 的 Android 产品化与 Berberis 议题使跨 ISA 应用生态成为显性问题 [S02][S03]；RVA23 使 ISA 基线更清晰 [S04]；欧洲公开的 Linux、RISE、工具链和汽车协作强调上游基础设施 [S11][S12]；中国的系统软件、AI、HPC 和汽车议程则表明终端/边缘异构集成是重要需求 [S14][S15]。</p>
+<p>见图 3，趋势雷达不是市场份额图，而是将这些峰会信号翻译为 Android 项目的验证方向。它尤其强调“公开演讲”和“公开 NDK ABI/认证/实机产品”之间仍有不可跳过的工程距离。</p>
+<figure class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAwIiBoZWlnaHQ9IjcyMCIgdmlld0JveD0iMCAwIDE0MDAgNzIwIj48c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCwnTWljcm9zb2Z0IFlhSGVpJyxzYW5zLXNlcmlmO2ZpbGw6I2VkZmZmOH0uaHtmb250LXNpemU6MzRweDtmb250LXdlaWdodDpib2xkfS5ze2ZvbnQtc2l6ZToyMXB4fS5te2ZvbnQtc2l6ZToxN3B4O2ZpbGw6I2I2ZGZkMn0uY3tmaWxsOiMwYjNiNDA7c3Ryb2tlOiM1NmNiYWE7c3Ryb2tlLXdpZHRoOjJ9LnJ7ZmlsbDpub25lO3N0cm9rZTojNzRlM2JmO3N0cm9rZS13aWR0aDoyO29wYWNpdHk6LjQ1fS5he3N0cm9rZTojODBlNmM1O3N0cm9rZS13aWR0aDoyfTwvc3R5bGU+PHJlY3Qgd2lkdGg9IjE0MDAiIGhlaWdodD0iNzIwIiBmaWxsPSIjMTA0YjQ5Ii8+PHRleHQgeD0iNjAiIHk9IjcwIiBjbGFzcz0iaCI+5bOw5Lya5L+h5Y+36L2s5Li6IEFuZHJvaWQg5bel56iL6Lev57q/77ya6LaL5Yq/5LiO6aqM6K+BPC90ZXh0Pjx0ZXh0IHg9IjYwIiB5PSIxMDgiIGNsYXNzPSJtIj7otovlir/lvLrluqbkuI3mmK/luILlnLrku73pop3vvJvlj7PkvqfmmK/lupTnurPlhaXniYjmnKzpl6jnpoHnmoTpqozor4Hlr7nosaHjgII8L3RleHQ+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzUwIDQwMCkiPjxjaXJjbGUgcj0iMTg1IiBjbGFzcz0iciIvPjxjaXJjbGUgcj0iMTI1IiBjbGFzcz0iciIvPjxjaXJjbGUgcj0iNjUiIGNsYXNzPSJyIi8+PHBhdGggZD0iTTAgMFYtMTg1TTAgMGwxNzYtNTdNMCAwbDEwOSAxNTBNMCAwbC0xMDkgMTUwTTAgMGwtMTc2LTU3IiBjbGFzcz0iYSIvPjxwYXRoIGQ9Ik0wLTE1OEwxNDQtNDcgNzggMTA4LTc0IDEwMi0xNDItNDZaIiBmaWxsPSIjNWFkOGIzIiBvcGFjaXR5PSIuNDUiIHN0cm9rZT0iI2ExZjRkNyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHRleHQgeD0iLTU1IiB5PSItMjEwIiBjbGFzcz0icyI+QUJJIOWfuue6vzwvdGV4dD48dGV4dCB4PSIxOTAiIHk9Ii02MCIgY2xhc3M9InMiPuaooeaLn+WZqDwvdGV4dD48dGV4dCB4PSIxMTUiIHk9IjE4MCIgY2xhc3M9InMiPuW3peWFt+mTvjwvdGV4dD48dGV4dCB4PSItMjI1IiB5PSIxODAiIGNsYXNzPSJzIj7lvILmnoQvQUk8L3RleHQ+PHRleHQgeD0iLTI4NSIgeT0iLTYwIiBjbGFzcz0icyI+TGludXgvR0tJPC90ZXh0PjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3MzAgMTcwKSI+PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI5MCIgcng9IjE2IiBjbGFzcz0iYyIvPjx0ZXh0IHg9IjI1IiB5PSIzNiIgY2xhc3M9InMiPjEgwrcgQUJJ77ya5LuOIElTQSBwcm9maWxlIOWIsOWPr+WPkeW4g+WOn+eUn+W6kzwvdGV4dD48dGV4dCB4PSIyNSIgeT0iNjciIGNsYXNzPSJtIj7pqozmlLbvvJpOREsgQUJJ44CB5omT5YyF44CB5Yqo5oCB5Yqg6L295LiO56ys5LiJ5pa5IFNESyDopobnm5Y8L3RleHQ+PHJlY3QgeT0iMTEwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjkwIiByeD0iMTYiIGNsYXNzPSJjIi8+PHRleHQgeD0iMjUiIHk9IjE0NiIgY2xhc3M9InMiPjIgwrcg5YW85a6577ya5YWI5ZyoIEN1dHRsZWZpc2ggLyDkuozov5vliLbnv7vor5HkuK3nvKnlsI/po47pmak8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjE3NyIgY2xhc3M9Im0iPumqjOaUtu+8mkFSVOOAgW5hdGl2ZSBicmlkZ2XjgIFDVFMvVlRTIOS4juWbnuW9kui+k+WFpembhjwvdGV4dD48cmVjdCB5PSIyMjAiIHdpZHRoPSI2MDAiIGhlaWdodD0iOTAiIHJ4PSIxNiIgY2xhc3M9ImMiLz48dGV4dCB4PSIyNSIgeT0iMjU2IiBjbGFzcz0icyI+MyDCtyDova/ku7blupXluqfvvJpMaW51eOOAgee8luivkeWZqOOAgeiwg+ivleS4juS4iua4uOWNj+WQjDwvdGV4dD48dGV4dCB4PSIyNSIgeT0iMjg3IiBjbGFzcz0ibSI+6aqM5pS277ya5bel5YW36ZO+54mI5pys44CB6LCD6K+V5Y+v6KeC5rWL5oCn44CB5YaF5qC45LiO6amx5Yqo55+p6Zi1PC90ZXh0PjxyZWN0IHk9IjMzMCIgd2lkdGg9IjYwMCIgaGVpZ2h0PSI5MCIgcng9IjE2IiBjbGFzcz0iYyIvPjx0ZXh0IHg9IjI1IiB5PSIzNjYiIGNsYXNzPSJzIj40IMK3IOS6p+WTge+8muenu+WKqOOAgeepv+aItOOAgeaxvei9puS4juerr+S+pyBBSSDlkIToh6rpqozor4E8L3RleHQ+PHRleHQgeD0iMjUiIHk9IjM5NyIgY2xhc3M9Im0iPumqjOaUtu+8muWKn+iAl+OAgeeDreeos+aAgeOAgeWbvuW9oi/nm7jmnLov5a6J5YWo44CB55Sf5ZG95ZGo5pyf5pSv5oyBPC90ZXh0PjwvZz48cmVjdCB4PSI3MzAiIHk9IjYyNSIgd2lkdGg9IjYwMCIgaGVpZ2h0PSI1MCIgcng9IjI1IiBmaWxsPSIjMTM2MzViIi8+PHRleHQgeD0iNzY1IiB5PSI2NTgiIGNsYXNzPSJtIj7kuI3opoHnlKjigJzls7DkvJrmvJTorrLigJ3mm7/ku6MgTkRL44CB6K6k6K+B5oiW6YeP5Lqn55qE54us56uL6K+B5o2u44CCPC90ZXh0Pjwvc3ZnPg==" alt="图 3：RISC-V 峰会 Android 趋势与验证"><figcaption>图 3：RISC-V 峰会 Android 趋势与验证</figcaption></figure>
+<p>图 3：RISC-V 峰会 Android 趋势与验证。来源：根据 North America Android 议题、RVA23、AOSP/NDK 状态以及欧洲/中国软件议程综合绘制；各轴表示工程关注度，不表示商业成熟度或地区排名 [S02][S03][S04][S06][S07][S11][S14]。</p>
+<div class="table-wrap"><table><thead><tr><th>情景</th><th>触发条件</th><th>可能变化</th><th>需要提前建设的能力</th><th>可信度</th></tr></thead><tbody><tr><td>NDK riscv64 ABI 公开稳定</td><td>Android 官方 ABI、构建和发布工具出现完整接口</td><td>原生 SDK、游戏引擎和 app 构建可开始形成生态闭环</td><td>ABI inventory、SDK CI、AAB 打包与兼容测试</td><td>【S】</td></tr><tr><td>Cuttlefish/翻译路径持续成熟</td><td>AOSP 组件与 native bridge 覆盖扩展</td><td>ISA 迁移问题可更早在非最终硬件暴露</td><td>trace、差分测试、tombstone 与性能归因</td><td>【C*】</td></tr><tr><td>RVA23 成为更多 SoC 的软件契约</td><td>硬件、内核、编译器和发行版围绕 profile 对齐</td><td>设备差异从基础 ISA 转向驱动、性能与扩展策略</td><td>feature discovery、版本矩阵、跨芯片回归</td><td>【S】</td></tr><tr><td>端侧 AI/汽车推动异构集成</td><td>NPU、GPU、ISP 与 RISC-V CPU 同机部署扩大</td><td>Android 工作从 CPU port 扩展为系统级调度问题</td><td>HAL/驱动、功耗、内存、热与安全 workload</td><td>【S】</td></tr><tr><td>峰会叙事与产品证据脱节</td><td>演讲增多但 ABI/CTS/设备数据缺失</td><td>市场预期先升、交付风险后置</td><td>证据台账、发布门禁和外部沟通边界</td><td>【C*】</td></tr></tbody></table></div>
+<h3 id="6-1-对中国团队的机会">6.1 对中国团队的机会</h3>
+<p>中国 RISC-V 生态在峰会中已展现系统软件、AI、汽车、芯片和终端协同的强动机。若目标是 Android，最稀缺的能力不是再做一个 RV64 启动 demo，而是让开放芯片、BSP、AOSP、原生应用、工具链和商业应用共同通过同一套跨版本验证。可以优先选择一个低风险目标形态，例如开发者设备、特定穿戴或受控行业终端，形成从 SoC feature、AOSP build、NDK/SDK、应用集、功耗和升级的完整样板，再逐步扩大应用与设备矩阵。</p>
+<h3 id="6-2-对全球合作的含义">6.2 对全球合作的含义</h3>
+<p>RISC-V 的开放性并不会自动消除碎片化。北美峰会中暴露的 Android ABI/产品化问题、欧洲的软件上游协作和中国的端侧集成必须在公开 profile、测试标准、工具链版本和共同 workload 上会合。合作最应公开的是可复现实验：目标 ISA、模型/应用版本、编译参数、Cuttlefish/实机路径、性能和失败样本，而不是缺少上下文的“已支持 Android”表述。</p>
+<h2 id="7-建议与验收">7. 建议与验收</h2>
+<h3 id="7-1-建立-峰会信号-产品证据-双账本">7.1 建立“峰会信号—产品证据”双账本</h3>
+<p>每项峰会信息应在进入路线图前被标记为：议程题名、公开代码、上游接口、原型、认证、量产设备或独立测试。以 2024 北美峰会为例，“Android 产品化探索”和 Berberis 可以进入问题/合作台账，但不能直接进入“已量产”台账 [S02][S03]。以 RVA23 为例，它可以进入架构基线台账，却不能代替 NDK ABI 或 CTS 数据 [S04][S07]。这一双账本可防止产品、市场和研发因证据等级不同而传递失真结论。</p>
+<p>第二步是针对每个设备建立 release evidence bundle：SoC revision、RVA profile/扩展、bootloader、内核/GKI、vendor image、AOSP tag、ART、NDK/SDK、图形/相机/AI 驱动、测试版本、应用集合和性能/功耗 trace 必须绑定到同一个版本号。若某项结论仅在 Cuttlefish 或翻译路径成立，也必须显式标注，不能外推给真实设备。</p>
+<h3 id="能力成熟度对比矩阵">能力成熟度对比矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>原型/演示可交付</th><th>产品团队可交付</th><th>平台负责人可交付</th><th>Android RISC-V 验收重点</th></tr></thead><tbody><tr><td>ISA/SoC</td><td>RV64/RVA23 启动样机</td><td>记录 feature、内核和驱动依赖</td><td>维护 SoC/扩展/固件支持矩阵</td><td>真实 feature discovery 与跨版本兼容</td></tr><tr><td>系统</td><td>AOSP/ART 或 Cuttlefish 启动</td><td>自动化刷机、启动、升级与日志</td><td>GKI/vendor/安全更新治理</td><td>启动、稳定性、升级和故障归因</td></tr><tr><td>应用</td><td>编译一个 JNI demo</td><td>自研 app 与关键 SDK 通过</td><td>生态 ABI 与第三方依赖策略</td><td>APK/AAB、动态加载、崩溃符号、商店链路</td></tr><tr><td>异构性能</td><td>展示 RVV/NPU 单项 demo</td><td>端到端 workload 优化</td><td>设备池、SLO、热与回归门禁</td><td>首帧、P99、RSS、功耗、温度、回退</td></tr><tr><td>合规与沟通</td><td>宣称“支持 RISC-V”</td><td>标注原型/内部/公开边界</td><td>证据台账与发布审批</td><td>NDK、CTS/VTS、隐私和生命周期证据</td></tr></tbody></table></div>
+<h3 id="主张-证据矩阵">主张—证据矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>主张</th><th>直接证据</th><th>反例/边界</th><th>结论等级</th></tr></thead><tbody><tr><td>北美 2024 将 Android 兼容/产品化作为公开话题</td><td>阿里 Android 产品化探索、Google Berberis 议程 [S02][S03]</td><td>演讲题名不构成认证或量产声明</td><td>【C】</td></tr><tr><td>Android RISC-V 正在建立较清晰的 ISA/系统基础</td><td>RVA23 Android ABI baseline、AOSP/Cuttlefish 状态 [S04][S06]</td><td>公开 NDK ABI 页面尚未列 riscv64 [S07]</td><td>【C*】</td></tr><tr><td>欧洲公开叙事偏向通用软件基础设施</td><td>2024–2026 Linux、RVA23、RISE、工具链材料 [S10][S11][S12]</td><td>未检索到专题不等于没有内部 Android 项目</td><td>【S】</td></tr><tr><td>中国公开叙事偏向系统软件、AI、HPC、汽车和芯片协作</td><td>中国 2024/2025 官方回顾、议程与演讲库 [S13][S14][S15][S16]</td><td>通用 OS/AI 不等于 AOSP 或 Android Automotive</td><td>【C】</td></tr><tr><td>不能用单一峰会结论判断 Android 产品成熟度</td><td>NDK ABI、AOSP 状态和 profile 的证据层不同 [S04][S06][S07]</td><td>内部合作和未公开测试无法由本报告覆盖</td><td>【C*】</td></tr></tbody></table></div>
+<h3 id="7-2-团队机制建议">7.2 团队机制建议</h3>
+<ol><li>维护 <strong>区域峰会证据看板</strong>：按 North America、Europe、China 标注时间、议题、讲者、公开代码、影响层与证据等级；“未检索到”必须标记资料范围。</li><li>维护 <strong>Android ABI 供应链表</strong>：列出每个 APK/AAB、JNI 库、SDK、构建插件、许可证和升级 owner，禁止只以 Java demo 判断可迁移性。</li><li>固化 <strong>虚拟—翻译—实机三路径测试</strong>：Cuttlefish 用于系统回归，翻译路径用于兼容性定位，实机用于性能、功耗和外设体验；三者结果不可互相替代。</li><li>建立 <strong>SoC 异构 workload 契约</strong>：将 CPU/RVV、GPU、NPU、ISP、内存和功耗放入统一 trace，记录实际加速路径与回退。</li><li>建立 <strong>对外用语门禁</strong>：只有获得相应的公开 ABI、认证和实机证据，才可使用“开发者可分发”“兼容”“量产”等表述。</li></ol>
+<h3 id="建议-验收矩阵">建议—验收矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>建议</th><th>90 天可交付物</th><th>验收条件</th><th>验证手段</th><th>优先级</th></tr></thead><tbody><tr><td>建立 Android RISC-V 证据双账本</td><td>峰会/上游/设备证据表</td><td>每项外部主张可追溯并标明边界</td><td>链接审查、版本化台账</td><td>P0</td></tr><tr><td>盘点原生 ABI 依赖</td><td>APK/AAB 与 JNI/SDK 清单</td><td>关键库均有源码、替代或风险 owner</td><td>ELF、Gradle、运行时加载审计</td><td>P0</td></tr><tr><td>搭建三路径回归</td><td>Cuttlefish、翻译、实机 CI 任务</td><td>同一 workload 可比较并能定位差异</td><td>自动化测试、trace、tombstone</td><td>P0</td></tr><tr><td>完成异构稳态基线</td><td>图形、相机、AI、热和电量报告</td><td>SLO 下不出现未解释的回退或过热</td><td>性能采样、功耗/温控循环</td><td>P0</td></tr><tr><td>形成设备发布门禁</td><td>版本矩阵、阈值、回滚策略</td><td>ABI/驱动/性能回归可阻断发布</td><td>CI、灰度与产物归档</td><td>P1</td></tr></tbody></table></div>
+<h2 id="8-不确定性与研究限制">8. 不确定性与研究限制</h2>
+<ol><li>峰会页面、Sched 页面和部分演讲材料可能更新、下线或受访问限制；本文以本次可访问的官方页、公开仓库和搜索可核验元数据为界，不把无法稳定抓取的描述扩展为细节事实。</li><li>欧洲和中国部分“未见 Android 专题”的结论仅针对列出的年份、可访问的公开议程/演讲库与检索条件，不代表组织、厂商或地区不存在未公开的 Android 研发。</li><li>Google 2023 文章、AOSP 项目仓库、RVA23 公告和 2026 NDK 文档覆盖的层级不同，可能在时间和接口状态上演进；发布设备前必须重新核验目标 Android 分支和当期 NDK/CTS 文档 [S04][S05][S06][S07]。</li><li>本文不确认任何 RISC-V Android 设备已完成 CTS/VTS/GTS、获得某项商业服务资格或具备通用手机量产能力，因为本次来源未提供可审计的完整证据链。</li><li>AI、汽车、Linux、OpenHarmony 与 openEuler 的峰会内容在技术上可成为 Android 的上游输入，但不是 Android/AOSP/Android Automotive 的替代证据；本文刻意避免这种外推 [S11][S13][S14][S15]。</li><li>性能、功耗、应用兼容率和安全性受具体核、SoC、驱动、Android 分支、编译参数、温度和 workload 影响；峰会演讲、TOPS 或单项 benchmark 不能代表终端用户体验。</li></ol>
+<h2 id="参考来源">参考来源</h2>
+<div class="table-wrap"><table><thead><tr><th>ID</th><th>来源</th><th>类型</th><th>本文使用范围</th></tr></thead><tbody><tr><td>[S01]</td><td><a href="https://riscv.org/community/risc-v-summits/" rel="noopener">RISC-V Summits</a></td><td>RISC-V International 官方活动页</td><td>峰会区域与命名范围</td></tr><tr><td>[S02]</td><td><a href="https://riscvsummit2024.sched.com/event/1iYuo/exploration-of-productization-of-android-on-risc-v-han-mao-alibaba-damo-academy" rel="noopener">North America 2024：Android on RISC-V 产品化探索</a></td><td>峰会公开议程</td><td>阿里达摩院 Android 产品化探索题名</td></tr><tr><td>[S03]</td><td><a href="https://riscvsummit2024.sched.com/event/1iYuJ/berberis-dynamic-binary-translation-from-risc-v-to-x8664-on-android-lev-rumyantsev-jeremiah-griffin-google" rel="noopener">North America 2024：Berberis Android 二进制翻译</a></td><td>峰会公开议程</td><td>Google Berberis 题名与 Android 关联</td></tr><tr><td>[S04]</td><td><a href="https://riscv.org/blog/risc-v-announces-ratification-of-the-rva23-profile-standard/" rel="noopener">RISC-V International：RVA23 profile 批准</a></td><td>RVI 官方公告</td><td>RVA23、Android ABI baseline 与扩展要求</td></tr><tr><td>[S05]</td><td><a href="https://opensource.googleblog.com/2023/10/android-and-risc-v-what-you-need-to-know.html" rel="noopener">Google Open Source Blog：Android and RISC-V</a></td><td>Google 官方博客</td><td>Android RISC-V 实验/协作定位与早期形态</td></tr><tr><td>[S06]</td><td><a href="https://github.com/google/android-riscv64" rel="noopener">Google android-riscv64</a></td><td>Google 维护项目仓库</td><td>AOSP、ART/Cuttlefish 与 NDK ABI 状态</td></tr><tr><td>[S07]</td><td><a href="https://developer.android.com/ndk/guides/abis" rel="noopener">Android Developers：NDK ABI 管理</a></td><td>Android 官方文档</td><td>当前列出的 NDK ABI 架构</td></tr><tr><td>[S08]</td><td><a href="https://android.googlesource.com/platform/frameworks/libs/binary_translation/+/refs/heads/main" rel="noopener">AOSP：binary_translation / Berberis</a></td><td>AOSP 上游仓库</td><td>riscv64 原生代码到 x86_64 的动态翻译</td></tr><tr><td>[S09]</td><td><a href="https://riscvsummit2025.sched.com/2025-10-22/list/descriptions/type/Software" rel="noopener">RISC-V Summit North America 2025 软件日程</a></td><td>峰会公开日程</td><td>2025 软件议程范围</td></tr><tr><td>[S10]</td><td><a href="https://riscv-europe.org/summit/2024/conference" rel="noopener">RISC-V Summit Europe 2024 conference</a></td><td>峰会官方页</td><td>欧洲 2024 议程范围</td></tr><tr><td>[S11]</td><td><a href="https://riscv-europe.org/summit/2025/presentations" rel="noopener">RISC-V Summit Europe 2025 presentations</a></td><td>峰会官方演讲页</td><td>欧洲 2025 RVA23、RISE、软件议题范围</td></tr><tr><td>[S12]</td><td><a href="https://riscv-europe.org/summit/2026/presentations" rel="noopener">RISC-V Summit Europe 2026 presentations</a></td><td>峰会官方演讲页</td><td>欧洲 2026 Linux/RVA23 等公开材料范围</td></tr><tr><td>[S13]</td><td><a href="https://riscv.org/blog/exploring-the-amazing-risc-v-summit-china-2024/" rel="noopener">RISC-V International：中国峰会 2024 回顾</a></td><td>RVI 官方回顾</td><td>杭州峰会、系统软件与生态主题</td></tr><tr><td>[S14]</td><td><a href="https://riscv.org/blog/risc-v-summit-china-2025-reflections-from-a-risc-v-software-contributor/" rel="noopener">RISC-V International：中国峰会 2025 软件贡献者回顾</a></td><td>RVI 官方回顾</td><td>2025 软件、CUDA、Linux kernel、RVA profile 主题</td></tr><tr><td>[S15]</td><td><a href="https://github.com/cnrv/RVSC2025" rel="noopener">RVSC2025 演讲材料库</a></td><td>峰会公开演讲库</td><td>AI、嵌入式、HPC 等可访问演讲资料范围</td></tr><tr><td>[S16]</td><td><a href="https://riscv-summit.com/agenda.html" rel="noopener">2025 RISC-V 中国峰会议程</a></td><td>峰会官方议程</td><td>上海峰会时间与主题范围</td></tr><tr><td>[S17]</td><td><a href="https://riscv.org/blog/risc-v-2024-a-year-of-global-growth-and-innovation/" rel="noopener">RISC-V International：2024 全球增长回顾</a></td><td>RVI 官方回顾</td><td>区域峰会与 RVA23/Android 生态背景</td></tr></tbody></table></div>
+<h2 id="附录-研究方法">附录：研究方法</h2>
+<h3 id="a-资料采集与判定规则">A. 资料采集与判定规则</h3>
+<ol><li>以峰会主办方、RISC-V International、Android Developers、AOSP/Google 项目仓库为优先来源；媒体或厂商材料只用于发现线索，未作为关键结论的唯一依据。</li><li>对“Android 相关”按强度分级：题名直接含 Android/AOSP/NDK/Android Automotive 的为直接证据；RVA23、Linux、LLVM、Cuttlefish、AI、汽车和芯片系统为间接证据；没有可访问材料的为【?】。</li><li>对“没有”的写法采用范围限定：仅说“本次可访问的某年公开议程/演讲库未见”，绝不从资料缺失推断研发缺失。</li><li>对“已支持”的写法必须同时回答：支持对象是 AOSP 代码、模拟器、NDK ABI、第三方应用、CTS/VTS 还是量产设备；若对象未明确，结论降级。</li></ol>
+<h3 id="b-建议的复核清单">B. 建议的复核清单</h3>
+<div class="table-wrap"><table><thead><tr><th>复核对象</th><th>最低证据</th><th>复核问题</th></tr></thead><tbody><tr><td>峰会议题</td><td>官方议程或演讲页</td><td>是否为直接 Android 题名？时间、讲者和组织是否可核验？</td></tr><tr><td>ISA 基线</td><td>RVI profile 文档与目标 SoC 手册</td><td>RVA23/RVV 等扩展是否实际存在且可由系统发现？</td></tr><tr><td>系统状态</td><td>对应 AOSP 分支、构建日志、Cuttlefish/实机测试</td><td>ART、Bionic、内核、HAL 和安全更新处于哪个状态？</td></tr><tr><td>应用 ABI</td><td>最新 NDK 文档、构建工具、APK/AAB 产物</td><td>riscv64 是否在公开 ABI、SDK 和分发链中稳定可用？</td></tr><tr><td>产品体验</td><td>固定 workload、设备/固件/温度记录</td><td>性能、功耗、图形、相机、AI 和回退能否复现？</td></tr></tbody></table></div>
+<h3 id="c-可复现实验最小记录">C. 可复现实验最小记录</h3>
+<p>每次试验至少归档：Android/AOSP tag、内核与固件、SoC revision、RISC-V feature/ISA 字符串、编译器与 NDK 版本、应用 hash、JNI 库清单、Cuttlefish/翻译/实机路径、输入 workload、测试次数、首帧/时延/RSS/功耗代理、错误日志和回退原因。只有这些上下文齐全，峰会信号才能被转换为可审计的产品决策。</p>
+</main>
+</div>
+</body>
+</html>

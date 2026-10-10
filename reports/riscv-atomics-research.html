@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>riscv64 原子指令体系调研：Zaamo / Zalrsc / Zacas / Zabha / Zalasr / Ztso</title>
+<style>
+:root {
+  --fg: #1a1a1a; --fg-soft: #4a4a4a; --bg: #ffffff; --bg-soft: #f6f7f9;
+  --border: #e3e6ea; --accent: #b8442e; --code-bg: #f4f5f7;
+  --c: #1f7a4d; --cstar: #2563a8; --s: #a86b1f; --p: #7a4fa3; --q: #a33a3a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6e6e6; --fg-soft: #a8a8a8; --bg: #14161a; --bg-soft: #1b1e24;
+    --border: #2c313a; --accent: #e0705a; --code-bg: #1e2229;
+    --c: #58c08a; --cstar: #6aa8e0; --s: #d8a45a; --p: #b088d8; --q: #e07a7a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px; line-height: 1.75; -webkit-font-smoothing: antialiased;
+}
+.layout { display: flex; max-width: 1400px; margin: 0 auto; }
+.toc {
+  width: 280px; flex: 0 0 280px; position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto; padding: 32px 20px 32px 28px;
+  border-right: 1px solid var(--border); font-size: 13.5px;
+}
+.toc h2 {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-soft); margin: 0 0 12px; font-weight: 600;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block; padding: 5px 0; color: var(--fg-soft); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 10px;
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+.toc-l1 a { font-weight: 600; color: var(--fg); }
+.toc-l2 a { padding-left: 10px; }
+.toc-l3 a { padding-left: 24px; font-size: 12.5px; }
+main { flex: 1 1 auto; min-width: 0; padding: 40px 56px 96px; max-width: 940px; }
+h1 {
+  font-size: 30px; line-height: 1.35; margin: 0 0 8px; font-weight: 650;
+  letter-spacing: -.01em;
+}
+h2 {
+  font-size: 21px; margin: 44px 0 14px; padding-bottom: 8px; font-weight: 620;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 17px; margin: 30px 0 10px; font-weight: 600; }
+h4 { font-size: 15px; margin: 22px 0 8px; font-weight: 600; color: var(--fg-soft); }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+code {
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .875em; background: var(--code-bg); padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 18px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+blockquote {
+  margin: 0 0 18px; padding: 12px 18px; background: var(--bg-soft);
+  border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+}
+blockquote p { margin: 0; }
+ul, ol { margin: 0 0 16px; padding-left: 26px; }
+li { margin: 5px 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+.badge {
+  display: inline-block; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+  color: #fff; vertical-align: 1px; letter-spacing: .02em;
+}
+.badge-c { background: var(--c); }
+.badge-cstar { background: var(--cstar); }
+.badge-s { background: var(--s); }
+.badge-p { background: var(--p); }
+.badge-q { background: var(--q); }
+figure.fig {
+  margin: 28px auto 20px;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+figure.fig figcaption {
+  font-size: 13px;
+  color: var(--soft, #666);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.mermaid {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; margin: 0 0 20px; text-align: center; overflow-x: auto;
+}
+.mermaid-fallback {
+  text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; white-space: pre-wrap; color: var(--fg-soft);
+}
+.doc-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px;
+  font-size: 13px; color: var(--fg-soft);
+}
+.doc-meta span {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+@media (max-width: 1000px) {
+  .toc { display: none; }
+  main { padding: 28px 20px 64px; }
+}
+@media print {
+  .toc { display: none; }
+  main { max-width: none; padding: 0; }
+  a { color: var(--fg); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc"><h2>目录</h2><ul><li class="toc-l1"><a href="#riscv64-原子指令体系调研-zaamo-zalrsc-zacas-zabha-zalasr-ztso">riscv64 原子指令体系调研：Zaamo / Zalrsc / Zacas / Zabha / Zalasr / Ztso</a></li><li class="toc-l2"><a href="#可靠性标注约定">可靠性标注约定</a></li><li class="toc-l2"><a href="#1-总览-为什么-a-扩展-变成了一个原子扩展家族">1. 总览：为什么&quot;A 扩展&quot;变成了一个原子扩展家族</a></li><li class="toc-l2"><a href="#2-基础层-zaamo-与-zalrsc">2. 基础层：Zaamo 与 Zalrsc</a></li><li class="toc-l3"><a href="#2-1-zaamo-amo-指令族">2.1 Zaamo：AMO 指令族</a></li><li class="toc-l3"><a href="#2-2-zalrsc-lr-sc-与-forward-progress-约束">2.2 Zalrsc：LR/SC 与 forward progress 约束</a></li><li class="toc-l3"><a href="#2-3-amo-vs-lr-sc-选择依据">2.3 AMO vs LR/SC：选择依据</a></li><li class="toc-l2"><a href="#3-zacas-硬件-cas">3. Zacas：硬件 CAS</a></li><li class="toc-l3"><a href="#3-1-指令与语义-c">3.1 指令与语义 `C`</a></li><li class="toc-l3"><a href="#3-2-为什么需要硬件-cas">3.2 为什么需要硬件 CAS</a></li><li class="toc-l2"><a href="#4-zabha-字节-半字原子">4. Zabha：字节/半字原子</a></li><li class="toc-l3"><a href="#4-1-指令-c">4.1 指令 `C`</a></li><li class="toc-l3"><a href="#4-2-为什么需要-c">4.2 为什么需要 `C`</a></li><li class="toc-l3"><a href="#4-3-设计取舍-c">4.3 设计取舍 `C`</a></li><li class="toc-l2"><a href="#5-zalasr-显式-load-acquire-store-release">5. Zalasr：显式 load-acquire / store-release</a></li><li class="toc-l3"><a href="#5-1-指令表-c">5.1 指令表 `C`</a></li><li class="toc-l3"><a href="#5-2-为什么-fence-不够-c">5.2 为什么 fence 不够 `C`</a></li><li class="toc-l3"><a href="#5-3-提案论文的关键结论-c">5.3 提案论文的关键结论 `C`</a></li><li class="toc-l3"><a href="#5-4-内核侧进展-c">5.4 内核侧进展 `C`</a></li><li class="toc-l2"><a href="#6-ztso-tso-内存模型模式">6. Ztso：TSO 内存模型模式</a></li><li class="toc-l3"><a href="#6-1-语义-c">6.1 语义 `C`</a></li><li class="toc-l3"><a href="#6-2-对-fence-的影响-c">6.2 对 fence 的影响 `C`</a></li><li class="toc-l3"><a href="#6-3-软件含义-c">6.3 软件含义 `C*`</a></li><li class="toc-l2"><a href="#7-内存序全景-rvwmo-fence-与-aq-rl-的关系">7. 内存序全景：RVWMO、fence 与 .aq/.rl 的关系</a></li><li class="toc-l3"><a href="#7-1-三层排序机制-c">7.1 三层排序机制 `C*`</a></li><li class="toc-l3"><a href="#7-2-fence-tso-c">7.2 `fence.tso` `C*`</a></li><li class="toc-l3"><a href="#7-3-c11-atomics-的映射-c">7.3 C11 atomics 的映射 `C*`</a></li><li class="toc-l2"><a href="#8-生态支持度矩阵">8. 生态支持度矩阵</a></li><li class="toc-l3"><a href="#8-1-规范与-profile">8.1 规范与 Profile</a></li><li class="toc-l3"><a href="#8-2-编译器-c-gcc-文档-s-llvm">8.2 编译器 `C`（GCC 文档）/ `S`（LLVM）</a></li><li class="toc-l3"><a href="#8-3-linux-内核">8.3 Linux 内核</a></li><li class="toc-l3"><a href="#8-4-其他生态-s">8.4 其他生态 `S`</a></li><li class="toc-l2"><a href="#9-微架构与性能考量-性能工程师核心区">9. 微架构与性能考量（性能工程师核心区）</a></li><li class="toc-l3"><a href="#9-1-lr-sc-重试风暴">9.1 LR/SC 重试风暴</a></li><li class="toc-l3"><a href="#9-2-amo-与-cache-line-所有权">9.2 AMO 与 cache line 所有权</a></li><li class="toc-l3"><a href="#9-3-cas-循环-vs-硬件-amocas">9.3 CAS 循环 vs 硬件 amocas</a></li><li class="toc-l3"><a href="#9-4-zalasr-vs-fence-的收益场景">9.4 Zalasr vs fence 的收益场景</a></li><li class="toc-l3"><a href="#9-5-横向对比-c">9.5 横向对比 `C*`</a></li><li class="toc-l3"><a href="#9-6-rva23-的现实约束-c">9.6 RVA23 的现实约束 `C`</a></li><li class="toc-l2"><a href="#10-学习路径与实验建议">10. 学习路径与实验建议</a></li><li class="toc-l3"><a href="#10-1-阅读顺序">10.1 阅读顺序</a></li><li class="toc-l3"><a href="#10-2-实验建议-按性价比排序">10.2 实验建议（按性价比排序）</a></li><li class="toc-l3"><a href="#10-3-模拟器支持">10.3 模拟器支持 `?`</a></li><li class="toc-l2"><a href="#11-不确定性清单">11. 不确定性清单</a></li><li class="toc-l2"><a href="#12-参考来源">12. 参考来源</a></li><li class="toc-l2"><a href="#附-方法说明">附：方法说明</a></li></ul></nav>
+<main>
+<h1>riscv64 原子指令体系调研：Zaamo / Zalrsc / Zacas / Zabha / Zalasr / Ztso</h1>
+<div class="doc-meta"><span>v1.0 · 2026-09-04</span><span>由 riscv-atomics-research.md 生成</span></div>
+<h1 id="riscv64-原子指令体系调研-zaamo-zalrsc-zacas-zabha-zalasr-ztso">riscv64 原子指令体系调研：Zaamo / Zalrsc / Zacas / Zabha / Zalasr / Ztso</h1>
+<p><strong>版本</strong>：v1.0 · 2026-09-04 <strong>读者画像</strong>：RISC-V CPU 软件性能优化工程师 <strong>调研目的</strong>：理解原理为主，建立原子扩展家族的全景地图，识别性能问题域 <strong>覆盖范围</strong>：六个原子相关扩展的规范语义 · 与 RVWMO 内存模型的关系 · 编译器/内核生态支持度 · 微架构与性能考量</p>
+<hr>
+<h2 id="可靠性标注约定">可靠性标注约定</h2>
+<div class="table-wrap"><table><thead><tr><th>标记</th><th>含义</th></tr></thead><tbody><tr><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td><td><strong>已核实</strong>：本次调研中在线核实（docs.riscv.org 规范 / GitHub / GCC 文档 / LWN）</td></tr><tr><td><span class="badge badge-cstar" title="规范级稳定知识">C*</span></td><td><strong>基础常识</strong>：规范级稳定知识，标注了建议核对的章节出处，未逐条在线复核</td></tr><tr><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td><td><strong>单一来源</strong>：仅搜索摘要或单一来源支持，未交叉验证</td></tr><tr><td><span class="badge badge-q" title="未能核实">?</span></td><td><strong>未能核实</strong>：留空而非填充估计值</td></tr></tbody></table></div>
+<hr>
+<h2 id="1-总览-为什么-a-扩展-变成了一个原子扩展家族">1. 总览：为什么"A 扩展"变成了一个原子扩展家族</h2>
+<p>历史上 RISC-V 的原子能力由单一的 <strong>A 扩展</strong>承载（LR/SC + AMO）。现行 ISA 把它拆分为多个独立扩展，<strong>每个解决一类具体的能力缺口</strong> <span class="badge badge-c" title="源码/一手来源核实">C</span>：</p>
+<div class="mermaid">graph TD
+    A[&quot;原 A 扩展&quot;] --&gt; B[&quot;Zaamo&lt;br/&gt;AMO 指令&quot;]
+    A --&gt; C[&quot;Zalrsc&lt;br/&gt;LR/SC 指令&quot;]
+    D[&quot;能力缺口&quot;] --&gt; E[&quot;Zacas&lt;br/&gt;硬件 CAS&quot;]
+    D --&gt; F[&quot;Zabha&lt;br/&gt;字节/半字 AMO&quot;]
+    G[&quot;内存序缺口&quot;] --&gt; H[&quot;Zalasr&lt;br/&gt;load-acquire/store-release&quot;]
+    G --&gt; I[&quot;Ztso&lt;br/&gt;TSO 内存模型模式&quot;]</div>
+<div class="table-wrap"><table><thead><tr><th>扩展</th><th>解决的问题</th><th>规范状态</th><th>等级</th></tr></thead><tbody><tr><td><strong>Zaamo</strong></td><td>AMO 指令（原子读-改-写）</td><td>Ratified，v1.0</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>Zalrsc</strong></td><td>LR/SC（乐观并发原语）</td><td>Ratified，v1.0</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>Zacas</strong></td><td>硬件 CAS（amocas.w/d/q）</td><td>Ratified，v1.0.0</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>Zabha</strong></td><td>字节/半字 AMO</td><td>Ratified，v1.0</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>Zalasr</strong></td><td>显式 load-acquire / store-release</td><td>Ratified，v1.0</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>Ztso</strong></td><td>TSO 内存模型实现模式</td><td>Ratified，v1.0</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr></tbody></table></div>
+<p><strong>拆分的工程动机</strong>（规范 rationale 原文）<span class="badge badge-c" title="源码/一手来源核实">C</span>：<strong>"CAS atomic instructions scale better to highly parallel systems than LR/SC."</strong>——即 LR/SC 在高并行度下的可扩展性问题，是 Zacas 出现的根本原因。这句话是理解整个原子扩展家族演进的钥匙。</p>
+<blockquote><strong>性能工程师视角</strong>：这六个扩展不是并列的功能列表，而是一条<strong>"从乐观并发到确定性并发、从粗粒度内存序到细粒度内存序"</strong>的演进线。你的优化工作会集中在两条线上：(1) 并发原语的选择与开销；(2) 内存序保证的最小化。</blockquote>
+<hr>
+<h2 id="2-基础层-zaamo-与-zalrsc">2. 基础层：Zaamo 与 Zalrsc</h2>
+<h3 id="2-1-zaamo-amo-指令族">2.1 Zaamo：AMO 指令族</h3>
+<p>RV64 下的 AMO 指令（<code>.w</code> = 32 位，<code>.d</code> = 64 位）<span class="badge badge-cstar" title="规范级稳定知识">C*</span>（出处：非特权 ISA Zaamo 章节）：</p>
+<div class="table-wrap"><table><thead><tr><th>指令</th><th>操作</th></tr></thead><tbody><tr><td><code>amoswap.w/d</code></td><td>原子交换</td></tr><tr><td><code>amoadd.w/d</code></td><td>原子加</td></tr><tr><td><code>amoxor.w/d</code></td><td>原子异或</td></tr><tr><td><code>amoand.w/d</code></td><td>原子与</td></tr><tr><td><code>amoor.w/d</code></td><td>原子或</td></tr><tr><td><code>amomin.w/d</code> / <code>amomax.w/d</code></td><td>有符号最小/最大</td></tr><tr><td><code>amominu.w/d</code> / <code>amomaxu.w/d</code></td><td>无符号最小/最大</td></tr></tbody></table></div>
+<p>每条 AMO 可附加 <strong><code>.aq</code> / <code>.rl</code> / <code>.aqrl</code></strong> 后缀声明内存序意图（见 §7）。</p>
+<p><strong>语义本质</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：AMO 是<strong>单指令完成的原子读-改-写</strong>——硬件保证"读取→计算→写回"对同一地址原子发生。典型用途：计数器（<code>amoadd</code>）、自旋锁的 test-and-set（<code>amoswap</code>/<code>amoor</code>）、位掩码操作（<code>amoand</code>/<code>amoor</code>）。</p>
+<h3 id="2-2-zalrsc-lr-sc-与-forward-progress-约束">2.2 Zalrsc：LR/SC 与 forward progress 约束</h3>
+<p><strong>语义</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：</p>
+<ul><li><code>lr.w/d</code>：加载并<strong>建立 reservation</strong>（硬件记录"我正在监视这个地址"）</li><li><code>sc.w/d</code>：仅当 reservation 仍有效时才写入；失败返回非零</li></ul>
+<p><strong>constrained LR/SC loop 规则</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>（出处：非特权 ISA Zalrsc 章节，建议核对原文）：为保证 forward progress，规范要求约束循环内<strong>至多 16 条指令</strong>，且不得包含除 SC 之外的内存访问、分支跳转、系统指令等。<strong>超出约束的 LR/SC 循环不享有 forward progress 保证</strong>——这是写自旋原语时的硬性约束。</p>
+<p><strong>ABA 问题</strong> <span class="badge badge-c" title="源码/一手来源核实">C</span>：规范 rationale 明确指出 CAS 类原子指令的价值之一是<strong>"support implementation of algorithms for ABA problem avoidance"</strong>。LR/SC 天然免疫 ABA（reservation 监视地址而非值），而朴素 CAS 循环会受 ABA 影响——这是 §3 中 128 位 CAS 用途的背景。</p>
+<h3 id="2-3-amo-vs-lr-sc-选择依据">2.3 AMO vs LR/SC：选择依据</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>AMO（Zaamo）</th><th>LR/SC（Zalrsc）</th></tr></thead><tbody><tr><td>表达能力</td><td>固定操作集（add/and/or/xor/min/max/swap）</td><td><strong>任意</strong>读-改-写逻辑（含 CAS、复杂条件更新）</td></tr><tr><td>指令数</td><td>1 条</td><td>≥2 条 + 循环重试</td></tr><tr><td>高并行度可扩展性</td><td>好</td><td><strong>差</strong>（规范 rationale 原话）<span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>重试行为</td><td>无重试</td><td>竞争时重试风暴</td></tr></tbody></table></div>
+<p><strong>实践判断</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：能用 AMO 表达的操作优先用 AMO；需要任意逻辑时用 LR/SC 循环——<strong>而在有 Zacas 的平台上，CAS 循环应改用 <code>amocas</code></strong>。</p>
+<hr>
+<h2 id="3-zacas-硬件-cas">3. Zacas：硬件 CAS</h2>
+<h3 id="3-1-指令与语义-c">3.1 指令与语义 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<ul><li><code>amocas.w/d/q</code>，支持 <code>.aq</code> / <code>.rl</code> / <code>.aqrl</code></li><li><strong><code>amocas.q</code>（128 位 CAS）使用寄存器对</strong>：rd/rd+1 与 rs1/rs1+1（偶数寄存器对齐）</li><li>规范版本 v1.0.0</li></ul>
+<h3 id="3-2-为什么需要硬件-cas">3.2 为什么需要硬件 CAS</h3>
+<p>三个层次的理由：</p>
+<ol><li><strong>可扩展性</strong>：LR/SC 的 CAS 循环在高竞争下重试率飙升；单指令 CAS 无重试语义 <span class="badge badge-c" title="源码/一手来源核实">C</span>（rationale 原话）</li><li><strong>ABA 规避</strong>：128 位 CAS 允许"值 + 版本号"打包原子更新——无锁数据结构的经典手法（versioned pointer）<span class="badge badge-cstar" title="规范级稳定知识">C*</span></li><li><strong>指令数收缩</strong>：CAS 循环 ≥3 条指令 + 分支 + 重试；<code>amocas.d</code> 一条完成。对锁获取路径这种<strong>每操作执行频次极高</strong>的代码，收缩比例直接反映到吞吐</li></ol>
+<blockquote><strong>性能工程师视角</strong>：<code>amocas.q</code> 的存在让 RISC-V 第一次具备与 x86 <code>lock cmpxchg16b</code>、ARM LSE <code>CASP</code> 对等的 128 位原子 CAS 能力。这是无锁编程范式（seqlock-free、tagged pointer、lock-free queue）在 RISC-V 上完整落地的前提。</blockquote>
+<hr>
+<h2 id="4-zabha-字节-半字原子">4. Zabha：字节/半字原子</h2>
+<h3 id="4-1-指令-c">4.1 指令 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>为全部 AMO 操作增加 <code>.b</code>（字节）与 <code>.h</code>（半字）变体（如 <code>amoadd.b/h</code>、<code>amoswap.b/h</code>）。</p>
+<h3 id="4-2-为什么需要-c">4.2 为什么需要 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>规范 rationale 原文：没有字节级原子时，软件模拟<strong>"introduces issues related to scalability and fairness"</strong>——即在共享字上用 LR/SC 模拟字节原子操作时，多核争抢同一 cache line 引发可扩展性与公平性问题。</p>
+<p><strong>典型需求场景</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：内核 <code>atomic_t</code> 的字节级操作、锁的字节位标记、引用计数的紧凑布局。</p>
+<h3 id="4-3-设计取舍-c">4.3 设计取舍 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p><strong>Zabha 刻意不提供字节/半字的 LR/SC</strong>——规范认为低实用性。即：字节级原子只能走 AMO 路线，复杂逻辑仍需回退到字级 LR/SC。</p>
+<hr>
+<h2 id="5-zalasr-显式-load-acquire-store-release">5. Zalasr：显式 load-acquire / store-release</h2>
+<h3 id="5-1-指令表-c">5.1 指令表 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>指令</th></tr></thead><tbody><tr><td>Load-acquire</td><td><code>lb.aq</code> / <code>lb.aqrl</code>、<code>lh.aq</code> / <code>lh.aqrl</code>、<code>lw.aq</code> / <code>lw.aqrl</code>、<code>ld.aq</code> / <code>ld.aqrl</code></td></tr><tr><td>Store-release</td><td><code>sb.rl</code> / <code>sb.aqrl</code>、<code>sh.rl</code> / <code>sh.aqrl</code>、<code>sw.rl</code> / <code>sw.aqrl</code>、<code>sd.rl</code> / <code>sd.aqrl</code></td></tr></tbody></table></div>
+<h3 id="5-2-为什么-fence-不够-c">5.2 为什么 fence 不够 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>规范表述：Zalasr 提供<strong>比 fence 更细粒度的同步——单向 fence 语义</strong>。对比：</p>
+<div class="table-wrap"><table><thead><tr><th>手段</th><th>语义</th><th>粒度</th></tr></thead><tbody><tr><td><code>fence rw,rw</code></td><td>全序屏障，所有方向</td><td>粗，影响所有内存操作</td></tr><tr><td><code>fence r,w</code></td><td>仅约束"先前 load → 后续 store"</td><td>中</td></tr><tr><td><code>lw.aq</code></td><td><strong>仅这一次 load 具有 acquire 语义</strong></td><td>细，单操作级</td></tr></tbody></table></div>
+<p><strong>fence 的问题</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：fence 是<strong>独立指令</strong>，作用于其后所有内存访问序列；acquire/release 是<strong>附着在单次访问上的属性</strong>。fence 粒度粗导致微架构上需要更保守的处理（排空写缓冲、限制乱序窗口），而单次 acquire load 只需约束该访问的排序关系。</p>
+<h3 id="5-3-提案论文的关键结论-c">5.3 提案论文的关键结论 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>论文 <em>Adding Explicit Load-Acquire and Store-Release Instructions to the RISC-V ISA</em>（Arden, Susskind, Sweeney，2023-09-02，arXiv 2302.03732）：</p>
+<ul><li><strong>动机</strong>：<strong>"prevent multiple ABI implementations and ecosystem fragmentation"</strong>——各家自行用 fence 模拟 acquire/release 会导致生态碎片化。这是 Zalasr 被标准化的首要原因（<strong>生态一致性 &gt; 性能</strong>）。</li><li><strong>反直觉结论</strong>：<strong>高竞争负载下"更少内存序"的收益是 muted（被掩盖的）</strong>——竞争本身的 cache line 乒乓开销主导了性能，内存序指令的差异被淹没。</li></ul>
+<blockquote><strong>性能工程师视角</strong>：Zalasr 的性能收益预期要<strong>分场景设定</strong>——低竞争路径（如 RCU 读侧、seqlock 读侧、发布-订阅指针）收益明显；高竞争锁路径收益有限（论文结论 <span class="badge badge-c" title="源码/一手来源核实">C</span>）。把 Zalasr 当作"fence 的替代品"来做全局优化，收益可能低于预期。</blockquote>
+<h3 id="5-4-内核侧进展-c">5.4 内核侧进展 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>Linux 内核 Zalasr 支持的 RFC（Xu Lu，2025-08-26，LWN 1035244）：<strong>目标原语是 <code>smp_load_acquire</code> 与 <code>smp_store_release</code></strong>——即内核的 acquire/release 语义原语将直接映射到 Zalasr 指令，替代当前的 fence 组合。</p>
+<hr>
+<h2 id="6-ztso-tso-内存模型模式">6. Ztso：TSO 内存模型模式</h2>
+<h3 id="6-1-语义-c">6.1 语义 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>Ztso v1.0 在 RVWMO 之上施加 <strong>TSO（Total Store Ordering）语义</strong>：<strong>所有 load 隐含 acquire、所有 store 隐含 release</strong>。</p>
+<h3 id="6-2-对-fence-的影响-c">6.2 对 fence 的影响 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p>规范表述：Ztso 下<strong>大部分 PPO 规则变得冗余</strong>，不带 I/O 位、无 PW/SR 位的 fence 大多成为冗余指令。</p>
+<h3 id="6-3-软件含义-c">6.3 软件含义 <span class="badge badge-cstar" title="规范级稳定知识">C*</span></h3>
+<ul><li><strong>同一二进制可跨 RVWMO 与 Ztso 平台运行</strong>：fence 与 <code>.aq/.rl</code> 在 TSO 平台上是冗余但合法的（保守即可正确）。</li><li><strong>性能含义</strong>：Ztso 平台上冗余 fence 是否被微架构零成本处理，是实现相关的问题——<strong>不能假设"TSO 平台上 fence 免费"</strong>，需要实测。</li><li><strong>判断</strong>：Ztso 主要价值是<strong>降低移植成本</strong>（x86 语义习惯的软件直接跑），而非提供性能优势；真正的性能优化方向仍是 Zalasr 式的细粒度排序。</li></ul>
+<hr>
+<h2 id="7-内存序全景-rvwmo-fence-与-aq-rl-的关系">7. 内存序全景：RVWMO、fence 与 .aq/.rl 的关系</h2>
+<h3 id="7-1-三层排序机制-c">7.1 三层排序机制 <span class="badge badge-cstar" title="规范级稳定知识">C*</span></h3>
+<div class="table-wrap"><table><thead><tr><th>层次</th><th>机制</th><th>说明</th></tr></thead><tbody><tr><td>全局模型</td><td><strong>RVWMO</strong></td><td>弱内存序，PPO（Preserved Program Order）规则定义保留序</td></tr><tr><td>显式屏障</td><td><strong><code>fence</code></strong></td><td><code>fence rd,wr,rr,ww</code> + I/O 位（pi/po/pr/pw）组合</td></tr><tr><td>单操作语义</td><td><strong><code>.aq</code> / <code>.rl</code> / <code>.aqrl</code></strong>（AMO/LR/SC）与 <strong>Zalasr</strong>（普通 load/store）</td><td>附着于单次访问</td></tr></tbody></table></div>
+<h3 id="7-2-fence-tso-c">7.2 <code>fence.tso</code> <span class="badge badge-cstar" title="规范级稳定知识">C*</span></h3>
+<p><code>fence.tso</code> 是特化 fence（仅保留"先前 load → 后续 store"方向，即 fence r,w 子集），<strong>专为 TSO 模式下的最小排序需求设计</strong>——在 Ztso 平台上替代 <code>fence rw,rw</code> 的标准手段。</p>
+<h3 id="7-3-c11-atomics-的映射-c">7.3 C11 atomics 的映射 <span class="badge badge-cstar" title="规范级稳定知识">C*</span></h3>
+<div class="table-wrap"><table><thead><tr><th>C11 memory_order</th><th>RVWMO 平台典型实现</th><th>Zalasr 平台实现</th></tr></thead><tbody><tr><td>relaxed</td><td>普通 load/store</td><td>同左</td></tr><tr><td>acquire</td><td>load + <code>fence r,rw</code></td><td><code>lw.aq</code> / <code>ld.aq</code></td></tr><tr><td>release</td><td><code>fence rw,w</code> + store</td><td><code>sw.rl</code> / <code>sd.rl</code></td></tr><tr><td>acq_rel</td><td>fence 组合或 AMO <code>.aqrl</code></td><td>Zalasr <code>.aqrl</code> 变体或 AMO <code>.aqrl</code></td></tr><tr><td>seq_cst</td><td><code>fence rw,rw</code> 组合</td><td>fence 仍需要（Zalasr 不等价 seq_cst）</td></tr></tbody></table></div>
+<blockquote><strong>性能工程师视角</strong>：这张表就是你的优化地图。<strong>每一次"load + fence"到"load.aq"的替换，都是删除一条独立屏障指令</strong>——在低竞争路径上这是纯收益；在高竞争路径上收益被竞争开销掩盖（§5.3 论文结论）。</blockquote>
+<hr>
+<h2 id="8-生态支持度矩阵">8. 生态支持度矩阵</h2>
+<h3 id="8-1-规范与-profile">8.1 规范与 Profile</h3>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>状态</th><th>等级</th></tr></thead><tbody><tr><td>六个扩展规范</td><td>全部 Ratified（v1.0 / v1.0.0）</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>RVA23U64</strong></td><td>强制 Zicclsm、Za64rs；<strong>Zabha/Zacas 列为 development options</strong>（开发选项，非强制）</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span>（规范页面，细节建议复核原文）</td></tr><tr><td>Zalasr/Ztso 在 RVA23 中的位置</td><td>本次未核实到明确条目</td><td><span class="badge badge-q" title="未能核实">?</span></td></tr></tbody></table></div>
+<h3 id="8-2-编译器-c-gcc-文档-s-llvm">8.2 编译器 <span class="badge badge-c" title="源码/一手来源核实">C</span>（GCC 文档）/ <span class="badge badge-s" title="单一来源，未交叉验证">S</span>（LLVM）</h3>
+<div class="table-wrap"><table><thead><tr><th>扩展</th><th>GCC</th><th>LLVM</th></tr></thead><tbody><tr><td>Zaamo / Zalrsc</td><td>支持（v1.0）<span class="badge badge-c" title="源码/一手来源核实">C</span></td><td>Assembly Support <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Zacas</td><td>支持（v1.0）<span class="badge badge-c" title="源码/一手来源核实">C</span></td><td>Supported <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Zabha</td><td>支持（v1.0）<span class="badge badge-c" title="源码/一手来源核实">C</span></td><td>Supported <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Zalasr</td><td>支持（v1.0）<span class="badge badge-c" title="源码/一手来源核实">C</span></td><td>Supported <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Ztso</td><td>支持（v1.0）<span class="badge badge-c" title="源码/一手来源核实">C</span></td><td>Supported <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr></tbody></table></div>
+<p>GCC 文档说明：<code>-march</code> 中显式加入扩展后，<strong>依赖扩展会被隐式补齐</strong>。<span class="badge badge-c" title="源码/一手来源核实">C</span></p>
+<h3 id="8-3-linux-内核">8.3 Linux 内核</h3>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>状态</th><th>等级</th></tr></thead><tbody><tr><td><strong>CONFIG_RISCV_ISA_ZACAS</strong></td><td>存在；启用后内核 atomic cmpxchg 走 <code>amocas</code>；依赖 CONFIG_RISCV_ALTERNATIVE（alternatives 机制做运行时指令替换）</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>主线合并窗口</td><td>riscv-for-linus-6.13 合并标签含 Zacas 相关系列</td><td><span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td><strong>CONFIG_RISCV_ISA_ZABHA</strong></td><td>存在</td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td><strong>Zalasr 支持</strong></td><td>RFC 阶段（Xu Lu，2025-08-26），目标 <code>smp_load_acquire</code> / <code>smp_store_release</code></td><td><span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr></tbody></table></div>
+<blockquote><strong>关键机制</strong>：内核通过 <strong>alternatives</strong>（运行时根据 ISA 探测结果替换指令序列）使用新原子扩展——<strong>同一内核二进制在有无 Zacas/Zabha 的平台上自动选择最优路径</strong>。这与你做用户态优化时的思路一致：运行时探测 + 指令替换。</blockquote>
+<h3 id="8-4-其他生态-s">8.4 其他生态 <span class="badge badge-s" title="单一来源，未交叉验证">S</span></h3>
+<ul><li><strong>OpenJDK</strong>：JDK-8315856 "RISC-V: Use Zacas extension for cmpxchg"——JIT 层同样走扩展探测路线。</li></ul>
+<hr>
+<h2 id="9-微架构与性能考量-性能工程师核心区">9. 微架构与性能考量（性能工程师核心区）</h2>
+<h3 id="9-1-lr-sc-重试风暴">9.1 LR/SC 重试风暴</h3>
+<p><strong>reservation 失效的典型原因</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：其他核写入同一 cache line、cache line 被逐出、中断/异常打断循环、（部分实现）同核其他内存访问。</p>
+<p><strong>性能含义</strong>：高竞争下 SC 失败率上升 → 循环重试 → <strong>每次重试都是一次完整的 LR→SC 序列 + 可能的 cache line 所有权重新获取</strong>。这是规范 rationale 判定"LR/SC 不如 CAS 可扩展"的微架构根源。</p>
+<p><strong>优化手段</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：</p>
+<ul><li>缩小临界区、降低共享变量争用密度</li><li>避免在约束循环内做任何多余操作（16 条指令限制同时是性能预算）</li><li>竞争不可避免时改用 AMO（Zaamo）或 <code>amocas</code>（Zacas）</li></ul>
+<h3 id="9-2-amo-与-cache-line-所有权">9.2 AMO 与 cache line 所有权</h3>
+<p>AMO 的每次执行都要求该 cache line 处于<strong>独占状态</strong>（需要写权限）<span class="badge badge-cstar" title="规范级稳定知识">C*</span>。多核高频 AMO 同一地址 = cache line 在核间乒乓——<strong>这是原子操作高竞争开销的本质</strong>，与指令选择无关。论文结论（§5.3）"高竞争下内存序收益被掩盖"正是这个现象的体现。</p>
+<p><strong>优化手段</strong> <span class="badge badge-cstar" title="规范级稳定知识">C*</span>：per-CPU/per-thread 计数 + 聚合、cache line 对齐隔离（避免 false sharing）、降低原子操作频率（batch）。</p>
+<h3 id="9-3-cas-循环-vs-硬件-amocas">9.3 CAS 循环 vs 硬件 amocas</h3>
+<div class="table-wrap"><table><thead><tr><th></th><th>LR/SC CAS 循环</th><th><code>amocas.d</code></th></tr></thead><tbody><tr><td>指令数</td><td>≥3 + 分支</td><td>1</td></tr><tr><td>竞争行为</td><td>SC 失败重试</td><td>硬件内部处理，无软件重试</td></tr><tr><td>可扩展性</td><td>差（rationale 原话）<span class="badge badge-c" title="源码/一手来源核实">C</span></td><td>好</td></tr><tr><td>128 位</td><td>不支持</td><td><code>amocas.q</code>（寄存器对）<span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr></tbody></table></div>
+<h3 id="9-4-zalasr-vs-fence-的收益场景">9.4 Zalasr vs fence 的收益场景</h3>
+<div class="table-wrap"><table><thead><tr><th>场景</th><th>预期收益</th><th>依据</th></tr></thead><tbody><tr><td>低竞争读侧（RCU、seqlock、指针发布）</td><td><strong>明显</strong>——删除独立屏障指令</td><td>机制分析 <span class="badge badge-cstar" title="规范级稳定知识">C*</span></td></tr><tr><td>高竞争锁路径</td><td><strong>有限</strong>——竞争开销主导</td><td>论文结论 <span class="badge badge-c" title="源码/一手来源核实">C</span></td></tr><tr><td>TSO 平台上的冗余 fence</td><td>实现相关，<strong>需实测</strong></td><td>§6.3</td></tr></tbody></table></div>
+<h3 id="9-5-横向对比-c">9.5 横向对比 <span class="badge badge-cstar" title="规范级稳定知识">C*</span></h3>
+<div class="table-wrap"><table><thead><tr><th></th><th>x86-64</th><th>ARMv8.1-A（LSE）</th><th>riscv64（全扩展）</th></tr></thead><tbody><tr><td>原子 RMW</td><td><code>lock add</code> 等前缀</td><td><code>LDADD</code> / <code>SWP</code> 等</td><td>Zaamo <code>amoadd</code> 等</td></tr><tr><td>CAS</td><td><code>lock cmpxchg</code></td><td><code>CAS</code> / <code>CASP</code></td><td>Zacas <code>amocas.w/d/q</code></td></tr><tr><td>128 位 CAS</td><td><code>lock cmpxchg16b</code></td><td><code>CASP</code></td><td><code>amocas.q</code></td></tr><tr><td>字节/半字原子</td><td>天然支持</td><td>LSE 天然支持</td><td>Zabha</td></tr><tr><td>load-acquire/store-release</td><td>（x86 TSO 天然）</td><td><code>LDAPR</code> / <code>STLR</code></td><td>Zalasr</td></tr><tr><td>乐观并发原语</td><td>无对应</td><td>无对应（LSE 取代）</td><td>Zalrsc LR/SC（保留）</td></tr></tbody></table></div>
+<p><strong>观察</strong>：RISC-V 是唯一同时保留<strong>乐观并发（LR/SC）与确定性 CAS（Zacas）两条路线</strong>的主流 ISA——这是历史包袱也是灵活性。x86/ARM 都走了"确定性原子指令"单路线。</p>
+<h3 id="9-6-rva23-的现实约束-c">9.6 RVA23 的现实约束 <span class="badge badge-c" title="源码/一手来源核实">C</span></h3>
+<p><strong>Zabha/Zacas 在 RVA23 中仅是 development options</strong>——意味着<strong>合规 RVA23 平台不保证有硬件 CAS 和字节原子</strong>。软件必须保留 LR/SC 回退路径（内核 alternatives 机制正是为此设计 <span class="badge badge-c" title="源码/一手来源核实">C</span>）。做性能优化时不能假设目标平台必有 Zacas。</p>
+<hr>
+<h2 id="10-学习路径与实验建议">10. 学习路径与实验建议</h2>
+<h3 id="10-1-阅读顺序">10.1 阅读顺序</h3>
+<ol><li>非特权 ISA 文档：Zaamo → Zalrsc → Zacas → Zabha → Zalasr → Ztso 六章（均已 ratified，v20260120 版）<span class="badge badge-c" title="源码/一手来源核实">C</span></li><li>RVWMO 解释材料（PPO 规则逐条读）<span class="badge badge-c" title="源码/一手来源核实">C</span></li><li>规范 rationale 章节（理解设计取舍）<span class="badge badge-c" title="源码/一手来源核实">C</span></li><li>arXiv 2302.03732（Zalasr 提案论文）<span class="badge badge-c" title="源码/一手来源核实">C</span></li></ol>
+<h3 id="10-2-实验建议-按性价比排序">10.2 实验建议（按性价比排序）</h3>
+<ol><li><strong>CAS 对比实验</strong>：同一 cmpxchg 逻辑，LR/SC 循环 vs <code>amocas.d</code>，扫描竞争核数，画重试率与吞吐曲线。直接验证 rationale 的可扩展性论断。</li><li><strong>fence vs Zalasr 实验</strong>：低竞争发布-订阅路径上，"load+fence r,rw" vs "ld.aq"，测每操作周期差。验证 §5.3 论文结论在你的微架构上是否成立。</li><li><strong>128 位 CAS 实验</strong>：用 <code>amocas.q</code> 实现 versioned pointer 的无锁栈，对比 LR/SC 版本。</li><li><strong>字节原子实验</strong>：共享字上 LR/SC 模拟 vs Zabha <code>amoadd.b</code>，验证"scalability and fairness"论断。</li></ol>
+<h3 id="10-3-模拟器支持">10.3 模拟器支持 <span class="badge badge-q" title="未能核实">?</span></h3>
+<p>QEMU / Spike / gem5 对 Zacas/Zabha/Zalasr/Ztso 的支持版本<strong>本次未在线核实</strong>——动手前先确认你的模拟器版本支持目标扩展。</p>
+<hr>
+<h2 id="11-不确定性清单">11. 不确定性清单</h2>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>状态</th></tr></thead><tbody><tr><td>RVA23 中 Zalasr/Ztso/Zicbom 的确切条目</td><td>规范页面抓取结果简略，未逐条确认 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>LLVM 各扩展支持的具体版本号</td><td>文档未列出版本 <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>Zacas 内核支持的确切主线版本</td><td>合并标签指向 6.13，kernelconfig 另显示 stable backport 列表，存在口径差异 <span class="badge badge-s" title="单一来源，未交叉验证">S</span></td></tr><tr><td>模拟器（QEMU/Spike/gem5）扩展支持矩阵</td><td>未核实 <span class="badge badge-q" title="未能核实">?</span></td></tr><tr><td>LR/SC constrained loop 的 16 条指令细则</td><td>基础常识 <span class="badge badge-cstar" title="规范级稳定知识">C*</span>，建议核对非特权 ISA 原文</td></tr><tr><td>Ztso 平台上冗余 fence 的微架构成本</td><td>实现相关，无公开数据 <span class="badge badge-q" title="未能核实">?</span></td></tr></tbody></table></div>
+<hr>
+<h2 id="12-参考来源">12. 参考来源</h2>
+<p><strong>规范（docs.riscv.org，v20260120 版，全部 ratified）</strong></p>
+<ul><li><a href="https://github.com/riscv/riscv-zaamo-zalrsc/blob/main/zaamo-zalrsc.adoc" rel="noopener">Zaamo/Zalrsc 规范仓库</a></li><li><a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/zacas.html" rel="noopener">Zacas — Atomic Compare-and-Swap</a></li><li><a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/zabha.html" rel="noopener">Zabha — Byte and Halfword Atomic Memory Operations</a></li><li><a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/zalasr.html" rel="noopener">Zalasr — Atomic Load-Acquire and Store-Release</a></li><li><a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/ztso-st-ext.html" rel="noopener">Ztso — Total Store Ordering</a></li><li><a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/mm-eplan.html" rel="noopener">RVWMO 解释材料</a></li><li><a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/rationale.html" rel="noopener">Historical Rationale for Extensions</a></li><li><a href="https://docs.riscv.org/reference/rva23/v1.0/rva23-profiles.html" rel="noopener">RVA23 Profiles</a></li></ul>
+<p><strong>论文与内核</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2302.03732" rel="noopener">Arden, Susskind, Sweeney — Adding Explicit Load-Acquire and Store-Release Instructions to the RISC-V ISA（arXiv 2302.03732，2023-09）</a></li><li><a href="https://lwn.net/Articles/1035244/" rel="noopener">riscv: Add Zalasr ISA extension support（LWN 1035244，2025-08-26）</a></li><li><a href="https://www.kernelconfig.io/CONFIG_RISCV_ISA_ZACAS" rel="noopener">CONFIG_RISCV_ISA_ZACAS</a> · <a href="https://www.kernelconfig.io/CONFIG_RISCV_ISA_ZABHA" rel="noopener">CONFIG_RISCV_ISA_ZABHA</a></li></ul>
+<p><strong>工具链</strong></p>
+<ul><li><a href="https://gcc.gnu.org/onlinedocs/gcc/RISC-V-Options.html" rel="noopener">GCC RISC-V Options</a></li><li><a href="https://llvm.org/docs/RISCVUsage.html" rel="noopener">LLVM RISC-V Target User Guide</a></li></ul>
+<p><strong>其他</strong></p>
+<ul><li><a href="https://bugs.openjdk.org/browse/JDK-8315856" rel="noopener">JDK-8315856 — RISC-V: Use Zacas extension for cmpxchg</a></li><li><a href="https://ubuntu.com/blog/risc-v-profiles-why-is-rva23-significant" rel="noopener">RISC-V profiles – why is RVA23 significant?（Ubuntu）</a></li></ul>
+<hr>
+<h2 id="附-方法说明">附：方法说明</h2>
+<p>本报告通过 Web 检索 + docs.riscv.org 一手规范交叉验证生成。六个扩展的规范状态、指令表、rationale 引文均为在线核实（<span class="badge badge-c" title="源码/一手来源核实">C</span>）；内存模型基础语义（<span class="badge badge-cstar" title="规范级稳定知识">C*</span>）为规范级稳定知识，标注了核对出处但未逐条在线复核。所有 <span class="badge badge-q" title="未能核实">?</span> 级条目为真实核查缺口。</p>
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js" integrity="sha384-N3QqR/7q+xm3BGX+CBbNI8AUmRRqcsDzToy+0z1NLDI0QmTKW8zvwLvqulJgk3dP" crossorigin="anonymous" onerror="window.__mermaidMissing=true"></script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  function fallback() {
+    nodes.forEach(function (n) {
+      if (n.getAttribute('data-processed')) return;
+      var pre = document.createElement('pre');
+      pre.className = 'mermaid-fallback';
+      pre.textContent = n.textContent;
+      n.textContent = '';
+      n.appendChild(pre);
+    });
+  }
+  if (window.__mermaidMissing || typeof mermaid === 'undefined') { fallback(); return; }
+  try {
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+    mermaid.run({ nodes: nodes }).catch(fallback);
+  } catch (e) { fallback(); }
+})();
+</script>
+</body>
+</html>

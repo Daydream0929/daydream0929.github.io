@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>具身智能技术调研：从视觉—语言—动作模型到可验证的物理闭环</title>
+<style>
+:root {
+  --fg: #1a1a1a; --fg-soft: #4a4a4a; --bg: #ffffff; --bg-soft: #f6f7f9;
+  --border: #e3e6ea; --accent: #b8442e; --code-bg: #f4f5f7;
+  --c: #1f7a4d; --cstar: #2563a8; --s: #a86b1f; --p: #7a4fa3; --q: #a33a3a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6e6e6; --fg-soft: #a8a8a8; --bg: #14161a; --bg-soft: #1b1e24;
+    --border: #2c313a; --accent: #e0705a; --code-bg: #1e2229;
+    --c: #58c08a; --cstar: #6aa8e0; --s: #d8a45a; --p: #b088d8; --q: #e07a7a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px; line-height: 1.75; -webkit-font-smoothing: antialiased;
+}
+.layout { display: flex; max-width: 1400px; margin: 0 auto; }
+.toc {
+  width: 280px; flex: 0 0 280px; position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto; padding: 32px 20px 32px 28px;
+  border-right: 1px solid var(--border); font-size: 13.5px;
+}
+.toc h2 {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-soft); margin: 0 0 12px; font-weight: 600;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block; padding: 5px 0; color: var(--fg-soft); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 10px;
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+.toc-l1 a { font-weight: 600; color: var(--fg); }
+.toc-l2 a { padding-left: 10px; }
+.toc-l3 a { padding-left: 24px; font-size: 12.5px; }
+main { flex: 1 1 auto; min-width: 0; padding: 40px 56px 96px; max-width: 940px; }
+h1 {
+  font-size: 30px; line-height: 1.35; margin: 0 0 8px; font-weight: 650;
+  letter-spacing: -.01em;
+}
+h2 {
+  font-size: 21px; margin: 44px 0 14px; padding-bottom: 8px; font-weight: 620;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 17px; margin: 30px 0 10px; font-weight: 600; }
+h4 { font-size: 15px; margin: 22px 0 8px; font-weight: 600; color: var(--fg-soft); }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+code {
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .875em; background: var(--code-bg); padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 18px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+blockquote {
+  margin: 0 0 18px; padding: 12px 18px; background: var(--bg-soft);
+  border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+}
+blockquote p { margin: 0; }
+ul, ol { margin: 0 0 16px; padding-left: 26px; }
+li { margin: 5px 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+.badge {
+  display: inline-block; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+  color: #fff; vertical-align: 1px; letter-spacing: .02em;
+}
+.badge-c { background: var(--c); }
+.badge-cstar { background: var(--cstar); }
+.badge-s { background: var(--s); }
+.badge-p { background: var(--p); }
+.badge-q { background: var(--q); }
+figure.fig {
+  margin: 28px auto 20px;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+figure.fig figcaption {
+  font-size: 13px;
+  color: var(--soft, #666);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.mermaid {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; margin: 0 0 20px; text-align: center; overflow-x: auto;
+}
+.mermaid-fallback {
+  text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; white-space: pre-wrap; color: var(--fg-soft);
+}
+.doc-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px;
+  font-size: 13px; color: var(--fg-soft);
+}
+.doc-meta span {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+@media (max-width: 1000px) {
+  .toc { display: none; }
+  main { padding: 28px 20px 64px; }
+}
+@media print {
+  .toc { display: none; }
+  main { max-width: none; padding: 0; }
+  a { color: var(--fg); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc"><h2>目录</h2><ul><li class="toc-l1"><a href="#具身智能技术调研-从视觉-语言-动作模型到可验证的物理闭环">具身智能技术调研：从视觉—语言—动作模型到可验证的物理闭环</a></li><li class="toc-l2"><a href="#0-阅读说明-证据-术语与非结论">0. 阅读说明：证据、术语与非结论</a></li><li class="toc-l3"><a href="#证据分级">证据分级</a></li><li class="toc-l3"><a href="#三个不应混淆的判断">三个不应混淆的判断</a></li><li class="toc-l2"><a href="#1-系统本质-模型必须嵌入受约束的控制闭环">1. 系统本质：模型必须嵌入受约束的控制闭环</a></li><li class="toc-l3"><a href="#1-1-时间尺度决定了分层设计">1.1 时间尺度决定了分层设计</a></li><li class="toc-l3"><a href="#1-2-关键接口比模型命名更重要">1.2 关键接口比模型命名更重要</a></li><li class="toc-l2"><a href="#2-技术路线-三类方案服务于不同风险面">2. 技术路线：三类方案服务于不同风险面</a></li><li class="toc-l3"><a href="#2-1-vla-的代表性证据-而非-排行榜">2.1 VLA 的代表性证据，而非“排行榜”</a></li><li class="toc-l2"><a href="#3-数据才是物理泛化的瓶颈">3. 数据才是物理泛化的瓶颈</a></li><li class="toc-l3"><a href="#3-1-为什么机器人数据比互联网数据更难">3.1 为什么机器人数据比互联网数据更难</a></li><li class="toc-l3"><a href="#3-2-数据集与基准的正确用途">3.2 数据集与基准的正确用途</a></li><li class="toc-l3"><a href="#3-3-数据治理不是附录">3.3 数据治理不是附录</a></li><li class="toc-l2"><a href="#4-仿真到真实-它缩短试验-不取代实机证据">4. 仿真到真实：它缩短试验，不取代实机证据</a></li><li class="toc-l2"><a href="#5-评测-从-成功率-升级为可运营指标">5. 评测：从“成功率”升级为可运营指标</a></li><li class="toc-l3"><a href="#5-1-三层证据链">5.1 三层证据链</a></li><li class="toc-l3"><a href="#5-2-建议的实机-scorecard">5.2 建议的实机 scorecard</a></li><li class="toc-l2"><a href="#6-安全与部署-先定义不可越过的边界">6. 安全与部署：先定义不可越过的边界</a></li><li class="toc-l3"><a href="#6-1-独立安全层的最低能力">6.1 独立安全层的最低能力</a></li><li class="toc-l3"><a href="#6-2-逐门推进-而非-一键上线">6.2 逐门推进，而非“一键上线”</a></li><li class="toc-l3"><a href="#6-3-三种本体的现实取舍">6.3 三种本体的现实取舍</a></li><li class="toc-l2"><a href="#7-开源与生态-把-可下载-拆成可运行-可修改-可商用">7. 开源与生态：把“可下载”拆成可运行、可修改、可商用</a></li><li class="toc-l2"><a href="#8-决策框架-用任务而非-通用性-立项">8. 决策框架：用任务而非“通用性”立项</a></li><li class="toc-l3"><a href="#8-1-poc-选择清单">8.1 PoC 选择清单</a></li><li class="toc-l3"><a href="#8-2-立项时应冻结的验收契约">8.2 立项时应冻结的验收契约</a></li><li class="toc-l2"><a href="#9-未来-12-24-个月的可检验信号">9. 未来 12–24 个月的可检验信号</a></li><li class="toc-l2"><a href="#10-最终判断">10. 最终判断</a></li><li class="toc-l2"><a href="#参考资料-优先一手来源">参考资料（优先一手来源）</a></li></ul></nav>
+<main>
+<h1>具身智能技术调研：从视觉—语言—动作模型到可验证的物理闭环</h1>
+<div class="doc-meta"><span>由 embodied-intelligence-research.md 生成</span></div>
+<h1 id="具身智能技术调研-从视觉-语言-动作模型到可验证的物理闭环">具身智能技术调研：从视觉—语言—动作模型到可验证的物理闭环</h1>
+<blockquote><strong>结论先行</strong>：具身智能的关键进步不是让模型“会描述世界”，而是让系统在不完整观测、接触不确定性和安全约束下，持续完成可验收的物理任务。视觉—语言—动作（VLA）模型已显示出跨物体、跨语言指令的迁移潜力；但真实生产能力仍主要取决于任务边界、数据闭环、确定性低层控制、独立安全回路与渐进式验证，而非单个基础模型的参数规模。  <strong>调研截点</strong>：2026-09-07　|　<strong>范围</strong>：物理机器人（固定机械臂、移动操作平台、人形平台），不把纯虚拟智能体或宣传演示等同于可部署系统。</blockquote>
+<hr>
+<h2 id="0-阅读说明-证据-术语与非结论">0. 阅读说明：证据、术语与非结论</h2>
+<h3 id="证据分级">证据分级</h3>
+<div class="table-wrap"><table><thead><tr><th>标签</th><th>含义</th><th>本文使用方式</th></tr></thead><tbody><tr><td><strong>[A]</strong></td><td>原始论文、正式标准、模型卡或官方技术页面</td><td>支撑机制、实验设置和规范边界</td></tr><tr><td><strong>[B]</strong></td><td>官方代码仓库、开发者文档、项目页</td><td>支撑可获得性、接口和复现实务；状态可能变化</td></tr><tr><td><strong>[C]</strong></td><td>基于 A/B 的工程推断</td><td>明确标记为建议，不表述为已验证事实</td></tr></tbody></table></div>
+<ul><li>本文优先引用一手资料；厂商展示、融资规模和单段视频<strong>不</strong>作为泛化能力证据。</li><li><strong>具身智能</strong>指感知、状态估计、决策/策略、运动控制、执行器与反馈学习构成的物理闭环。大语言模型可以是其中的任务接口或语义先验，但不是闭环本身。</li><li><strong>VLA</strong>（Vision-Language-Action）以视觉与语言为条件直接或近直接地产生机器人动作/动作块；它与传统规划、技能库、伺服控制并不互斥。</li></ul>
+<h3 id="三个不应混淆的判断">三个不应混淆的判断</h3>
+<ol><li><strong>会做演示 ≠ 可长期运行</strong>：一次成功没有覆盖遮挡、标定漂移、网络抖动、物体偏移、恢复动作与人工接管。</li><li><strong>仿真得分 ≠ 实机安全</strong>：仿真可以扩大覆盖，但接触、柔性物、摩擦、相机噪声与人机共处仍存在域差距。</li><li><strong>语言泛化 ≠ 运动泛化</strong>：能理解“把红杯放入盒中”并不保证在新夹具、不同摩擦或受限关节下能稳定完成抓取与放置。</li></ol>
+<hr>
+<h2 id="1-系统本质-模型必须嵌入受约束的控制闭环">1. 系统本质：模型必须嵌入受约束的控制闭环</h2>
+<p>一个可部署系统至少有两条彼此独立的链路：</p>
+<ul><li><strong>能力链路</strong>：从多模态观测和任务指令，产生候选动作，利用技能与控制器执行，并把成败样本回流至训练与评测；</li><li><strong>安全链路</strong>：不信任模型输出，独立校验速度、力、工作空间、碰撞、通信超时与急停状态，并可在模型失效时停止或降级。</li></ul>
+<figure class="fig"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDMuMCAoMCkKIC0tPgo8IS0tIFRpdGxlOiBlbWJvZGllZF9hcmNoaXRlY3R1cmUgUGFnZXM6IDEgLS0+Cjxzdmcgd2lkdGg9IjE1NDZwdCIgaGVpZ2h0PSIyNjJwdCIKIHZpZXdCb3g9IjAuMDAgMC4wMCAxNTQ2LjAwIDI2Mi4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoMTggMjQ0KSI+Cjx0aXRsZT5lbWJvZGllZF9hcmNoaXRlY3R1cmU8L3RpdGxlPgo8IS0tIHNlbnNvcnMgLS0+CjxnIGlkPSJub2RlMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+c2Vuc29yczwvdGl0bGU+CjxwYXRoIGZpbGw9IiNlMGYyZmUiIHN0cm9rZT0iIzAyODRjNyIgc3Ryb2tlLXdpZHRoPSIxLjIiIGQ9Ik0xMzEsLTIyNkMxMzEsLTIyNiAxMiwtMjI2IDEyLC0yMjYgNiwtMjI2IDAsLTIyMCAwLC0yMTQgMCwtMjE0IDAsLTE5NCAwLC0xOTQgMCwtMTg4IDYsLTE4MiAxMiwtMTgyIDEyLC0xODIgMTMxLC0xODIgMTMxLC0xODIgMTM3LC0xODIgMTQzLC0xODggMTQzLC0xOTQgMTQzLC0xOTQgMTQzLC0yMTQgMTQzLC0yMTQgMTQzLC0yMjAgMTM3LC0yMjYgMTMxLC0yMjYiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzEuNSIgeT0iLTIwNy40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPueJqeeQhuS4lueVjOS4juS8oOaEn+WZqDwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzEuNSIgeT0iLTE5NC40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPuinhuiniSDCtyDlipvop4kgwrcg5pys5L2T54q25oCBPC90ZXh0Pgo8L2c+CjwhLS0gc3RhdGUgLS0+CjxnIGlkPSJub2RlMiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+c3RhdGU8L3RpdGxlPgo8cGF0aCBmaWxsPSIjZGJlYWZlIiBzdHJva2U9IiMyNTYzZWIiIHN0cm9rZS13aWR0aD0iMS4yIiBkPSJNMzYyLC0yMjZDMzYyLC0yMjYgMjQ5LC0yMjYgMjQ5LC0yMjYgMjQzLC0yMjYgMjM3LC0yMjAgMjM3LC0yMTQgMjM3LC0yMTQgMjM3LC0xOTQgMjM3LC0xOTQgMjM3LC0xODggMjQzLC0xODIgMjQ5LC0xODIgMjQ5LC0xODIgMzYyLC0xODIgMzYyLC0xODIgMzY4LC0xODIgMzc0LC0xODggMzc0LC0xOTQgMzc0LC0xOTQgMzc0LC0yMTQgMzc0LC0yMTQgMzc0LC0yMjAgMzY4LC0yMjYgMzYyLC0yMjYiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzA1LjUiIHk9Ii0yMDcuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7nirbmgIHkvLDorqHkuI7lnLrmma/ooajlvoE8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMwNS41IiB5PSItMTk0LjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+5qCH5a6aIMK3IOaXtumSnyDCtyDlnZDmoIfns7s8L3RleHQ+CjwvZz4KPCEtLSBzZW5zb3JzJiM0NTsmZ3Q7c3RhdGUgLS0+CjxnIGlkPSJlZGdlMSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+c2Vuc29ycyYjNDU7Jmd0O3N0YXRlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjQ3NDhiIiBzdHJva2Utd2lkdGg9IjEuNSIgZD0iTTE0My4wNSwtMjA0QzE3MC4zNCwtMjA0IDIwMS42MiwtMjA0IDIyOS4zMywtMjA0Ii8+Cjxwb2x5Z29uIGZpbGw9IiM2NDc0OGIiIHN0cm9rZT0iIzY0NzQ4YiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHBvaW50cz0iMjI5LjY3LC0yMDYuNDUgMjM2LjY3LC0yMDQgMjI5LjY3LC0yMDEuNTUgMjI5LjY3LC0yMDYuNDUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTkwIiB5PSItMjA3IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAuMDAiPuWQjOatpeingua1izwvdGV4dD4KPC9nPgo8IS0tIHBvbGljeSAtLT4KPGcgaWQ9Im5vZGUzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5wb2xpY3k8L3RpdGxlPgo8cGF0aCBmaWxsPSIjZWRlOWZlIiBzdHJva2U9IiM3YzNhZWQiIHN0cm9rZS13aWR0aD0iMS4yIiBkPSJNNjQ4LjUsLTIyNkM2NDguNSwtMjI2IDQ5My41LC0yMjYgNDkzLjUsLTIyNiA0ODcuNSwtMjI2IDQ4MS41LC0yMjAgNDgxLjUsLTIxNCA0ODEuNSwtMjE0IDQ4MS41LC0xOTQgNDgxLjUsLTE5NCA0ODEuNSwtMTg4IDQ4Ny41LC0xODIgNDkzLjUsLTE4MiA0OTMuNSwtMTgyIDY0OC41LC0xODIgNjQ4LjUsLTE4MiA2NTQuNSwtMTgyIDY2MC41LC0xODggNjYwLjUsLTE5NCA2NjAuNSwtMTk0IDY2MC41LC0yMTQgNjYwLjUsLTIxNCA2NjAuNSwtMjIwIDY1NC41LC0yMjYgNjQ4LjUsLTIyNiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1NzEiIHk9Ii0yMDcuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7ku7vliqHmqKHlnosgLyBWTEEg562W55WlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1NzEiIHk9Ii0xOTQuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7or63oqIDmnaHku7Ygwrcg6KeG6KeJ5p2h5Lu2IMK3IOWKqOS9nOWdlzwvdGV4dD4KPC9nPgo8IS0tIHN0YXRlJiM0NTsmZ3Q7cG9saWN5IC0tPgo8ZyBpZD0iZWRnZTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnN0YXRlJiM0NTsmZ3Q7cG9saWN5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjQ3NDhiIiBzdHJva2Utd2lkdGg9IjEuNSIgZD0iTTM3NC4wMiwtMjA0QzQwNC40OCwtMjA0IDQ0MS4wMSwtMjA0IDQ3NC4yNCwtMjA0Ii8+Cjxwb2x5Z29uIGZpbGw9IiM2NDc0OGIiIHN0cm9rZT0iIzY0NzQ4YiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHBvaW50cz0iNDc0LjI3LC0yMDYuNDUgNDgxLjI3LC0yMDQgNDc0LjI3LC0yMDEuNTUgNDc0LjI3LC0yMDYuNDUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDI1LjUiIHk9Ii0yMDciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMC4wMCI+54q25oCBIC8g5oyH5LukPC90ZXh0Pgo8L2c+CjwhLS0gc2tpbGxzIC0tPgo8ZyBpZD0ibm9kZTQiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnNraWxsczwvdGl0bGU+CjxwYXRoIGZpbGw9IiNmZWYzYzciIHN0cm9rZT0iI2Q5NzcwNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGQ9Ik05MDksLTE4MUM5MDksLTE4MSA4MDgsLTE4MSA4MDgsLTE4MSA4MDIsLTE4MSA3OTYsLTE3NSA3OTYsLTE2OSA3OTYsLTE2OSA3OTYsLTE0OSA3OTYsLTE0OSA3OTYsLTE0MyA4MDIsLTEzNyA4MDgsLTEzNyA4MDgsLTEzNyA5MDksLTEzNyA5MDksLTEzNyA5MTUsLTEzNyA5MjEsLTE0MyA5MjEsLTE0OSA5MjEsLTE0OSA5MjEsLTE2OSA5MjEsLTE2OSA5MjEsLTE3NSA5MTUsLTE4MSA5MDksLTE4MSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI4NTguNSIgeT0iLTE2Mi40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPuaKgOiDveW6k+S4jui/kOWKqOaOp+WItjwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iODU4LjUiIHk9Ii0xNDkuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7op4TliJIgwrcg6L2o6L+5IMK3IOS8uuacjTwvdGV4dD4KPC9nPgo8IS0tIHBvbGljeSYjNDU7Jmd0O3NraWxscyAtLT4KPGcgaWQ9ImVkZ2UzIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5wb2xpY3kmIzQ1OyZndDtza2lsbHM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiM2NDc0OGIiIHN0cm9rZS13aWR0aD0iMS41IiBkPSJNNjYwLjc3LC0xOTAuMDFDNzAyLjA3LC0xODMuNSA3NTAuNDMsLTE3NS44OCA3ODguODgsLTE2OS44MiIvPgo8cG9seWdvbiBmaWxsPSIjNjQ3NDhiIiBzdHJva2U9IiM2NDc0OGIiIHN0cm9rZS13aWR0aD0iMS41IiBwb2ludHM9Ijc4OS40LC0xNzIuMjEgNzk1Ljk0LC0xNjguNyA3ODguNjQsLTE2Ny4zNyA3ODkuNCwtMTcyLjIxIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjczMC41IiB5PSItMTg3IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAuMDAiPuWAmemAieWKqOS9nDwvdGV4dD4KPC9nPgo8IS0tIHJvYm90IC0tPgo8ZyBpZD0ibm9kZTUiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvYm90PC90aXRsZT4KPHBhdGggZmlsbD0iI2RjZmNlNyIgc3Ryb2tlPSIjMTZhMzRhIiBzdHJva2Utd2lkdGg9IjEuMiIgZD0iTTExOTEsLTE4MUMxMTkxLC0xODEgMTAzNiwtMTgxIDEwMzYsLTE4MSAxMDMwLC0xODEgMTAyNCwtMTc1IDEwMjQsLTE2OSAxMDI0LC0xNjkgMTAyNCwtMTQ5IDEwMjQsLTE0OSAxMDI0LC0xNDMgMTAzMCwtMTM3IDEwMzYsLTEzNyAxMDM2LC0xMzcgMTE5MSwtMTM3IDExOTEsLTEzNyAxMTk3LC0xMzcgMTIwMywtMTQzIDEyMDMsLTE0OSAxMjAzLC0xNDkgMTIwMywtMTY5IDEyMDMsLTE2OSAxMjAzLC0xNzUgMTE5NywtMTgxIDExOTEsLTE4MSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMTEzLjUiIHk9Ii0xNjIuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7miafooYzlmajkuI7njq/looM8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjExMTMuNSIgeT0iLTE0OS40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPuacuuaisOiHgiDCtyDnp7vliqjlupXnm5ggwrcg5Lq65b2i5bmz5Y+wPC90ZXh0Pgo8L2c+CjwhLS0gc2tpbGxzJiM0NTsmZ3Q7cm9ib3QgLS0+CjxnIGlkPSJlZGdlNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+c2tpbGxzJiM0NTsmZ3Q7cm9ib3Q8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiM2NDc0OGIiIHN0cm9rZS13aWR0aD0iMS41IiBkPSJNOTIxLjA3LC0xNTlDOTQ5Ljc2LC0xNTkgOTg0LjU3LC0xNTkgMTAxNi41OSwtMTU5Ii8+Cjxwb2x5Z29uIGZpbGw9IiM2NDc0OGIiIHN0cm9rZT0iIzY0NzQ4YiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHBvaW50cz0iMTAxNi44MSwtMTYxLjQ1IDEwMjMuODEsLTE1OSAxMDE2LjgxLC0xNTYuNTUgMTAxNi44MSwtMTYxLjQ1Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9Ijk3Mi41IiB5PSItMTYyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAuMDAiPuehruWumuaAp+aOp+WItjwvdGV4dD4KPC9nPgo8IS0tIHJvYm90JiM0NTsmZ3Q7c2Vuc29ycyAtLT4KPGcgaWQ9ImVkZ2U1IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb2JvdCYjNDU7Jmd0O3NlbnNvcnM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiM2NDc0OGIiIHN0cm9rZS13aWR0aD0iMS41IiBkPSJNMTAyNS44NywtMTM2Ljk2Qzk5My4yMywtMTI5LjcgOTU1LjYzLC0xMjIuNTggOTIxLC0xMTkgNzY5LjQ4LC0xMDMuMzQgMzg3LjQsLTEzOS44MiAyMzcsLTE2NCAyMDguMzgsLTE2OC42IDE3Ny4zOSwtMTc1LjYgMTUwLjExLC0xODIuNDYiLz4KPHBvbHlnb24gZmlsbD0iIzY0NzQ4YiIgc3Ryb2tlPSIjNjQ3NDhiIiBzdHJva2Utd2lkdGg9IjEuNSIgcG9pbnRzPSIxNDkuNDQsLTE4MC4xIDE0My4yNSwtMTg0LjIgMTUwLjY0LC0xODQuODUgMTQ5LjQ0LC0xODAuMSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1NzEiIHk9Ii0xMzciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMC4wMCI+54mp55CG5Y+N6aaIPC90ZXh0Pgo8L2c+CjwhLS0gZGF0YSAtLT4KPGcgaWQ9Im5vZGU2IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5kYXRhPC90aXRsZT4KPHBhdGggZmlsbD0iI2ZjZTdmMyIgc3Ryb2tlPSIjZGIyNzc3IiBzdHJva2Utd2lkdGg9IjEuMiIgZD0iTTE0OTgsLTIxOUMxNDk4LC0yMTkgMTM0NiwtMjE5IDEzNDYsLTIxOSAxMzQwLC0yMTkgMTMzNCwtMjEzIDEzMzQsLTIwNyAxMzM0LC0yMDcgMTMzNCwtMTg3IDEzMzQsLTE4NyAxMzM0LC0xODEgMTM0MCwtMTc1IDEzNDYsLTE3NSAxMzQ2LC0xNzUgMTQ5OCwtMTc1IDE0OTgsLTE3NSAxNTA0LC0xNzUgMTUxMCwtMTgxIDE1MTAsLTE4NyAxNTEwLC0xODcgMTUxMCwtMjA3IDE1MTAsLTIwNyAxNTEwLC0yMTMgMTUwNCwtMjE5IDE0OTgsLTIxOSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNDIyIiB5PSItMjAwLjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+5pWw5o2u5LiO6K+E5rWL6Zet546vPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNDIyIiB5PSItMTg3LjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+56S65pWZIMK3IOS7v+ecnyDCtyDlm57mlL4gwrcg5aSx5pWI5qC35pysPC90ZXh0Pgo8L2c+CjwhLS0gcm9ib3QmIzQ1OyZndDtkYXRhIC0tPgo8ZyBpZD0iZWRnZTciIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvYm90JiM0NTsmZ3Q7ZGF0YTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2RiMjc3NyIgc3Ryb2tlLXdpZHRoPSIxLjUiIGQ9Ik0xMjAzLjE1LC0xNjkuOTlDMTI0MS44NSwtMTc0Ljc5IDEyODcuMjcsLTE4MC40MiAxMzI2LjYsLTE4NS4zIi8+Cjxwb2x5Z29uIGZpbGw9IiNkYjI3NzciIHN0cm9rZT0iI2RiMjc3NyIgc3Ryb2tlLXdpZHRoPSIxLjUiIHBvaW50cz0iMTMyNi42MiwtMTg3Ljc3IDEzMzMuODcsLTE4Ni4yIDEzMjcuMjIsLTE4Mi45IDEzMjYuNjIsLTE4Ny43NyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMjY4LjUiIHk9Ii0xODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMC4wMCIgZmlsbD0iIzlkMTc0ZCI+5pel5b+XIC8g5oiQ6LSlIC8g5o6l566hPC90ZXh0Pgo8L2c+CjwhLS0gZGF0YSYjNDU7Jmd0O3BvbGljeSAtLT4KPGcgaWQ9ImVkZ2U2IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5kYXRhJiM0NTsmZ3Q7cG9saWN5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZGIyNzc3IiBzdHJva2Utd2lkdGg9IjEuNSIgZD0iTTEzMzMuODcsLTIwMS4xOEMxMzI0LjgsLTIwMS41MSAxMzE1LjcxLC0yMDEuNzkgMTMwNywtMjAyIDEwNjcuOTUsLTIwNy42OCAxMDA4LjExLC0yMDMuNTYgNzY5LC0yMDQgNzM2LjA5LC0yMDQuMDYgNzAwLjA5LC0yMDQuMDggNjY3Ljk3LC0yMDQuMDciLz4KPHBvbHlnb24gZmlsbD0iI2RiMjc3NyIgc3Ryb2tlPSIjZGIyNzc3IiBzdHJva2Utd2lkdGg9IjEuNSIgcG9pbnRzPSI2NjcuNzUsLTIwMS42MiA2NjAuNzUsLTIwNC4wNyA2NjcuNzUsLTIwNi41MiA2NjcuNzUsLTIwMS42MiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI5NzIuNSIgeT0iLTIwNyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwLjAwIiBmaWxsPSIjOWQxNzRkIj7orq3nu4PkuI7lm57lvZI8L3RleHQ+CjwvZz4KPCEtLSBzYWZldHkgLS0+CjxnIGlkPSJub2RlNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+c2FmZXR5PC90aXRsZT4KPHBhdGggZmlsbD0iI2ZlZTJlMiIgc3Ryb2tlPSIjZGMyNjI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZD0iTTY1MywtNDRDNjUzLC00NCA0ODksLTQ0IDQ4OSwtNDQgNDgzLC00NCA0NzcsLTM4IDQ3NywtMzIgNDc3LC0zMiA0NzcsLTEyIDQ3NywtMTIgNDc3LC02IDQ4MywwIDQ4OSwwIDQ4OSwwIDY1MywwIDY1MywwIDY1OSwwIDY2NSwtNiA2NjUsLTEyIDY2NSwtMTIgNjY1LC0zMiA2NjUsLTMyIDY2NSwtMzggNjU5LC00NCA2NTMsLTQ0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjU3MSIgeT0iLTI1LjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+54us56uL5a6J5YWo6L6555WMPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1NzEiIHk9Ii0xMi40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPumZkOS9jSDCtyDnorDmkp7nm5HmtYsgwrcg55yL6Zeo54uXIMK3IOaApeWBnDwvdGV4dD4KPC9nPgo8IS0tIHNhZmV0eSYjNDU7Jmd0O3NraWxscyAtLT4KPGcgaWQ9ImVkZ2U4IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5zYWZldHkmIzQ1OyZndDtza2lsbHM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiNkYzI2MjYiIHN0cm9rZS13aWR0aD0iMi4zIiBkPSJNNjE3Ljg3LC00NC4wMUM2NjguOTIsLTY4LjUxIDc1MS4yNSwtMTA4LjAyIDgwNC44OCwtMTMzLjc1Ii8+Cjxwb2x5Z29uIGZpbGw9IiNkYzI2MjYiIHN0cm9rZT0iI2RjMjYyNiIgc3Ryb2tlLXdpZHRoPSIyLjMiIHBvaW50cz0iODAzLjksLTEzNiA4MTEuMjcsLTEzNi44MiA4MDYuMDIsLTEzMS41OCA4MDMuOSwtMTM2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjczMC41IiB5PSItMTE4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAuMDAiIGZpbGw9IiNiOTFjMWMiPuWFgeiuuCAvIOaLkue7nSAvIOWBnOatojwvdGV4dD4KPC9nPgo8IS0tIHNhZmV0eSYjNDU7Jmd0O3JvYm90IC0tPgo8ZyBpZD0iZWRnZTkiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnNhZmV0eSYjNDU7Jmd0O3JvYm90PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZGMyNjI2IiBzdHJva2Utd2lkdGg9IjIuMyIgZD0iTTY2NS4zOCwtMTEuODZDNzU1LjM4LC02LjM0IDg5Mi44NywtOS40IDk5NywtNjMgMTAzMS4zNCwtODAuNjggMTA2NC42MSwtMTEwLjA0IDEwODYuNTUsLTEzMS42NCIvPgo8cG9seWdvbiBmaWxsPSIjZGMyNjI2IiBzdHJva2U9IiNkYzI2MjYiIHN0cm9rZS13aWR0aD0iMi4zIiBwb2ludHM9IjEwODQuOTIsLTEzMy40NyAxMDkxLjYsLTEzNi42OCAxMDg4LjM4LC0xMzAgMTA4NC45MiwtMTMzLjQ3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9Ijg1OC41IiB5PSItMzciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMC4wMCIgZmlsbD0iI2I5MWMxYyI+56Gs5Lu25LqS6ZSBPC90ZXh0Pgo8L2c+CjwvZz4KPC9zdmc+Cg==" alt="具身智能的能力与安全闭环"><figcaption>具身智能的能力与安全闭环</figcaption></figure>
+<p><em>图 1　能力链路与安全链路必须解耦。模型可提出动作，但不应是物理安全的唯一裁决者。图源：本文根据 [1][2][12][16] 整理。</em></p>
+<h3 id="1-1-时间尺度决定了分层设计">1.1 时间尺度决定了分层设计</h3>
+<div class="table-wrap"><table><thead><tr><th>层级</th><th>典型职责</th><th>工程属性</th><th>失效时的后果</th></tr></thead><tbody><tr><td>任务层</td><td>解释自然语言、选择子任务、估计完成条件</td><td>允许较慢、可调用大模型</td><td>任务选错、语义歧义</td></tr><tr><td>策略层</td><td>视觉条件动作、动作块、重规划</td><td>VLA / 模仿学习 / 强化学习</td><td>泛化失败、动作不可执行</td></tr><tr><td>技能与规划层</td><td>抓取、插拔、避障、轨迹生成</td><td>有明确坐标系、约束与可测指标</td><td>轨迹失败、无恢复策略</td></tr><tr><td>伺服与安全层</td><td>关节控制、限位、碰撞/力监测、急停</td><td>必须确定、可审计、低时延</td><td>设备、物料或人员风险</td></tr></tbody></table></div>
+<p><strong>工程推断 [C]</strong>：把生成式/概率式策略限定在任务层或候选动作层，并把最终执行权交给可验证的控制与安全层，通常比“端到端直接下发电机命令”更利于首批真实部署。这个判断不否定端到端学习，而是将其置于可观测、可拒绝、可回退的系统边界内。</p>
+<h3 id="1-2-关键接口比模型命名更重要">1.2 关键接口比模型命名更重要</h3>
+<p>应把下列接口作为可测试的“数据契约”：相机内外参和时间戳、机器人坐标系、控制频率、动作表示、延迟预算、夹具状态、力/扭矩单位、任务成功判据，以及人工接管事件。跨本体数据训练时，动作空间和观测延迟若未显式处理，模型很容易把“不同机器人”误当作同一动力学系统。[7][10]</p>
+<hr>
+<h2 id="2-技术路线-三类方案服务于不同风险面">2. 技术路线：三类方案服务于不同风险面</h2>
+<div class="table-wrap"><table><thead><tr><th>路线</th><th>核心思想</th><th>适合的问题</th><th>优势</th><th>主要短板</th><th>首批部署建议</th></tr></thead><tbody><tr><td><strong>端到端 VLA</strong></td><td>图像+文字→离散动作或连续动作块</td><td>语义多样、物体外观变化多的操作</td><td>语言条件泛化、端到端学习接口</td><td>数据昂贵；长时程误差累计；难以解释</td><td>作为受约束的技能选择器或候选策略</td></tr><tr><td><strong>分层/模块化</strong></td><td>任务规划、场景表征、技能策略、控制器分工</td><td>多步骤、需诊断与恢复的流程</td><td>易加约束、易定位故障、可替换模块</td><td>接口设计复杂；误差会跨模块传递</td><td>大多数生产 PoC 的默认路线</td></tr><tr><td><strong>专用策略+确定性自动化</strong></td><td>为固定工位、物料和轨迹优化</td><td>节拍、精度和可靠性优先的重复任务</td><td>可验证、吞吐稳定、验收清晰</td><td>换型和语义泛化较弱</td><td>最高优先级；VLA 增强异常处理</td></tr></tbody></table></div>
+<h3 id="2-1-vla-的代表性证据-而非-排行榜">2.1 VLA 的代表性证据，而非“排行榜”</h3>
+<div class="table-wrap"><table><thead><tr><th>系统</th><th>一手证据与事实</th><th>说明</th><th>对采购/研发的含义</th></tr></thead><tbody><tr><td><strong>RT-2</strong>（2023）</td><td>将机器人轨迹表示为 token，与互联网视觉—语言数据共同训练；原论文在其特定新颖任务设置中报告 RT-2 成功率 62%，RT-1 为 32%。[1] <strong>[A]</strong></td><td>展示“网络语义→机器人动作”的迁移可行性。</td><td>这是研究评测，不是对任意工厂任务的 SLA。</td></tr><tr><td><strong>OpenVLA</strong>（2024）</td><td>公开 7B VLA，融合 SigLIP/DINOv2 视觉编码器与 Llama 2 主干；项目页称其用 97 万个 Open X-Embodiment episode 训练，并在其泛化评测中优于若干基线。[2][3] <strong>[A/B]</strong></td><td>代表可复现、可微调的开放路径。</td><td>许可证、显存、动作适配和实机校准均需独立核验。</td></tr><tr><td><strong>π₀ / OpenPI</strong>（2024–）</td><td>π₀ 项目使用 VLM 与 flow matching 生成连续动作，原始资料报告 7 类机器人、68 个任务、约 1 万小时数据与 50 Hz 控制输出；OpenPI 仓库公开 π₀、π₀.₅、FAST 相关实现与若干工作流。[4][5] <strong>[A/B]</strong></td><td>连续动作生成与异构机器人数据是重要方向。</td><td>原始 π₀ 未给出完整可复现权重/训练集；“可用代码”不等于目标本体已验证。</td></tr><tr><td><strong>Isaac GR00T</strong>（2025–）</td><td>NVIDIA 将其定位为通用人形机器人开放参考平台，并连接基础模型、开放数据、仿真与边缘计算组件。[6] <strong>[B]</strong></td><td>有利于打通工具链，但公开页的能力表述与独立基准不同。</td><td>逐项验证模型版本、训练数据、硬件和任务指标。</td></tr><tr><td><strong>Gemini Robotics</strong>（版本持续演进）</td><td>官方将模型描述为 VLA/具身推理系列，面向从视觉和语言到机器人控制的接口。[8] <strong>[B]</strong></td><td>表明前沿闭源模型正进入机器人接口层。</td><td>接入条件、数据出境、版本漂移、可审计性应写入供应条款。</td></tr></tbody></table></div>
+<blockquote><strong>可比性警告</strong>：上述系统使用的机器人形态、相机、任务分布、训练数据和成功定义不同。没有统一实机协议时，不应从一项论文或一次演示推导“某模型总体领先”。</blockquote>
+<hr>
+<h2 id="3-数据才是物理泛化的瓶颈">3. 数据才是物理泛化的瓶颈</h2>
+<h3 id="3-1-为什么机器人数据比互联网数据更难">3.1 为什么机器人数据比互联网数据更难</h3>
+<p>互联网图文包含丰富语义，却通常缺少精确的末端位姿、夹具状态、力觉、坐标系、控制延迟、失败恢复与安全约束。机器人记录还需要处理本体差异、相机安装差异和操作者差异。Open X-Embodiment/RT-X 汇聚 21 家以上机构的 22 种机器人、527 项技能和百万级轨迹，证明了跨机构、跨机器人汇聚数据的价值，同时也把动作归一化和数据质量控制推到工程核心。[7]</p>
+<div class="table-wrap"><table><thead><tr><th>数据类别</th><th>应包含的字段</th><th>能解决什么</th><th>常见误用</th></tr></thead><tbody><tr><td>遥操作/示教</td><td>多视角视频、关节/末端状态、动作、时间戳、任务标签</td><td>基础模仿与接触先验</td><td>只存成功片段，导致恢复能力缺失</td></tr><tr><td>自主 rollout</td><td>模型版本、环境差异、干预、失败原因</td><td>分布外检测、主动采样</td><td>未记录人工接管，使失败不可解释</td></tr><tr><td>仿真数据</td><td>随机化参数、资产版本、接触配置、种子</td><td>预训练和覆盖长尾组合</td><td>误以为高仿真分数就是实机表现</td></tr><tr><td>运行日志</td><td>传感器健康、延迟、急停、保护停、轨迹</td><td>可靠性、审计与回归测试</td><td>与训练集脱节，无法复现线上失效</td></tr></tbody></table></div>
+<p><strong>数据闭环最小集 [C]</strong>：对每次实机尝试同时存储“指令—观测—候选动作—安全裁决—最终动作—结果—人工干预—硬件/软件版本”。没有这条可追溯链路，迭代会退化成不可复现的试错。</p>
+<h3 id="3-2-数据集与基准的正确用途">3.2 数据集与基准的正确用途</h3>
+<ul><li><strong>Open X-Embodiment / RT-X</strong>：[7] 汇聚异构机器人学习数据，适合作为跨本体预训练和动作表示研究的证据，不替代目标工位采集。</li><li><strong>DROID</strong>：[10] 由 13 个实验室以统一 Franka、ZED 与 Quest 采集设置获得 7.6 万条轨迹、564 个场景、50 位采集者的真实环境数据；其价值在于补充真实视觉与操作变化。该版本剔除了失败轨迹，目标平台仍需做分布匹配与恢复数据补采。</li><li><strong>BEHAVIOR-1K</strong>：[11] 在 OmniGibson 中给出 1,000 个日常活动、50 个场景的长时程评测；它应被视作“任务覆盖与诊断工具”，而非实机认证。</li><li><strong>LIBERO / 任务套件类评测</strong>：适合比较学习算法的保持、迁移与组合能力；应同时报告训练/测试划分、随机种子、失败类型和置信区间。</li></ul>
+<h3 id="3-3-数据治理不是附录">3.3 数据治理不是附录</h3>
+<p>实拍数据可能包含人员、厂区布局、工艺、语音和客户物料。部署前需定义采集授权、最小化字段、访问控制、保留期限、可删除性与跨境边界。对“从互联网视频学习”的设想，还要额外区分动作语义先验与可执行控制监督，避免将未经授权内容直接视作机器人控制标签。[C]</p>
+<hr>
+<h2 id="4-仿真到真实-它缩短试验-不取代实机证据">4. 仿真到真实：它缩短试验，不取代实机证据</h2>
+<p>仿真环境的角色包括资产搭建、并行采样、策略回归、故障注入和系统辨识。Isaac Lab 提供 GPU 加速的机器人学习工作流；ManiSkill3 强调并行仿真与渲染。[12][13] 这些工具能增加覆盖面，但接触动力学、柔性物、反光/透明物、视觉遮挡和传感器延迟仍是典型 sim-to-real 残差来源。</p>
+<div class="table-wrap"><table><thead><tr><th>手段</th><th>降低的风险</th><th>仍不能替代</th></tr></thead><tbody><tr><td>域随机化</td><td>光照、纹理、相机、质量和摩擦的小范围差异</td><td>未建模的接触、物料形变、装配间隙</td></tr><tr><td>数字孪生/系统辨识</td><td>资产几何和动力学偏差</td><td>现场维护、磨损、随机摆放</td></tr><tr><td>Hardware-in-the-loop（HIL）</td><td>接口、延迟、控制频率和异常路径</td><td>人机共处、真实物料损坏</td></tr><tr><td>回放与影子模式</td><td>模型回归与告警阈值</td><td>执行时的闭环扰动与恢复</td></tr></tbody></table></div>
+<p><strong>验收原则 [C]</strong>：每项仿真改进都应对应至少一个实机对照，例如首抓成功率、恢复成功率、碰撞/保护停率、平均人工干预次数和完成时间分位数。只报平均成功率会掩盖长尾风险。</p>
+<hr>
+<h2 id="5-评测-从-成功率-升级为可运营指标">5. 评测：从“成功率”升级为可运营指标</h2>
+<h3 id="5-1-三层证据链">5.1 三层证据链</h3>
+<div class="table-wrap"><table><thead><tr><th>层次</th><th>问题</th><th>最小报告项</th><th>不足以证明什么</th></tr></thead><tbody><tr><td>离线回放</td><td>新模型是否破坏已知样本？</td><td>数据版本、成功判据、失败簇、置信区间</td><td>闭环控制稳定性</td></tr><tr><td>仿真/HIL</td><td>是否覆盖边界条件和接口故障？</td><td>随机化范围、种子、故障注入、延迟</td><td>真实接触与人员安全</td></tr><tr><td>实机受控试验</td><td>是否在目标分布完成任务？</td><td>任务数、重置方式、成功/恢复、接管、异常</td><td>长期生产可用性</td></tr></tbody></table></div>
+<h3 id="5-2-建议的实机-scorecard">5.2 建议的实机 scorecard</h3>
+<ol><li><strong>任务成功率</strong>：预先冻结成功定义，报告样本量与区间估计。</li><li><strong>恢复率</strong>：首尝试失败后，在允许动作内自行恢复的比例。</li><li><strong>人工干预</strong>：每 100 次任务的接管、急停、远程协助次数。</li><li><strong>安全事件</strong>：保护停、限位触发、碰撞、超力、通信超时，按严重度分级。</li><li><strong>节拍与尾延迟</strong>：报告 P50/P95/P99，避免平均值掩盖堵塞。</li><li><strong>分布漂移</strong>：按照明、物料批次、摆放、夹具、操作时段切分结果。</li><li><strong>可追溯性</strong>：每项结果关联软件、模型、数据、标定与硬件版本。</li></ol>
+<hr>
+<h2 id="6-安全与部署-先定义不可越过的边界">6. 安全与部署：先定义不可越过的边界</h2>
+<p>ISO 10218-1:2025 是工业机器人安全要求系列中的 Part 1。[16] 该标准的适用与合规评定应由具备资质的专业团队结合具体系统完成；更重要的是，基础模型的概率性输出不会自动继承安全认证。</p>
+<h3 id="6-1-独立安全层的最低能力">6.1 独立安全层的最低能力</h3>
+<ul><li>硬件急停、使能开关、速度/力/工作空间限位与通信看门狗；</li><li>运动前的可达性、碰撞、载荷和夹具状态检查；</li><li>模型输出的动作范围、帧率、坐标系和置信/异常阈值校验；</li><li>不确定、传感器失效或指令歧义时的<strong>停止/请求人工确认</strong>，而非继续猜测；</li><li>可审计日志与安全事件回放；控制系统与安全系统的最小权限隔离；ROS 2 的 DDS-Security 可提供认证、加密与访问控制，但网络安全配置不等同于功能安全认证。[17]</li></ul>
+<h3 id="6-2-逐门推进-而非-一键上线">6.2 逐门推进，而非“一键上线”</h3>
+<figure class="fig"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDMuMCAoMCkKIC0tPgo8IS0tIFRpdGxlOiBkZXBsb3ltZW50X2dhdGVzIFBhZ2VzOiAxIC0tPgo8c3ZnIHdpZHRoPSIxMjExcHQiIGhlaWdodD0iMjczcHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgMTIxMS4wMCAyNzMuMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgo8ZyBpZD0iZ3JhcGgwIiBjbGFzcz0iZ3JhcGgiIHRyYW5zZm9ybT0ic2NhbGUoMSAxKSByb3RhdGUoMCkgdHJhbnNsYXRlKDE4IDI1NSkiPgo8dGl0bGU+ZGVwbG95bWVudF9nYXRlczwvdGl0bGU+CjwhLS0gZzAgLS0+CjxnIGlkPSJub2RlMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+ZzA8L3RpdGxlPgo8cGF0aCBmaWxsPSIjZjFmNWY5IiBzdHJva2U9IiM2NDc0OGIiIHN0cm9rZS13aWR0aD0iMS4yIiBkPSJNMTExLC00NEMxMTEsLTQ0IDEyLC00NCAxMiwtNDQgNiwtNDQgMCwtMzggMCwtMzIgMCwtMzIgMCwtMTIgMCwtMTIgMCwtNiA2LDAgMTIsMCAxMiwwIDExMSwwIDExMSwwIDExNywwIDEyMywtNiAxMjMsLTEyIDEyMywtMTIgMTIzLC0zMiAxMjMsLTMyIDEyMywtMzggMTE3LC00NCAxMTEsLTQ0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjYxLjUiIHk9Ii0yNS40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPjAg5Lu75Yqh6L6555WMPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI2MS41IiB5PSItMTIuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7ljbHpmanmupDkuI7miJDlip/lrprkuYk8L3RleHQ+CjwvZz4KPCEtLSBnMSAtLT4KPGcgaWQ9Im5vZGUyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5nMTwvdGl0bGU+CjxwYXRoIGZpbGw9IiNlMGYyZmUiIHN0cm9rZT0iIzAyODRjNyIgc3Ryb2tlLXdpZHRoPSIxLjIiIGQ9Ik0zMDcsLTQ0QzMwNywtNDQgMTg0LC00NCAxODQsLTQ0IDE3OCwtNDQgMTcyLC0zOCAxNzIsLTMyIDE3MiwtMzIgMTcyLC0xMiAxNzIsLTEyIDE3MiwtNiAxNzgsMCAxODQsMCAxODQsMCAzMDcsMCAzMDcsMCAzMTMsMCAzMTksLTYgMzE5LC0xMiAzMTksLTEyIDMxOSwtMzIgMzE5LC0zMiAzMTksLTM4IDMxMywtNDQgMzA3LC00NCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNDUuNSIgeT0iLTI1LjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+MSDnprvnur/lm57mlL48L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI0NS41IiB5PSItMTIuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7mlbDmja7lrozmlbTmgKfkuI7nrZbnlaXlm57lvZI8L3RleHQ+CjwvZz4KPCEtLSBnMCYjNDU7Jmd0O2cxIC0tPgo8ZyBpZD0iZWRnZTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPmcwJiM0NTsmZ3Q7ZzE8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiM0NzU1NjkiIHN0cm9rZS13aWR0aD0iMS44IiBkPSJNMTIzLjEsLTIyQzEzNi40LC0yMiAxNTAuNjcsLTIyIDE2NC42LC0yMiIvPgo8cG9seWdvbiBmaWxsPSIjNDc1NTY5IiBzdHJva2U9IiM0NzU1NjkiIHN0cm9rZS13aWR0aD0iMS44IiBwb2ludHM9IjE2NC44NCwtMjQuNDUgMTcxLjg0LC0yMiAxNjQuODQsLTE5LjU1IDE2NC44NCwtMjQuNDUiLz4KPC9nPgo8IS0tIGcyIC0tPgo8ZyBpZD0ibm9kZTMiIGNsYXNzPSJub2RlIj4KPHRpdGxlPmcyPC90aXRsZT4KPHBhdGggZmlsbD0iI2RiZWFmZSIgc3Ryb2tlPSIjMjU2M2ViIiBzdHJva2Utd2lkdGg9IjEuMiIgZD0iTTQ5MSwtOTZDNDkxLC05NiAzODAsLTk2IDM4MCwtOTYgMzc0LC05NiAzNjgsLTkwIDM2OCwtODQgMzY4LC04NCAzNjgsLTY0IDM2OCwtNjQgMzY4LC01OCAzNzQsLTUyIDM4MCwtNTIgMzgwLC01MiA0OTEsLTUyIDQ5MSwtNTIgNDk3LC01MiA1MDMsLTU4IDUwMywtNjQgNTAzLC02NCA1MDMsLTg0IDUwMywtODQgNTAzLC05MCA0OTcsLTk2IDQ5MSwtOTYiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDM1LjUiIHk9Ii03Ny40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPjIg5Lu/55yfIC8gSElMPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MzUuNSIgeT0iLTY0LjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+5Z+f6ZqP5py65YyW5LiO5pWF6Zqc5rOo5YWlPC90ZXh0Pgo8L2c+CjwhLS0gZzEmIzQ1OyZndDtnMiAtLT4KPGcgaWQ9ImVkZ2UyIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5nMSYjNDU7Jmd0O2cyPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDc1NTY5IiBzdHJva2Utd2lkdGg9IjEuOCIgZD0iTTMxOS4xOSwtNDIuMUMzMzIuODIsLTQ1Ljg4IDM0Ny4wOSwtNDkuODIgMzYwLjc2LC01My42Ii8+Cjxwb2x5Z29uIGZpbGw9IiM0NzU1NjkiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjgiIHBvaW50cz0iMzYwLjQ1LC01Ni4wNiAzNjcuODUsLTU1LjU3IDM2MS43NiwtNTEuMzQgMzYwLjQ1LC01Ni4wNiIvPgo8L2c+CjwhLS0gc3RvcCAtLT4KPGcgaWQ9Im5vZGU2IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5zdG9wPC90aXRsZT4KPHBhdGggZmlsbD0iI2ZlZTJlMiIgc3Ryb2tlPSIjZGMyNjI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZD0iTTExNjMsLTEzMUMxMTYzLC0xMzEgMTAyOCwtMTMxIDEwMjgsLTEzMSAxMDIyLC0xMzEgMTAxNiwtMTI1IDEwMTYsLTExOSAxMDE2LC0xMTkgMTAxNiwtOTkgMTAxNiwtOTkgMTAxNiwtOTMgMTAyMiwtODcgMTAyOCwtODcgMTAyOCwtODcgMTE2MywtODcgMTE2MywtODcgMTE2OSwtODcgMTE3NSwtOTMgMTE3NSwtOTkgMTE3NSwtOTkgMTE3NSwtMTE5IDExNzUsLTExOSAxMTc1LC0xMjUgMTE2OSwtMTMxIDExNjMsLTEzMSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMDk1LjUiIHk9Ii0xMTIuNCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyLjAwIj7ku7vkuIDpl6jmp5vlpLHotKU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjEwOTUuNSIgeT0iLTk5LjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMi4wMCI+6ZmN57qn5Yiw56Gu5a6a5oCn5oqA6IO95oiW5YGc5q2iPC90ZXh0Pgo8L2c+CjwhLS0gZzEmIzQ1OyZndDtzdG9wIC0tPgo8ZyBpZD0iZWRnZTUiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPmcxJiM0NTsmZ3Q7c3RvcDwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2RjMjYyNiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjUsMiIgZD0iTTMxOS4wOSwtMTEuMjJDMzUzLjkxLC02LjkzIDM5Ni4yOCwtMyA0MzQuNSwtMyA0MzQuNSwtMyA0MzQuNSwtMyA4NTguNSwtMyA5MzYuMDksLTMgMTAxNi40MiwtNTEuMjcgMTA2MC40NywtODIuNjYiLz4KPHBvbHlnb24gZmlsbD0iI2RjMjYyNiIgc3Ryb2tlPSIjZGMyNjI2IiBzdHJva2Utd2lkdGg9IjEuOCIgcG9pbnRzPSIxMDU5LjA3LC04NC42NyAxMDY2LjE4LC04Ni43OCAxMDYxLjk0LC04MC43IDEwNTkuMDcsLTg0LjY3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjYyNS41IiB5PSItNiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwLjAwIiBmaWxsPSIjYjkxYzFjIj7opobnm5bkuI3otrM8L3RleHQ+CjwvZz4KPCEtLSBnMyAtLT4KPGcgaWQ9Im5vZGU0IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5nMzwvdGl0bGU+CjxwYXRoIGZpbGw9IiNmZWYzYzciIHN0cm9rZT0iI2Q5NzcwNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGQ9Ik02ODcsLTE3MkM2ODcsLTE3MiA1NjQsLTE3MiA1NjQsLTE3MiA1NTgsLTE3MiA1NTIsLTE2NiA1NTIsLTE2MCA1NTIsLTE2MCA1NTIsLTE0MCA1NTIsLTE0MCA1NTIsLTEzNCA1NTgsLTEyOCA1NjQsLTEyOCA1NjQsLTEyOCA2ODcsLTEyOCA2ODcsLTEyOCA2OTMsLTEyOCA2OTksLTEzNCA2OTksLTE0MCA2OTksLTE0MCA2OTksLTE2MCA2OTksLTE2MCA2OTksLTE2NiA2OTMsLTE3MiA2ODcsLTE3MiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI2MjUuNSIgeT0iLTE1My40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPjMg6ZqU56a75a6e5py6PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI2MjUuNSIgeT0iLTE0MC40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPuWbtOagj+OAgeS9jumAn+OAgeS6uuW3peaOpeeuoTwvdGV4dD4KPC9nPgo8IS0tIGcyJiM0NTsmZ3Q7ZzMgLS0+CjxnIGlkPSJlZGdlMyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+ZzImIzQ1OyZndDtnMzwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjgiIGQ9Ik00OTEuMTMsLTk2LjA4QzUxMy43MywtMTA1LjIyIDU0MC4wMywtMTE1Ljg1IDU2My4yNywtMTI1LjI1Ii8+Cjxwb2x5Z29uIGZpbGw9IiM0NzU1NjkiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjgiIHBvaW50cz0iNTYyLjY1LC0xMjcuNjQgNTcwLjA2LC0xMjcuOTkgNTY0LjQ5LC0xMjMuMSA1NjIuNjUsLTEyNy42NCIvPgo8L2c+CjwhLS0gZzImIzQ1OyZndDtzdG9wIC0tPgo8ZyBpZD0iZWRnZTYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPmcyJiM0NTsmZ3Q7c3RvcDwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2RjMjYyNiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjUsMiIgZD0iTTUwMy4yMSwtNzcuNTVDNjIzLjQyLC04My45NCA4NzYuMTksLTk3LjM5IDEwMDguOTQsLTEwNC40NSIvPgo8cG9seWdvbiBmaWxsPSIjZGMyNjI2IiBzdHJva2U9IiNkYzI2MjYiIHN0cm9rZS13aWR0aD0iMS44IiBwb2ludHM9IjEwMDguODIsLTEwNi45IDEwMTUuOTUsLTEwNC44MiAxMDA5LjA5LC0xMDIgMTAwOC44MiwtMTA2LjkiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzQ3LjUiIHk9Ii05NCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwLjAwIiBmaWxsPSIjYjkxYzFjIj7lpLHmlYjmnKrmlLbmlZs8L3RleHQ+CjwvZz4KPCEtLSBnNCAtLT4KPGcgaWQ9Im5vZGU1IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5nNDwvdGl0bGU+CjxwYXRoIGZpbGw9IiNkY2ZjZTciIHN0cm9rZT0iIzE2YTM0YSIgc3Ryb2tlLXdpZHRoPSIxLjIiIGQ9Ik05MDcsLTIzN0M5MDcsLTIzNyA4MDgsLTIzNyA4MDgsLTIzNyA4MDIsLTIzNyA3OTYsLTIzMSA3OTYsLTIyNSA3OTYsLTIyNSA3OTYsLTIwNSA3OTYsLTIwNSA3OTYsLTE5OSA4MDIsLTE5MyA4MDgsLTE5MyA4MDgsLTE5MyA5MDcsLTE5MyA5MDcsLTE5MyA5MTMsLTE5MyA5MTksLTE5OSA5MTksLTIwNSA5MTksLTIwNSA5MTksLTIyNSA5MTksLTIyNSA5MTksLTIzMSA5MTMsLTIzNyA5MDcsLTIzNyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI4NTcuNSIgeT0iLTIxOC40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPjQg5Y+X5o6n55Sf5LqnPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI4NTcuNSIgeT0iLTIwNS40IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIuMDAiPuebkeaOp+OAgeWuoeiuoeOAgeWbnua7mjwvdGV4dD4KPC9nPgo8IS0tIGczJiM0NTsmZ3Q7ZzQgLS0+CjxnIGlkPSJlZGdlNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+ZzMmIzQ1OyZndDtnNDwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjgiIGQ9Ik02OTkuMjcsLTE3MC41N0M3MjcuOTEsLTE3OC42NiA3NjAuNTksLTE4Ny45IDc4OC43MiwtMTk1Ljg1Ii8+Cjxwb2x5Z29uIGZpbGw9IiM0NzU1NjkiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjgiIHBvaW50cz0iNzg4LjM3LC0xOTguMjkgNzk1Ljc3LC0xOTcuODQgNzg5LjcsLTE5My41OCA3ODguMzcsLTE5OC4yOSIvPgo8L2c+CjwhLS0gZzMmIzQ1OyZndDtzdG9wIC0tPgo8ZyBpZD0iZWRnZTciIGNsYXNzPSJlZGdlIj4KPHRpdGxlPmczJiM0NTsmZ3Q7c3RvcDwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2RjMjYyNiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1kYXNoYXJyYXk9IjUsMiIgZD0iTTY5OS4xMSwtMTQzLjY0Qzc4Mi43MywtMTM2LjMxIDkxOS45NSwtMTI0LjI5IDEwMDguNzUsLTExNi41MSIvPgo8cG9seWdvbiBmaWxsPSIjZGMyNjI2IiBzdHJva2U9IiNkYzI2MjYiIHN0cm9rZS13aWR0aD0iMS44IiBwb2ludHM9IjEwMDkuMDksLTExOC45NCAxMDE1Ljg1LC0xMTUuODkgMTAwOC42NywtMTE0LjA2IDEwMDkuMDksLTExOC45NCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI4NTcuNSIgeT0iLTEzNyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwLjAwIiBmaWxsPSIjYjkxYzFjIj7otornlYwgLyDmjqXnrqE8L3RleHQ+CjwvZz4KPCEtLSBnNCYjNDU7Jmd0O3N0b3AgLS0+CjxnIGlkPSJlZGdlOCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+ZzQmIzQ1OyZndDtzdG9wPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZGMyNjI2IiBzdHJva2Utd2lkdGg9IjEuOCIgc3Ryb2tlLWRhc2hhcnJheT0iNSwyIiBkPSJNOTE5LjE5LC0xOTkuNDRDOTQyLjQ2LC0xOTIuNTcgOTY4Ljk0LC0xODMuNjIgOTkyLC0xNzMgMTAxNC43NywtMTYyLjUyIDEwMzguNjIsLTE0Ny44OCAxMDU3LjU3LC0xMzUuMjQiLz4KPHBvbHlnb24gZmlsbD0iI2RjMjYyNiIgc3Ryb2tlPSIjZGMyNjI2IiBzdHJva2Utd2lkdGg9IjEuOCIgcG9pbnRzPSIxMDU5LjM3LC0xMzYuOTkgMTA2My44LC0xMzEuMDQgMTA1Ni42MywtMTMyLjkyIDEwNTkuMzcsLTEzNi45OSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI5NjcuNSIgeT0iLTE5NCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwLjAwIiBmaWxsPSIjYjkxYzFjIj7mvILnp7sgLyDlvILluLg8L3RleHQ+CjwvZz4KPC9nPgo8L3N2Zz4K" alt="从研发到受控生产的门槛"><figcaption>从研发到受控生产的门槛</figcaption></figure>
+<p><em>图 2　部署门槛必须允许降级与停止；后续阶段不应覆盖前一阶段的验收工件。图源：本文根据 [12][13][16] 整理。</em></p>
+<div class="table-wrap"><table><thead><tr><th>阶段</th><th>放行条件示例</th><th>失败后的动作</th></tr></thead><tbody><tr><td>0. 任务边界</td><td>明确物料、人员区域、最大载荷、危险源和成功定义</td><td>收窄任务或补充防护</td></tr><tr><td>1. 离线回放</td><td>数据完整、版本可复现、无关键回归</td><td>修复数据/策略/接口</td></tr><tr><td>2. 仿真与 HIL</td><td>关键扰动与故障路径覆盖，接口时序满足预算</td><td>调整模型、控制或数字孪生</td></tr><tr><td>3. 隔离实机</td><td>围栏/低速/接管，目标分布下的恢复和安全指标达标</td><td>降级到确定性技能或停止</td></tr><tr><td>4. 受控生产</td><td>监控、审计、变更审批、回滚和现场责任人到位</td><td>暂停变更、回放和根因分析</td></tr></tbody></table></div>
+<h3 id="6-3-三种本体的现实取舍">6.3 三种本体的现实取舍</h3>
+<div class="table-wrap"><table><thead><tr><th>本体</th><th>最佳早期任务</th><th>系统优势</th><th>主要代价</th></tr></thead><tbody><tr><td>固定机械臂</td><td>上下料、分拣、包装、受限装配</td><td>工作空间与安全边界最清晰</td><td>覆盖范围有限，需要工装配合</td></tr><tr><td>移动操作平台</td><td>仓储、实验室、跨工位搬运操作</td><td>覆盖更大环境</td><td>导航、定位与操作耦合，验证复杂</td></tr><tr><td>人形平台</td><td>为人类环境设计的双足/双臂任务研究</td><td>形态兼容既有人类工具</td><td>平衡、跌倒、能耗、维护和安全验证成本最高</td></tr></tbody></table></div>
+<p><strong>建议 [C]</strong>：若目标是近端业务价值，优先选择“高重复、物料受控、空间受限、可围栏”的单站任务；人形平台应以明确的形态收益（而非通用叙事）证明其额外复杂度。</p>
+<hr>
+<h2 id="7-开源与生态-把-可下载-拆成可运行-可修改-可商用">7. 开源与生态：把“可下载”拆成可运行、可修改、可商用</h2>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>代表工具/项目</th><th>尽调问题</th></tr></thead><tbody><tr><td>模型与训练</td><td>OpenVLA、OpenPI、RT-X 系列</td><td>权重、数据、代码分别是什么许可证？是否支持目标动作空间？</td></tr><tr><td>仿真与数据生成</td><td>Isaac Lab、ManiSkill、MuJoCo</td><td>资产、物理参数和渲染能否覆盖目标工位？</td></tr><tr><td>机器人中间件</td><td>ROS 2、MoveIt 等 [15]</td><td>驱动、生命周期、时间同步、实时性和安全接口如何集成？</td></tr><tr><td>控制与安全</td><td>机器人控制器、现场总线、安全 PLC</td><td>谁拥有最终停机权？失联、版本回退和手动模式如何验证？</td></tr><tr><td>运维</td><td>数据版本、模型注册、日志、回放与监控</td><td>能否将一次异常还原为具体模型/数据/标定版本？</td></tr></tbody></table></div>
+<p>开放代码的工程价值在于可审计、可微调和可集成，不在于免除验证。以 OpenVLA 为例，仓库给出了 LoRA/全量微调路线，同时也列明了 PyTorch、Flash Attention 与显存等依赖。[3] 这类依赖应纳入 PoC 成本，而非在采购后才发现。</p>
+<hr>
+<h2 id="8-决策框架-用任务而非-通用性-立项">8. 决策框架：用任务而非“通用性”立项</h2>
+<h3 id="8-1-poc-选择清单">8.1 PoC 选择清单</h3>
+<p>选择 1 个任务时，建议同时满足：</p>
+<ul><li>物料尺寸、姿态和质量有可测范围；</li><li>成功可由传感器或工艺结果自动判定；</li><li>可以围栏、限速或在无人时段试验；</li><li>失败可以安全复位，且不会损伤高价值物料；</li><li>有足够历史数据或可在 4–8 周内采集有代表性的示教与失败样本；</li><li>现有确定性方案存在可量化缺口（换型、人力、异常恢复或柔性），而不是为了替换已足够可靠的自动化。</li></ul>
+<h3 id="8-2-立项时应冻结的验收契约">8.2 立项时应冻结的验收契约</h3>
+<ol><li><strong>任务分布</strong>：物料、布局、光照、夹具和人员进入范围。</li><li><strong>SLO 与安全阈值</strong>：成功、节拍、恢复、接管和事件上限。</li><li><strong>对照基线</strong>：人工操作或传统自动化在同一任务分布下的指标。</li><li><strong>变更流程</strong>：模型、数据、标定、固件变更后必须重跑哪些门槛。</li><li><strong>数据权利</strong>：谁可访问、训练、删除和导出运行数据。</li><li><strong>退出与降级</strong>：模型不可用时回到哪套确定性流程，由谁执行。</li></ol>
+<hr>
+<h2 id="9-未来-12-24-个月的可检验信号">9. 未来 12–24 个月的可检验信号</h2>
+<div class="table-wrap"><table><thead><tr><th>信号</th><th>值得期待的变化</th><th>不能据此推导</th></tr></thead><tbody><tr><td>真实数据规模化</td><td>更丰富的跨任务、跨本体先验</td><td>无需目标场景数据</td></tr><tr><td>连续动作与动作块</td><td>更平滑的长序列控制、较少手工分段</td><td>能自动满足接触安全</td></tr><tr><td>合成数据与世界模型</td><td>更快覆盖罕见组合与失败路径</td><td>取代真实验证</td></tr><tr><td>人形基础模型</td><td>双臂协同、全身控制研究加速</td><td>人形在每个场景都优于专用本体</td></tr><tr><td>边缘推理</td><td>更低往返延迟、更强隐私控制</td><td>可忽略功耗、散热与安全认证</td></tr><tr><td>标准与评测</td><td>更清晰的安全与互操作语言</td><td>单一榜单可代表生产可靠性</td></tr></tbody></table></div>
+<hr>
+<h2 id="10-最终判断">10. 最终判断</h2>
+<p>具身智能已经从“视觉理解附加动作头”的研究设想，进入基础模型、真实机器人数据、仿真、控制栈和边缘计算共同演进的阶段。RT-2、OpenVLA、π₀/OpenPI 等项目说明 VLA 路线可以把语言与视觉先验带入机器人动作学习；但它们并没有消除物理世界中的数据稀缺、接触不确定性、长时程恢复和安全责任。</p>
+<p><strong>对研发团队</strong>：先建设可追溯数据与回归体系，再比较模型；先把技能、控制和安全接口标准化，再扩大本体与任务。 <strong>对业务团队</strong>：把“通用智能”翻译成单一工位的 SLO、接管率和可回退计划。 <strong>对管理者</strong>：以受控任务的累计可靠性和安全证据评估进度，不以单次演示或融资新闻代替工程验收。</p>
+<hr>
+<h2 id="参考资料-优先一手来源">参考资料（优先一手来源）</h2>
+<ol><li><strong>[A]</strong> Google DeepMind, <em>RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control</em>（2023）：<a href="https://arxiv.org/abs/2307.15818" rel="noopener">https://arxiv.org/abs/2307.15818</a>；项目页：<a href="https://robotics-transformer2.github.io/" rel="noopener">https://robotics-transformer2.github.io/</a>。</li><li><strong>[A]</strong> Kim et al., <em>OpenVLA: An Open-Source Vision-Language-Action Model</em>（2024）：<a href="https://openvla.github.io/" rel="noopener">https://openvla.github.io/</a>；论文：<a href="https://arxiv.org/abs/2406.09246" rel="noopener">https://arxiv.org/abs/2406.09246</a>。</li><li><strong>[B]</strong> OpenVLA 官方仓库（模型、微调、依赖与许可证）：<a href="https://github.com/openvla/openvla" rel="noopener">https://github.com/openvla/openvla</a>。</li><li><strong>[A]</strong> Physical Intelligence, <em>π₀: Our First Generalist Policy</em>：<a href="https://www.pi.website/blog/pi0" rel="noopener">https://www.pi.website/blog/pi0</a>；论文：<a href="https://arxiv.org/abs/2410.24164" rel="noopener">https://arxiv.org/abs/2410.24164</a>。</li><li><strong>[B]</strong> Physical Intelligence, OpenPI 官方仓库：<a href="https://github.com/Physical-Intelligence/openpi" rel="noopener">https://github.com/Physical-Intelligence/openpi</a>。</li><li><strong>[B]</strong> NVIDIA, Isaac GR00T 官方开发者页面：<a href="https://developer.nvidia.com/isaac/gr00t" rel="noopener">https://developer.nvidia.com/isaac/gr00t</a>。</li><li><strong>[A]</strong> Open X-Embodiment Collaboration, <em>Open X-Embodiment: Robotic Learning Datasets and RT-X Models</em>（2023）：<a href="https://arxiv.org/abs/2310.08864" rel="noopener">https://arxiv.org/abs/2310.08864</a>。</li><li><strong>[B]</strong> Google DeepMind, Gemini Robotics 官方页面：<a href="https://deepmind.google/models/gemini-robotics/" rel="noopener">https://deepmind.google/models/gemini-robotics/</a>。</li><li><strong>[A]</strong> Octo Collaboration, <em>Octo: An Open-Source Generalist Robot Policy</em>（2024）：<a href="https://octo-models.github.io/" rel="noopener">https://octo-models.github.io/</a>。</li><li><strong>[A]</strong> Khazatsky et al., <em>DROID: A Large-Scale In-the-Wild Robot Manipulation Dataset</em>（2024）：<a href="https://droid-dataset.github.io/" rel="noopener">https://droid-dataset.github.io/</a>。</li><li><strong>[A]</strong> Li et al., <em>BEHAVIOR-1K: A Benchmark for Embodied AI with 1,000 Everyday Activities</em>：<a href="https://proceedings.mlr.press/v205/li23a.html" rel="noopener">https://proceedings.mlr.press/v205/li23a.html</a>。</li><li><strong>[B]</strong> NVIDIA, Isaac Lab 文档：<a href="https://isaac-sim.github.io/IsaacLab/" rel="noopener">https://isaac-sim.github.io/IsaacLab/</a>。</li><li><strong>[A]</strong> Tao et al., <em>ManiSkill3: GPU Parallelized Robotics Simulation and Rendering for Generalizable Embodied AI</em>（2024）：<a href="https://arxiv.org/abs/2410.00425" rel="noopener">https://arxiv.org/abs/2410.00425</a>。</li><li><strong>[A]</strong> Chi et al., <em>Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</em>（2023）：<a href="https://arxiv.org/abs/2303.04137" rel="noopener">https://arxiv.org/abs/2303.04137</a>。</li><li><strong>[B]</strong> ROS 2 官方文档：<a href="https://docs.ros.org/" rel="noopener">https://docs.ros.org/</a>。</li><li><strong>[A]</strong> ISO, <em>ISO 10218-1:2025 — Robotics — Safety requirements — Part 1: Industrial robots</em>：<a href="https://www.iso.org/standard/73933.html" rel="noopener">https://www.iso.org/standard/73933.html</a>。</li><li><strong>[B]</strong> ROS 2, DDS-Security 概念与配置边界：<a href="https://docs.ros.org/en/humble/Concepts/Intermediate/About-Security.html" rel="noopener">https://docs.ros.org/en/humble/Concepts/Intermediate/About-Security.html</a>。</li></ol>
+<blockquote>链接均为资料截点时可访问的一手页面或其原始论文入口。模型可用性、权重、许可证、API 接入和标准适用范围会变化；进入采购、生产或合规流程前，应以当期正式合同、软件发布说明和专业安全评估为准。</blockquote>
+</main>
+</div>
+</body>
+</html>

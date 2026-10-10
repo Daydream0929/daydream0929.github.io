@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RISC-V 64 位 AI/LLM 国内外发展现状：ISA、运行时、芯片与部署边界调研</title>
+<style>
+:root {
+  --fg: #1a1a1a; --fg-soft: #4a4a4a; --bg: #ffffff; --bg-soft: #f6f7f9;
+  --border: #e3e6ea; --accent: #b8442e; --code-bg: #f4f5f7;
+  --c: #1f7a4d; --cstar: #2563a8; --s: #a86b1f; --p: #7a4fa3; --q: #a33a3a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6e6e6; --fg-soft: #a8a8a8; --bg: #14161a; --bg-soft: #1b1e24;
+    --border: #2c313a; --accent: #e0705a; --code-bg: #1e2229;
+    --c: #58c08a; --cstar: #6aa8e0; --s: #d8a45a; --p: #b088d8; --q: #e07a7a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px; line-height: 1.75; -webkit-font-smoothing: antialiased;
+}
+.layout { display: flex; max-width: 1400px; margin: 0 auto; }
+.toc {
+  width: 280px; flex: 0 0 280px; position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto; padding: 32px 20px 32px 28px;
+  border-right: 1px solid var(--border); font-size: 13.5px;
+}
+.toc h2 {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-soft); margin: 0 0 12px; font-weight: 600;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block; padding: 5px 0; color: var(--fg-soft); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 10px;
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+.toc-l1 a { font-weight: 600; color: var(--fg); }
+.toc-l2 a { padding-left: 10px; }
+.toc-l3 a { padding-left: 24px; font-size: 12.5px; }
+main { flex: 1 1 auto; min-width: 0; padding: 40px 56px 96px; max-width: 940px; }
+h1 {
+  font-size: 30px; line-height: 1.35; margin: 0 0 8px; font-weight: 650;
+  letter-spacing: -.01em;
+}
+h2 {
+  font-size: 21px; margin: 44px 0 14px; padding-bottom: 8px; font-weight: 620;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 17px; margin: 30px 0 10px; font-weight: 600; }
+h4 { font-size: 15px; margin: 22px 0 8px; font-weight: 600; color: var(--fg-soft); }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+code {
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .875em; background: var(--code-bg); padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 18px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+blockquote {
+  margin: 0 0 18px; padding: 12px 18px; background: var(--bg-soft);
+  border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+}
+blockquote p { margin: 0; }
+ul, ol { margin: 0 0 16px; padding-left: 26px; }
+li { margin: 5px 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+.badge {
+  display: inline-block; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+  color: #fff; vertical-align: 1px; letter-spacing: .02em;
+}
+.badge-c { background: var(--c); }
+.badge-cstar { background: var(--cstar); }
+.badge-s { background: var(--s); }
+.badge-p { background: var(--p); }
+.badge-q { background: var(--q); }
+figure.fig {
+  margin: 28px auto 20px;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+figure.fig figcaption {
+  font-size: 13px;
+  color: var(--soft, #666);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.mermaid {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; margin: 0 0 20px; text-align: center; overflow-x: auto;
+}
+.mermaid-fallback {
+  text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; white-space: pre-wrap; color: var(--fg-soft);
+}
+.doc-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px;
+  font-size: 13px; color: var(--fg-soft);
+}
+.doc-meta span {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+@media (max-width: 1000px) {
+  .toc { display: none; }
+  main { padding: 28px 20px 64px; }
+}
+@media print {
+  .toc { display: none; }
+  main { max-width: none; padding: 0; }
+  a { color: var(--fg); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc"><h2>目录</h2><ul><li class="toc-l1"><a href="#risc-v-64-位-ai-llm-国内外发展现状-isa-运行时-芯片与部署边界调研">RISC-V 64 位 AI/LLM 国内外发展现状：ISA、运行时、芯片与部署边界调研</a></li><li class="toc-l2"><a href="#版本历史">版本历史</a></li><li class="toc-l2"><a href="#术语与缩略语">术语与缩略语</a></li><li class="toc-l2"><a href="#可靠性标记">可靠性标记</a></li><li class="toc-l2"><a href="#1-核心判断-tl-dr">1. 核心判断（TL;DR）</a></li><li class="toc-l2"><a href="#2-问题-范围与方法">2. 问题、范围与方法</a></li><li class="toc-l2"><a href="#3-全球技术基线">3. 全球技术基线</a></li><li class="toc-l3"><a href="#3-1-rv64-linux-rvv-与二进制分发是三个独立的前置条件">3.1 RV64 Linux、RVV 与二进制分发是三个独立的前置条件</a></li><li class="toc-l3"><a href="#3-2-llm-与通用推理运行时-入口存在-产品化仍以目标验证为准">3.2 LLM 与通用推理运行时：入口存在，产品化仍以目标验证为准</a></li><li class="toc-l3"><a href="#3-3-全球-ip-与加速器-区分向量-cpu-npu-ip-与整机系统">3.3 全球 IP 与加速器：区分向量 CPU、NPU IP 与整机系统</a></li><li class="toc-l2"><a href="#4-国内发展-差距与机会">4. 国内发展、差距与机会</a></li><li class="toc-l3"><a href="#4-1-中国-soc-与板卡-已出现-cpu-rvv-npu-组合-但规格不能替代模型验证">4.1 中国 SoC 与板卡：已出现 CPU/RVV/NPU 组合，但规格不能替代模型验证</a></li><li class="toc-l3"><a href="#4-2-模型-运行时与操作系统-连接点正在形成-统一性仍不足">4.2 模型、运行时与操作系统：连接点正在形成，统一性仍不足</a></li><li class="toc-l3"><a href="#4-3-机会与差距-从可启动原型转向可运营的异构部署">4.3 机会与差距：从可启动原型转向可运营的异构部署</a></li><li class="toc-l3"><a href="#能力成熟度对比矩阵">能力成熟度对比矩阵</a></li><li class="toc-l2"><a href="#5-关键机制深挖">5. 关键机制深挖</a></li><li class="toc-l3"><a href="#5-1-isa-rvv-与编译分发-功能可用性先于向量优化">5.1 ISA、RVV 与编译分发：功能可用性先于向量优化</a></li><li class="toc-l3"><a href="#5-2-llm-运行时与模型格式-gguf-入口不等于整条推理链已优化">5.2 LLM 运行时与模型格式：GGUF 入口不等于整条推理链已优化</a></li><li class="toc-l3"><a href="#5-3-npu-内存与端到端指标-标称-tops-需要被实际图执行证伪或确认">5.3 NPU、内存与端到端指标：标称 TOPS 需要被实际图执行证伪或确认</a></li><li class="toc-l2"><a href="#6-演进方向与情景">6. 演进方向与情景</a></li><li class="toc-l3"><a href="#6-1-对研发组织的含义">6.1 对研发组织的含义</a></li><li class="toc-l3"><a href="#6-2-对个人能力的含义">6.2 对个人能力的含义</a></li><li class="toc-l2"><a href="#7-建议与验收">7. 建议与验收</a></li><li class="toc-l3"><a href="#7-1-从第一天建立-risc-v-llm-工作负载合同">7.1 从第一天建立“RISC-V LLM 工作负载合同”</a></li><li class="toc-l3"><a href="#主张-证据矩阵">主张—证据矩阵</a></li><li class="toc-l3"><a href="#7-2-团队机制建议">7.2 团队机制建议</a></li><li class="toc-l3"><a href="#建议-验收矩阵">建议—验收矩阵</a></li><li class="toc-l2"><a href="#8-不确定性与研究限制">8. 不确定性与研究限制</a></li><li class="toc-l2"><a href="#参考来源">参考来源</a></li><li class="toc-l2"><a href="#附录-研究方法">附录：研究方法</a></li><li class="toc-l3"><a href="#a-证据采集规则">A. 证据采集规则</a></li><li class="toc-l3"><a href="#b-建议的最小实验记录">B. 建议的最小实验记录</a></li><li class="toc-l3"><a href="#c-图表说明">C. 图表说明</a></li></ul></nav>
+<main>
+<h1>RISC-V 64 位 AI/LLM 国内外发展现状：ISA、运行时、芯片与部署边界调研</h1>
+<div class="doc-meta"><span>由 riscv64-ai-llm-domestic-global-research.md 生成</span></div>
+<h1 id="risc-v-64-位-ai-llm-国内外发展现状-isa-运行时-芯片与部署边界调研">RISC-V 64 位 AI/LLM 国内外发展现状：ISA、运行时、芯片与部署边界调研</h1>
+<div class="table-wrap"><table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody><tr><td>文档类型</td><td>技术调研报告</td></tr><tr><td>版本</td><td>v1.0</td></tr><tr><td>状态</td><td>已完成（公开一手资料整理）</td></tr><tr><td>密级</td><td>公开资料整理</td></tr><tr><td>作者</td><td>Qoder</td></tr><tr><td>生成日期</td><td>2026-09-08</td></tr><tr><td>研究截点</td><td>2026-09-08；仅采用本次可访问的公开资料</td></tr><tr><td>目标读者</td><td>RISC-V SoC、Linux/编译器、推理运行时、LLM 部署、性能与产品工程团队</td></tr><tr><td>调研问题</td><td>国内外 RISC-V 64 位 AI/LLM 的软硬件发展处于何种阶段；RV64、RVV、NPU 和模型运行时如何共同决定实际部署能力？</td></tr><tr><td>覆盖范围</td><td>RV64 Linux、RVV、编译器、GGUF/llama.cpp、ONNX Runtime、TVM、ExecuTorch、代表性国际 IP 与中国 SoC/板卡/操作系统/模型生态</td></tr><tr><td>排除范围</td><td>不统计市场份额、融资、出货量或招聘数量；不以 NPU TOPS、厂商演示或单一编译成功结果推导跨设备 LLM token/s、能耗或量产成熟度</td></tr></tbody></table></div>
+<h2 id="版本历史">版本历史</h2>
+<div class="table-wrap"><table><thead><tr><th>版本</th><th>日期</th><th>变更</th><th>结论状态</th></tr></thead><tbody><tr><td>v1.0</td><td>2026-09-08</td><td>建立 RV64、RVV、NPU、运行时与 LLM 部署的可追溯分析框架</td><td>已完成</td></tr></tbody></table></div>
+<h2 id="术语与缩略语">术语与缩略语</h2>
+<div class="table-wrap"><table><thead><tr><th>术语</th><th>含义</th><th>本文语境</th></tr></thead><tbody><tr><td>RV64</td><td>RISC-V 的 64 位基础 ISA 运行环境</td><td>仅表示 CPU 指令集宽度，不承诺存在向量单元或 NPU</td></tr><tr><td>RVV</td><td>RISC-V Vector Extension</td><td>可变向量长度的 ISA 扩展；实际可用性仍依 CPU、内核、编译器和分发策略 [S01][S02]</td></tr><tr><td>VLEN</td><td>向量寄存器长度</td><td>影响 RVV 内核的实现与性能；不能由 <code>riscv64</code> 架构名推断</td></tr><tr><td>NPU / TPU</td><td>神经网络/张量专用加速器</td><td>与 RV64 CPU、RVV 向量核是不同硬件单元，可能有独立驱动、编译器和算子限制</td></tr><tr><td>GGUF</td><td>llama.cpp 常用的模型文件格式</td><td>用于本地量化权重部署；格式可读不代表目标 CPU 性能达标 [S18]</td></tr><tr><td>KV cache</td><td>自回归模型保存历史注意力状态的内存</td><td>直接影响长上下文、并发和峰值内存预算</td></tr><tr><td><code>riscv_hwprobe</code></td><td>Linux RISC-V 硬件能力查询接口</td><td>可用于检查 V 扩展及异构 CPU 集合差异 [S02]</td></tr><tr><td><code>-march</code></td><td>GCC/LLVM 目标 ISA 选择参数</td><td>编译产物与目标 ISA/ABI 必须匹配，不能用通用 RV64 二进制假设 RVV 可用 [S03][S04]</td></tr><tr><td>EP</td><td>ONNX Runtime Execution Provider</td><td>将模型图交由特定硬件后端执行的抽象；RISC-V 构建可行不等于有专用 EP [S07]</td></tr></tbody></table></div>
+<h2 id="可靠性标记">可靠性标记</h2>
+<ul><li>【C】可由单一官方文档、芯片资料、上游项目或源码直接核验的事实。</li><li>【C*】由多个独立一手来源共同支持的稳定结论。</li><li>【S】基于有限样本的生态趋势，不代表全部 RISC-V 设备、性能或市场规模。</li><li>【P】面向研发、选型和验证的建议，不是厂商性能承诺。</li><li>【?】资料未披露或未能稳定复核的细节。</li></ul>
+<h2 id="1-核心判断-tl-dr">1. 核心判断（TL;DR）</h2>
+<ul><li>【C*】“RV64 设备能运行 Linux”不是“具备 RISC-V LLM 加速能力”的同义句：RVV 需由 Linux <code>riscv_hwprobe</code> 或 HWCAP 检测，用户态向量状态又可受 <code>prctl</code> 控制；编译器还必须生成与目标 <code>-march</code>/ABI 匹配的代码 [S01][S02][S03][S04]。</li><li>【C*】开源 LLM 的最可见入口是 GGUF + llama.cpp 的 CPU/RVV 路径；上游已提供 RISC-V/RVV 构建选项和内核，但没有通用 riscv64 发布二进制，因而“源码可构建”仍须经过目标机器的功能、性能与稳定性验收 [S05][S06][S18]。</li><li>【C*】ONNX Runtime、TVM 已给出 riscv64 Linux 的构建或交叉编译路径，ExecuTorch 的一等 RISC-V 支持仍在演进；它们说明工程入口存在，却不能替代特定模型、算子集、后端和目标 SoC 的实机验证 [S07][S08][S09][S10]。</li><li>【S】中国生态已形成 RISC-V CPU/RVV、NPU SoC、板卡、Linux 发行版与 Qwen 本地模型路径的连接点，但量产交付的主要风险转向内存带宽、驱动和编译器成熟度、模型量化、后端受理率与设备矩阵，而非“是否为 RISC-V”这一标签 [S13][S14][S16][S18][S20]。</li><li>【P】选型和发布应分别记录 CPU ISA/RVV/VLEN、NPU 实际受理、模型量化、上下文/KV cache、首 token、热稳态 token/s、RSS、功耗/温度和质量；单报 NPU TOPS、模型参数或一次短测 token/s 均不足以证明 LLM 体验 [S01][S02][S14][S16]。</li></ul>
+<h2 id="2-问题-范围与方法">2. 问题、范围与方法</h2>
+<p>本文将 RISC-V 64 位 AI/LLM 部署拆成四个不可相互替代的层：第一层是 RV64 Linux 与工具链能否稳定运行；第二层是 CPU 是否含 RVV 及其向量长度、内核使能和二进制分发是否匹配；第三层是 SoC 是否含独立 NPU/TPU、其驱动/编译器是否真正接受目标模型；第四层是模型格式、量化、推理运行时、上下文与内存系统能否满足用户 workload。这样拆分可避免将 CPU ISA、向量扩展与专用加速器混为一项“AI 算力”。</p>
+<p>研究优先采用 Linux、GCC/LLVM、PyTorch/ONNX/TVM、llama.cpp/Qwen 等上游资料，以及芯片/板卡/操作系统厂商的公开页面。直接规格或接口事实标为【C】；多个一手来源支持的工程结论标为【C*】；对量产成熟度、实际 LLM 速度、功耗和市场走向只作受限的【S】判断。任何厂商 TOPS、可运行参数量或演示宣称只保留为原始口径，不与其他芯片作归一化排名。</p>
+<div class="table-wrap"><table><thead><tr><th>证据层</th><th>采集对象</th><th>可以支持的结论</th><th>不能支持的结论</th></tr></thead><tbody><tr><td>A：ISA/内核/编译器</td><td>Linux、GCC、LLVM 文档</td><td>如何发现 RVV、编译目标代码与控制向量状态</td><td>某模型在某 SoC 上的端到端速度</td></tr><tr><td>B：运行时与上游源码</td><td>llama.cpp、ORT、TVM、ExecuTorch、Qwen</td><td>构建入口、格式、后端或项目状态</td><td>完整算子覆盖、长期稳定性或量产认证</td></tr><tr><td>C：芯片与板卡资料</td><td>IP/SoC 规格、公开数据表</td><td>特定产品披露的 CPU、NPU、内存或产品状态</td><td>跨芯片 LLM 性能排名</td></tr><tr><td>D：系统生态</td><td>openEuler 等发行版资料</td><td>OS 启动、内核/软件包适配的可见进展</td><td>AI 运行时、模型或 NPU 已完整认证</td></tr></tbody></table></div>
+<p>图 1 给出从模型到设备的部署闭环。其核心不是“把权重放到 RISC-V 机器上”，而是让模型格式、运行时、CPU/RVV/NPU 路径、内存和真实任务共同接受验收。</p>
+<figure class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjUyMCIgdmlld0JveD0iMCAwIDEyMDAgNTIwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlJJU0MtViBMTE0gZGVwbG95bWVudCBsb29wIj48c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCwnUGluZ0ZhbmcgU0MnLCdNaWNyb3NvZnQgWWFIZWknLHNhbnMtc2VyaWY7ZmlsbDojMTcyMDMzfS50e2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OjcwMH0uc3tmb250LXNpemU6MTVweDtmaWxsOiM0MTUwNjZ9LmJveHtzdHJva2U6IzJkNWY5YTtzdHJva2Utd2lkdGg6MjtyeDoxNH0uYXtmaWxsOiNlOGYxZmZ9LmJ7ZmlsbDojZTlmOGVmO3N0cm9rZTojMjg3OTRifS5je2ZpbGw6I2ZmZjRkZjtzdHJva2U6I2I5NzkxMn0uZHtmaWxsOiNmNGViZmY7c3Ryb2tlOiM3NjQ2YTZ9LmFycm93e3N0cm9rZTojNTI2NTdkO3N0cm9rZS13aWR0aDozO2ZpbGw6bm9uZTttYXJrZXItZW5kOnVybCgjbSl9PC9zdHlsZT48ZGVmcz48bWFya2VyIGlkPSJtIiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iOSIgcmVmWT0iNCIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw0IEwwLDh6IiBmaWxsPSIjNTI2NTdkIi8+PC9tYXJrZXI+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjUyMCIgZmlsbD0iI2ZiZmNmZSIvPjx0ZXh0IHg9IjYwMCIgeT0iNDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJ0Ij5SSVNDLVYgTExNIOerr+WIsOerr+mDqOe9sumXreeOrzwvdGV4dD48cmVjdCB4PSI1MCIgeT0iMTcwIiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjEyMCIgY2xhc3M9ImJveCBhIi8+PHRleHQgeD0iMTQ1IiB5PSIyMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJ0Ij7mqKHlnovkuI7ku7vliqE8L3RleHQ+PHRleHQgeD0iMTQ1IiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj7moLzlvI8gwrcg6YeP5YyWIMK3IOS4iuS4i+aWhzwvdGV4dD48dGV4dCB4PSIxNDUiIHk9IjI2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPui0qOmHjyDCtyBLViBjYWNoZTwvdGV4dD48cmVjdCB4PSIzMDAiIHk9IjE3MCIgd2lkdGg9IjE5MCIgaGVpZ2h0PSIxMjAiIGNsYXNzPSJib3ggYiIvPjx0ZXh0IHg9IjM5NSIgeT0iMjEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0idCI+5p6E5bu65LiO6L+Q6KGM5pe2PC90ZXh0Pjx0ZXh0IHg9IjM5NSIgeT0iMjQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0icyI+bGxhbWEuY3BwIMK3IE9SVCDCtyBUVk08L3RleHQ+PHRleHQgeD0iMzk1IiB5PSIyNjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj7nvJbor5HlmaggwrcgLW1hcmNoPC90ZXh0PjxyZWN0IHg9IjU1MCIgeT0iMTIwIiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjEyMCIgY2xhc3M9ImJveCBjIi8+PHRleHQgeD0iNjQ1IiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJ0Ij5DUFUgLyBSVlY8L3RleHQ+PHRleHQgeD0iNjQ1IiB5PSIxOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj5JU0EgwrcgVkxFTiDCtyDnur/nqIs8L3RleHQ+PHRleHQgeD0iNjQ1IiB5PSIyMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj7moIfph4/lm57pgIA8L3RleHQ+PHJlY3QgeD0iNTUwIiB5PSIzMDAiIHdpZHRoPSIxOTAiIGhlaWdodD0iMTIwIiBjbGFzcz0iYm94IGQiLz48dGV4dCB4PSI2NDUiIHk9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InQiPk5QVSAvIFRQVTwvdGV4dD48dGV4dCB4PSI2NDUiIHk9IjM3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPuWbvue8luivkSDCtyDnrpflrZDlj5fnkIY8L3RleHQ+PHRleHQgeD0iNjQ1IiB5PSIzOTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj7lpI3liLYgwrcg5Zue6YCAPC90ZXh0PjxyZWN0IHg9IjgwMCIgeT0iMTcwIiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjEyMCIgY2xhc3M9ImJveCBhIi8+PHRleHQgeD0iODk1IiB5PSIyMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJ0Ij7otYTmupDkuI7ns7vnu588L3RleHQ+PHRleHQgeD0iODk1IiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj5SQU0gwrcg5bim5a69IMK3IEJTUDwvdGV4dD48dGV4dCB4PSI4OTUiIHk9IjI2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPumpseWKqCDCtyDmuKnluqYgwrcg5Yqf6ICXPC90ZXh0PjxyZWN0IHg9IjEwMDAiIHk9IjE3MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxMjAiIGNsYXNzPSJib3ggYiIvPjx0ZXh0IHg9IjEwNzUiIHk9IjIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InQiPumqjOaUtjwvdGV4dD48dGV4dCB4PSIxMDc1IiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj7pppYgdG9rZW48L3RleHQ+PHRleHQgeD0iMTA3NSIgeT0iMjYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0icyI+56iz5oCBIMK3IFJTUyDCtyDotKjph488L3RleHQ+PHBhdGggZD0iTTI0MCAyMzBIMzAwTTQ5MCAyMzBINTUwTTc0MCAxODBIODAwTTc0MCAzNjBIODAwTTk5MCAyMzBIMTAwMCIgY2xhc3M9ImFycm93Ii8+PHBhdGggZD0iTTEwNzUgMjkwVjQ2NUgxNDVWMjkwIiBjbGFzcz0iYXJyb3ciLz48dGV4dCB4PSI2MDAiIHk9IjQ5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPuavj+asoeaooeWei+OAgee8luivkeWZqOOAgeWGheaguOOAgempseWKqOaIlumHj+WMluWNh+e6p+Wdh+WbnuWIsOWQjOS4gCB3b3JrbG9hZCDlpI3pqow8L3RleHQ+PC9zdmc+" alt="图 1：RISC-V LLM 的端到端部署闭环"><figcaption>图 1：RISC-V LLM 的端到端部署闭环</figcaption></figure>
+<p>图 1：RISC-V LLM 的端到端部署闭环。来源：依据 Linux RISC-V Vector、GCC/LLVM、llama.cpp、ONNX Runtime、TVM、Qwen 与 SoC 公开资料综合绘制；表示工程验证顺序，不表示任何厂商内部架构 [S01][S03][S05][S07][S09][S18]。</p>
+<h2 id="3-全球技术基线">3. 全球技术基线</h2>
+<h3 id="3-1-rv64-linux-rvv-与二进制分发是三个独立的前置条件">3.1 RV64 Linux、RVV 与二进制分发是三个独立的前置条件</h3>
+<p>Linux 的 RISC-V Vector 文档明确将 V 扩展作为独立硬件能力处理：应用可通过 <code>riscv_hwprobe</code> 或 <code>COMPAT_HWCAP_ISA_V</code> 判断，且可通过 <code>prctl(PR_RISCV_V_SET_CONTROL)</code> 设置用户态向量状态。<code>riscv_hwprobe</code> 还提醒，若查询的 CPU 集合在某项能力上不一致，结果可能无法作为统一基线使用 [S01][S02]。因此，面向 RVV 的模型内核应采用能力发现、同构 CPU 集合约束或明确的 CPU 回退，而不应只以 <code>uname</code> 的 riscv64 标识分发。</p>
+<p>LLVM 将 RVV 表示为 scalable vector，并持续优化向量长度设置和固定长度向量 lowering；GCC 以 <code>-march</code> 指定 ISA 扩展，并要求 ABI 与 ISA 选择兼容 [S03][S04]。对推理软件而言，这意味着源码中的 RVV intrinsic、编译器向量化和运行时实际使用 RVV 是三层不同证据：前两层可证明潜在路径，最后一层仍需通过目标机反汇编、功能测试和 profiler 验证。不同 VLEN、缓存、内存带宽、调度策略与核间异构都会使相同源码表现不同。</p>
+<div class="table-wrap"><table><thead><tr><th>层次</th><th>可直接检查的对象</th><th>常见误判</th><th>正确的工程动作</th></tr></thead><tbody><tr><td>RV64 基础环境</td><td>Linux、动态链接、基础 ISA</td><td>把 RV64 当成“已有向量/NPU”</td><td>先建立普通 CPU 功能基线</td></tr><tr><td>RVV 可用性</td><td><code>riscv_hwprobe</code>、HWCAP、<code>prctl</code></td><td>根据架构名直接执行 RVV 二进制</td><td>运行时发现、按特性分发与回退 [S01][S02]</td></tr><tr><td>编译代码</td><td><code>-march</code>、ABI、汇编、intrinsic</td><td>编译通过即代表目标硬件可跑</td><td>在目标机核验 ISA、非法指令和性能 [S03][S04]</td></tr><tr><td>NPU/TPU 后端</td><td>驱动、编译器、模型受理报告</td><td>SoC 标称 TOPS 等于模型已上 NPU</td><td>记录图切分、未受理算子和端到端开销</td></tr></tbody></table></div>
+<h3 id="3-2-llm-与通用推理运行时-入口存在-产品化仍以目标验证为准">3.2 LLM 与通用推理运行时：入口存在，产品化仍以目标验证为准</h3>
+<p>llama.cpp 的 CPU CMake 配置已包含 RISC-V/RVV 相关开关，GGML 源码存在 RVV 内核；Qwen 的 llama.cpp 指引也提供 GGUF 下载与本地运行的版本要求 [S05][S18]。这为 RV64 Linux 上运行量化 Qwen/其他 GGUF 模型提供了现实入口。边界在于，上游没有提供通用 riscv64 发行二进制，且特定 RISC-V 扩展/编译配置会影响构建与执行，因此应将它视为“可由源码适配和验证的路径”，而非“所有 RISC-V 设备已认证的 LLM 平台” [S06]。</p>
+<p>ONNX Runtime 官方构建文档已列出 Linux RISCV64，MLAS 的构建逻辑也包含 RVV 内核选择与标量回退；TVM 文档给出了 <code>riscv64-unknown-linux-gnu</code> 的 LLVM 交叉编译示例 [S07][S08][S09]。这些能力更适用于受控模型、交叉构建和编译部署链路，但不等于已存在覆盖所有 Transformer 算子和所有加速器的统一 RISC-V 后端。ExecuTorch 将一等 RISC-V 支持列为进行中的 RFC，规划以 RV64GC(V) Linux 与 XNNPACK 为基础，故项目采用时需以目标版本和实际 operator coverage 复核，而非将 RFC 当作已完成的通用支持 [S10]。</p>
+<h3 id="3-3-全球-ip-与加速器-区分向量-cpu-npu-ip-与整机系统">3.3 全球 IP 与加速器：区分向量 CPU、NPU IP 与整机系统</h3>
+<p>国际生态同时出现三种不同路线。SiFive X280 是 64 位 RISC-V 向量处理器 IP，说明 RVV 可作为 CPU/vector 计算路径；Semidynamics Cervell C1 则定位为可编程 RISC-V NPU IP，属于专用推理单元 [S11][S12]。两者都不能单独推出某块开发板的 LLM 速度：前者受 CPU 核数、VLEN、内存和软件内核影响，后者还取决于模型编译器、数据类型、算子集合和主机/NPU 数据传输。</p>
+<p>【C*】全球 RISC-V AI 的稳定技术主线不是一个统一的“RISC-V AI API”，而是 Linux 特性发现、编译器目标控制、通用 CPU/RVV 内核、图编译/运行时与厂商 NPU 工具链的组合。图 2 将这几层的边界并列展示。对团队而言，最重要的可观测物是实际执行路径和回退，而不是芯片宣传页上的单一算力字段 [S01][S03][S05][S07][S11][S12]。</p>
+<figure class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjU3MCIgdmlld0JveD0iMCAwIDEyMDAgNTcwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlJJU0MtViBBSSBzb2Z0d2FyZSBzdGFjayBib3VuZGFyaWVzIj48c3R5bGU+dGV4dHtmb250LWZhbWlseTpBcmlhbCwnUGluZ0ZhbmcgU0MnLCdNaWNyb3NvZnQgWWFIZWknLHNhbnMtc2VyaWY7ZmlsbDojMTcyMDMzfS50e2ZvbnQtc2l6ZToyMnB4O2ZvbnQtd2VpZ2h0OjcwMH0uaHtmb250LXNpemU6MThweDtmb250LXdlaWdodDo3MDB9LnN7Zm9udC1zaXplOjE1cHg7ZmlsbDojNDE1MDY2fS5sYXllcntzdHJva2Utd2lkdGg6MjtyeDoxM30uYXJyb3d7c3Ryb2tlOiM1ODZiODQ7c3Ryb2tlLXdpZHRoOjIuNTtmaWxsOm5vbmU7bWFya2VyLWVuZDp1cmwoI20pfTwvc3R5bGU+PGRlZnM+PG1hcmtlciBpZD0ibSIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjgiIHJlZlg9IjkiIHJlZlk9IjQiIG9yaWVudD0iYXV0byI+PHBhdGggZD0iTTAsMCBMMTAsNCBMMCw4eiIgZmlsbD0iIzU4NmI4NCIvPjwvbWFya2VyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI1NzAiIGZpbGw9IiNmYmZjZmUiLz48dGV4dCB4PSI2MDAiIHk9IjQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0idCI+UlY2NOOAgVJWVuOAgU5QVSDkuI7lhoXlrZjova/ku7bmoIjvvJrliIblsYLovrnnlYw8L3RleHQ+PHJlY3QgeD0iNzUiIHk9Ijc1IiB3aWR0aD0iMTA1MCIgaGVpZ2h0PSI4MCIgY2xhc3M9ImxheWVyIiBmaWxsPSIjZWFmMmZmIiBzdHJva2U9IiMyZDVmOWEiLz48dGV4dCB4PSIxMTAiIHk9IjExMCIgY2xhc3M9ImgiPuaooeWei+S4juW6lOeUqDwvdGV4dD48dGV4dCB4PSIzMTUiIHk9IjExMCIgY2xhc3M9InMiPkdHVUYgLyBPTk5YIC8gUHlUb3JjaCDCtyB0b2tlbml6ZXIgwrcg6YeP5YyWIMK3IHByb21wdCDCtyBLViBjYWNoZSDCtyDotKjph4/op4TliJk8L3RleHQ+PHJlY3QgeD0iNzUiIHk9IjE3NSIgd2lkdGg9IjEwNTAiIGhlaWdodD0iOTAiIGNsYXNzPSJsYXllciIgZmlsbD0iI2U5ZjhlZiIgc3Ryb2tlPSIjMjg3OTRiIi8+PHRleHQgeD0iMTEwIiB5PSIyMTMiIGNsYXNzPSJoIj7ov5DooYzml7bkuI7nvJbor5E8L3RleHQ+PHRleHQgeD0iMzE1IiB5PSIyMDgiIGNsYXNzPSJzIj5sbGFtYS5jcHAgLyBPUlQgLyBUVk0gLyBYTk5QQUNLIMK3IOaooeWei+i9rOaNoiDCtyDlm77liIfliIYgwrcg57q/56iL5LiO5YaF5a2Y566h55CGPC90ZXh0Pjx0ZXh0IHg9IjMxNSIgeT0iMjM1IiBjbGFzcz0icyI+6IO95Yqb5Y+R546w44CB5qih5Z6L57yT5a2Y44CB5Y+X55CG5oql5ZGK5LiOIENQVSDlm57pgIA8L3RleHQ+PHJlY3QgeD0iNzUiIHk9IjI4NSIgd2lkdGg9IjUwNSIgaGVpZ2h0PSIxMjUiIGNsYXNzPSJsYXllciIgZmlsbD0iI2ZmZjVlNCIgc3Ryb2tlPSIjYmQ3ZDE1Ii8+PHRleHQgeD0iMTEwIiB5PSIzMjUiIGNsYXNzPSJoIj7pgJrnlKggQ1BVIOi3r+W+hDwvdGV4dD48dGV4dCB4PSIxMTAiIHk9IjM1NCIgY2xhc3M9InMiPlJWNjTvvJrln7rnoYAgSVNBIOS4jiBMaW51eDwvdGV4dD48dGV4dCB4PSIxMTAiIHk9IjM4MCIgY2xhc3M9InMiPlJWVu+8mlYg5omp5bGV44CBVkxFTuOAgWh3cHJvYmXjgIEtbWFyY2g8L3RleHQ+PHJlY3QgeD0iNjIwIiB5PSIyODUiIHdpZHRoPSI1MDUiIGhlaWdodD0iMTI1IiBjbGFzcz0ibGF5ZXIiIGZpbGw9IiNmNGViZmYiIHN0cm9rZT0iIzc2NDZhNiIvPjx0ZXh0IHg9IjY1NSIgeT0iMzI1IiBjbGFzcz0iaCI+5LiT55So5Yqg6YCf5Zmo6Lev5b6EPC90ZXh0Pjx0ZXh0IHg9IjY1NSIgeT0iMzU0IiBjbGFzcz0icyI+TlBVIC8gVFBV77ya5qih5Z6L57yW6K+R44CB5pSv5oyB566X5a2Q44CB57K+5bqm44CB5Zu+5Y+X55CGPC90ZXh0Pjx0ZXh0IHg9IjY1NSIgeT0iMzgwIiBjbGFzcz0icyI+5LiOIENQVSDnmoTlpI3liLbjgIHlkIzmraXlkozmnKrlj5fnkIboioLngrnlm57pgIA8L3RleHQ+PHJlY3QgeD0iNzUiIHk9IjQzMCIgd2lkdGg9IjEwNTAiIGhlaWdodD0iODUiIGNsYXNzPSJsYXllciIgZmlsbD0iI2VlZjFmNSIgc3Ryb2tlPSIjNWM2Njc1Ii8+PHRleHQgeD0iMTEwIiB5PSI0NjgiIGNsYXNzPSJoIj5Tb0Mg5LiO57O757uf6LWE5rqQPC90ZXh0Pjx0ZXh0IHg9IjMxNSIgeT0iNDY4IiBjbGFzcz0icyI+UkFNIC8g5bim5a69IC8gY2FjaGUgwrcg5qC45ouT5omRIMK3IOWGheaguCAvIEJTUCAvIOmpseWKqCDCtyDnlLXmupDkuI7ng63orr7orqE8L3RleHQ+PHRleHQgeD0iMzE1IiB5PSI0OTUiIGNsYXNzPSJzIj7miYDmnInot6/lvoTlhbHkuqvmraTlsYLnmoTlhoXlrZjjgIHosIPluqbkuI7mjIHnu63lip/ogJfnuqbmnZ88L3RleHQ+PHBhdGggZD0iTTYwMCAxNTVWMTc1TTMyNyAyNjVWMjg1TTg3MyAyNjVWMjg1TTMyNyA0MTBWNDMwTTg3MyA0MTBWNDMwIiBjbGFzcz0iYXJyb3ciLz48dGV4dCB4PSI2MDAiIHk9IjU1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPuS4jeS7peKAnFJWNjTigJ3miJbigJxOUFUgVE9QU+KAneWNleeLrOS7o+ihqOaVtOadoeaooeWei+aJp+ihjOi3r+W+hDwvdGV4dD48L3N2Zz4=" alt="图 2：RV64、RVV、NPU 与内存软件栈的分层边界"><figcaption>图 2：RV64、RVV、NPU 与内存软件栈的分层边界</figcaption></figure>
+<p>图 2：RV64、RVV、NPU 与内存软件栈的分层边界。来源：根据 Linux RVV、LLVM/GCC、llama.cpp、ONNX Runtime 及 SiFive/Semidynamics 的公开接口和定位综合绘制；箭头表示数据与控制依赖，不表示实现保证或性能比例 [S01][S03][S05][S07][S11][S12]。</p>
+<h2 id="4-国内发展-差距与机会">4. 国内发展、差距与机会</h2>
+<h3 id="4-1-中国-soc-与板卡-已出现-cpu-rvv-npu-组合-但规格不能替代模型验证">4.1 中国 SoC 与板卡：已出现 CPU/RVV/NPU 组合，但规格不能替代模型验证</h3>
+<p>SpacemiT K1 的公开资料列出 X60 RISC-V CPU、RISC-V 64GCVB/RVA22、RVV 1.0、不同集群 VLEN 以及 2 TOPS NPU 和最高 16GB LPDDR4/4X；这使其成为可同时讨论 RVV 和 NPU 的中国 SoC 样本 [S13]。K3 的公开资料将其定位于更高端的端侧/本地 AI 场景，并披露 RISC-V CPU、向量与 AI 核组合；其“可本地推理 30B 模型”等表述应保留为厂商能力定位，不能在没有模型、量化、上下文和测试条件时转换成 token/s 结论 [S14]。</p>
+<p>ESWIN EIC7700 的公开资料说明其采用 SiFive P550 CPU 集群与 13.3 TOPS INT8 DNN 加速器；StarFive JH7110 则公开为四核 RISC-V CPU 与 GPU 的 SoC，页面没有标称 NPU/TOPS [S16][S17]。这两个样本说明，“RISC-V 板卡”内部差异很大：有 NPU 的平台仍需模型编译和受理验证；没有 NPU 的平台可作为 RV64/Linux/RVV 或轻量 CPU 推理和控制面验证环境，却不应被要求承载超出内存预算的现代 LLM。</p>
+<p>Milk-V Oasis/SG2380 的公告描述了 P670 CPU、X280 向量核和最高 20 TOPS INT8 的目标配置，但公告同时标明项目处于搁置状态，不能作为当前可采购量产桌面系统的证据 [S15]。这也提醒方案评审必须单独确认产品状态、固件/BSP、驱动、可获得内存配置和长期软件维护，而不能仅从芯片计划或开发板发布新闻推断项目可交付性。</p>
+<div class="table-wrap"><table><thead><tr><th>国内样本</th><th>公开硬件信息</th><th>可直接支持的工程判断</th><th>不应外推的内容</th></tr></thead><tbody><tr><td>SpacemiT K1</td><td>RISC-V 64GCVB/RVA22、RVV 1.0、NPU、最高 16GB 内存 [S13]</td><td>可建立 RVV 与 NPU 分别验收的 SoC 样本</td><td>任意 LLM 都能由 NPU 完整加速</td></tr><tr><td>SpacemiT K3</td><td>RISC-V/向量/AI 核的本地 AI 产品定位 [S14]</td><td>可作为更高资源端侧推理候选，须查具体版本资料</td><td>30B 宣称等同稳定 token/s 或长上下文体验</td></tr><tr><td>ESWIN EIC7700</td><td>P550 CPU、13.3 TOPS INT8 DNN 加速器 [S16]</td><td>有 CPU 与独立 DNN 路径，需要核验编译器和模型覆盖</td><td>P550 自动提供 RVV 或 LLM 专项优化</td></tr><tr><td>StarFive JH7110</td><td>四核 RISC-V CPU、GPU，未披露 NPU [S17]</td><td>适合 Linux/CPU 软件与轻量模型实验基线</td><td>具有未披露的 NPU 推理能力</td></tr><tr><td>Milk-V Oasis/SG2380</td><td>公告中的 P670/X280/20 TOPS 目标配置，项目搁置 [S15]</td><td>代表生态设计方向和风险项</td><td>可交付设备、驱动成熟度或实际性能</td></tr></tbody></table></div>
+<h3 id="4-2-模型-运行时与操作系统-连接点正在形成-统一性仍不足">4.2 模型、运行时与操作系统：连接点正在形成，统一性仍不足</h3>
+<p>Qwen 官方文档为 llama.cpp 提供 GGUF 获取和运行说明，Qwen3 的本地部署入口可以与上游 llama.cpp 的 RISC-V/RVV CPU 路径组合使用 [S05][S18]。这是一条可验证的“国内开放模型 + 上游运行时 + RV64 Linux”原型路径，但 Qwen 文档并未将所有 RISC-V SoC 列为认证硬件，因此不能把格式兼容写成每个设备上的已验证性能。MNN 的 CPU 构建文件中也有 RVV 后端编译选项，说明国内运行时对向量路径存在代码层连接；其 README 或构建项本身不证明特定 Qwen 模型、长上下文或 NPU 委派已可量产 [S19]。</p>
+<p>openEuler 24.03 LTS 公布了 RISC-V 原生支持，并提到 SG2380 与 JH7110 等平台。它降低了操作系统、内核和发行版适配门槛，却不替代模型运行时、NPU SDK、量化或性能验证 [S20]。图 3 概括国内外生态中“开放模型—运行时—SoC—OS”的连接关系：当前机会是将这些分散的连接点做成可复制的模型转换、能力发现、基准和回归链路；当前差距则是设备特性、编译器/驱动版本、后端受理和公开评测口径尚未形成统一契约。</p>
+<figure class="fig"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjYxMCIgdmlld0JveD0iMCAwIDEyMDAgNjEwIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlJJU0MtViBBSSBMTE0gZWNvc3lzdGVtIG1hcCI+PHN0eWxlPnRleHR7Zm9udC1mYW1pbHk6QXJpYWwsJ1BpbmdGYW5nIFNDJywnTWljcm9zb2Z0IFlhSGVpJyxzYW5zLXNlcmlmO2ZpbGw6IzE3MjAzM30udHtmb250LXNpemU6MjJweDtmb250LXdlaWdodDo3MDB9Lmh7Zm9udC1zaXplOjE4cHg7Zm9udC13ZWlnaHQ6NzAwfS5ze2ZvbnQtc2l6ZToxNHB4O2ZpbGw6IzQxNTA2Nn0uYm94e3N0cm9rZS13aWR0aDoyO3J4OjE0fS5hcnJvd3tzdHJva2U6IzY5N2I5MTtzdHJva2Utd2lkdGg6Mi41O2ZpbGw6bm9uZTttYXJrZXItZW5kOnVybCgjbSl9PC9zdHlsZT48ZGVmcz48bWFya2VyIGlkPSJtIiBtYXJrZXJXaWR0aD0iMTAiIG1hcmtlckhlaWdodD0iOCIgcmVmWD0iOSIgcmVmWT0iNCIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCwwIEwxMCw0IEwwLDh6IiBmaWxsPSIjNjk3YjkxIi8+PC9tYXJrZXI+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjYxMCIgZmlsbD0iI2ZiZmNmZSIvPjx0ZXh0IHg9IjYwMCIgeT0iNDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJ0Ij5SSVNDLVYgQUkvTExNIOeUn+aAgeeahOWbveWGheWklui/nuaOpeeCuTwvdGV4dD48cmVjdCB4PSI2MCIgeT0iOTAiIHdpZHRoPSIyNTAiIGhlaWdodD0iMTMwIiBjbGFzcz0iYm94IiBmaWxsPSIjZWFmMmZmIiBzdHJva2U9IiMyZDVmOWEiLz48dGV4dCB4PSIxODUiIHk9IjEyNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImgiPuS4iua4uOWfuuehgOiuvuaWvTwvdGV4dD48dGV4dCB4PSIxODUiIHk9IjE1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPkxpbnV4IMK3IExMVk0gwrcgR0NDPC90ZXh0Pjx0ZXh0IHg9IjE4NSIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0icyI+bGxhbWEuY3BwIMK3IE9SVCDCtyBUVk08L3RleHQ+PHRleHQgeD0iMTg1IiB5PSIyMDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj5FeGVjdVRvcmNoPC90ZXh0PjxyZWN0IHg9IjQ3NSIgeT0iOTAiIHdpZHRoPSIyNTAiIGhlaWdodD0iMTMwIiBjbGFzcz0iYm94IiBmaWxsPSIjZTlmOGVmIiBzdHJva2U9IiMyODc5NGIiLz48dGV4dCB4PSI2MDAiIHk9IjEyNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImgiPuW8gOaUvuaooeWei+S4jui/kOihjOaXtjwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjE1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPlF3ZW4gwrcgR0dVRiDCtyBsbGFtYS5jcHA8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj5NTk4gwrcg5qih5Z6L6L2s5o2iPC90ZXh0Pjx0ZXh0IHg9IjYwMCIgeT0iMjAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0icyI+6LSo6YeP5LiO6YeP5YyW6K+E5rWLPC90ZXh0PjxyZWN0IHg9Ijg5MCIgeT0iOTAiIHdpZHRoPSIyNTAiIGhlaWdodD0iMTMwIiBjbGFzcz0iYm94IiBmaWxsPSIjZmZmNWU0IiBzdHJva2U9IiNiZDdkMTUiLz48dGV4dCB4PSIxMDE1IiB5PSIxMjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJoIj7lm73pmYUgSVAg6Lev57q/PC90ZXh0Pjx0ZXh0IHg9IjEwMTUiIHk9IjE1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPlNpRml2ZSBYMjgw77ya5ZCR6YePPC90ZXh0Pjx0ZXh0IHg9IjEwMTUiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPlNlbWlkeW5hbWljc++8mk5QVSBJUDwvdGV4dD48dGV4dCB4PSIxMDE1IiB5PSIyMDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj5DUFUgLyBOUFUg5YiG5bGCPC90ZXh0PjxyZWN0IHg9IjI1MCIgeT0iMzEwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE1MCIgY2xhc3M9ImJveCIgZmlsbD0iI2Y0ZWJmZiIgc3Ryb2tlPSIjNzY0NmE2Ii8+PHRleHQgeD0iNDEwIiB5PSIzNDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJoIj7kuK3lm70gU29DIC8g5p2/5Y2h5qC35pysPC90ZXh0Pjx0ZXh0IHg9IjQxMCIgeT0iMzc1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0icyI+U3BhY2VtaVQgSzEgLyBLMyDCtyBFU1dJTjwvdGV4dD48dGV4dCB4PSI0MTAiIHk9IjQwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPlN0YXJGaXZlIMK3IE1pbGstViDorqHliJI8L3RleHQ+PHRleHQgeD0iNDEwIiB5PSI0MjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj5DUFUgwrcgUlZWIMK3IE5QVSDlv4XpobvliIbmtYs8L3RleHQ+PHJlY3QgeD0iNjMwIiB5PSIzMTAiIHdpZHRoPSIzMjAiIGhlaWdodD0iMTUwIiBjbGFzcz0iYm94IiBmaWxsPSIjZWVmMWY1IiBzdHJva2U9IiM1YzY2NzUiLz48dGV4dCB4PSI3OTAiIHk9IjM0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9ImgiPuaTjeS9nOezu+e7n+S4juS6pOS7mDwvdGV4dD48dGV4dCB4PSI3OTAiIHk9IjM3NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPm9wZW5FdWxlciDCtyBMaW51eCBCU1A8L3RleHQ+PHRleHQgeD0iNzkwIiB5PSI0MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJzIj7pqbHliqggwrcg5YaF5a2YIMK3IOeDreiuvuiuoTwvdGV4dD48dGV4dCB4PSI3OTAiIHk9IjQyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPuiuvuWkh+efqemYteS4juWbnuW9kumXqOemgTwvdGV4dD48cmVjdCB4PSI0MDUiIHk9IjUxMCIgd2lkdGg9IjM5MCIgaGVpZ2h0PSI2NSIgY2xhc3M9ImJveCIgZmlsbD0iI2U5ZjhlZiIgc3Ryb2tlPSIjMjg3OTRiIi8+PHRleHQgeD0iNjAwIiB5PSI1NDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGNsYXNzPSJoIj7lhbHlkIzpqozmlLblr7nosaHvvJrlj6/ph43mlL4gd29ya2xvYWQg5LiO56uv5Yiw56uv6K+B5o2uPC90ZXh0Pjx0ZXh0IHg9IjYwMCIgeT0iNTYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBjbGFzcz0icyI+6LSo6YePIMK3IOmmliB0b2tlbiDCtyDnqLPmgIEgwrcgUlNTIMK3IOWPl+eQhi/lm57pgIAgwrcg5rip5bqmL+WKn+iAlzwvdGV4dD48cGF0aCBkPSJNMzEwIDE1NUg0NzVNNzI1IDE1NUg4OTBNNTM1IDIyMEw0MzAgMzEwTTY2NSAyMjBMNzcwIDMxME00MTAgNDYwTDU1MCA1MTBNNzkwIDQ2MEw2NTAgNTEwIiBjbGFzcz0iYXJyb3ciLz48dGV4dCB4PSI2MDAiIHk9IjYwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgY2xhc3M9InMiPueUn+aAgei/nuaOpeS4jeS7o+ihqOS7u+S4gOe7hOWQiOW3suiOt+W+l+WujOaVtCBMTE0g5oCn6IO95oiW6YeP5Lqn6K6k6K+BPC90ZXh0Pjwvc3ZnPg==" alt="图 3：RISC-V AI/LLM 的国内外生态连接图"><figcaption>图 3：RISC-V AI/LLM 的国内外生态连接图</figcaption></figure>
+<p>图 3：RISC-V AI/LLM 的国内外生态连接图。来源：依据 Linux、llama.cpp、Qwen、SpacemiT、ESWIN、StarFive、Milk-V、openEuler、SiFive 与 Semidynamics 的公开资料归纳；展示技术连接点，不表示市场份额、组织隶属或端到端性能排名 [S01][S05][S11][S12][S13][S15][S16][S17][S18][S20]。</p>
+<h3 id="4-3-机会与差距-从可启动原型转向可运营的异构部署">4.3 机会与差距：从可启动原型转向可运营的异构部署</h3>
+<p>【S】国内 RISC-V AI 的短期价值不在于宣称一个统一胜出的硬件平台，而在于将开放模型、小型/量化模型、RVV CPU 内核、厂商 NPU、Linux 发行版和本地化场景组合为可验证方案。对控制、机器人、网关和端侧原型而言，CPU/RVV 路径可提供最低可运行基线；对资源更高的 SoC，NPU 路径可被当作独立加速候选。两条路径必须以相同 workload、质量和资源指标对照，不能因同在一个 RISC-V SoC 上便合并为同一性能结论 [S01][S13][S14][S16][S18]。</p>
+<p>【P】最应优先建设的基础设施是设备能力清单与部署证据链：启动时采集 ISA/RVV/VLEN、核拓扑、内存和驱动版本；编译阶段锁定 <code>-march</code>、编译器和模型转换版本；运行阶段记录 CPU/RVV/NPU 图分配、回退与复制；发布阶段保留模型 hash、量化、上下文、token/s、RSS、温度/功耗和质量结果。它能将“开发板能跑”升级为可定位、可回归、可解释的产品能力。</p>
+<h3 id="能力成熟度对比矩阵">能力成熟度对比矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>原型可交付</th><th>产品团队可交付</th><th>平台负责人可交付</th><th>RISC-V 专项验收重点</th></tr></thead><tbody><tr><td>特性发现</td><td>在一块板上编译并运行</td><td>自动检查 RVV、核一致性和内存</td><td>维护设备/内核/ISA/驱动兼容矩阵</td><td><code>hwprobe</code>、HWCAP、VLEN、<code>prctl</code> 策略 [S01][S02]</td></tr><tr><td>代码生成</td><td>指定一次 <code>-march</code></td><td>保存编译器、ABI、反汇编与回退构建</td><td>维护多 ISA 产物和发布策略</td><td>编译产物没有非法指令且路径可解释 [S03][S04]</td></tr><tr><td>模型部署</td><td>加载一个 GGUF 或 ONNX 模型</td><td>管理量化、上下文、内存和实际后端</td><td>建立模型目录、转换 CI 与受理报表</td><td>模型 hash、KV cache、图切分和质量</td></tr><tr><td>加速器</td><td>看到 NPU 初始化日志</td><td>比较 CPU/RVV/NPU 端到端基线</td><td>定义受理率、复制和回退 SLO</td><td>禁止把 TOPS 当 token/s [S13][S16]</td></tr><tr><td>回归治理</td><td>记录一次短测</td><td>冷/热态、长上下文与持续负载测试</td><td>跨板卡、固件和运行时的发布门禁</td><td>首 token、稳态、RSS、温控、正确性</td></tr></tbody></table></div>
+<h2 id="5-关键机制深挖">5. 关键机制深挖</h2>
+<h3 id="5-1-isa-rvv-与编译分发-功能可用性先于向量优化">5.1 ISA、RVV 与编译分发：功能可用性先于向量优化</h3>
+<p><strong>接口与实现依据。</strong> Linux 提供 <code>riscv_hwprobe</code>、HWCAP 与 <code>prctl(PR_RISCV_V_SET_CONTROL)</code> 等接口，用来查询和控制用户态 RVV 条件；LLVM 和 GCC 分别通过 RISC-V 目标后端、<code>-march</code> 与 ABI 规则把源码映射到目标 ISA [S01][S02][S03][S04]。实现上，应用或运行时应在进程启动或工作线程建立阶段确定特性集合，再选择标量、RVV 或厂商专用内核；构建系统则应保留对应的目标字符串、编译器版本、ABI 和反汇编证据。</p>
+<p><strong>失效边界。</strong> 仅检测到 riscv64 并不能保证 V 扩展存在、已经对当前任务开启或在所有可调度 CPU 上一致；即使存在 RVV，VLEN、微架构、编译器版本和内存访问模式也会改变结果。将一个 <code>rv64gcv</code> 构建投放到不含 V 的机器会触发非法指令；将单一 VLEN 的短测结论迁移到另一颗核，也可能因向量设置开销、cache 或带宽而失效。静态向量化报告不能证明真实 LLM 热点已进入向量路径。</p>
+<p><strong>验证条件。</strong> 每次测试保存 <code>riscv_hwprobe</code>/HWCAP 结果、核拓扑、内核版本、<code>prctl</code> 策略、编译器和完整 <code>-march</code>/ABI；对标量和 RVV 产物分别跑同一模型、相同 prompt/上下文和固定线程策略。结合反汇编确认目标指令，结合 runtime profile 确认热点实际走入该内核；如 CPU 集合不一致，应绑核、分组调度或回退到可移植实现。功能、数值输出和长时间稳定性要先于速度比较。</p>
+<p><strong>成本与权衡。</strong> 多 ISA 产物、动态分发和特性测试会增加构建、包体、CI 与故障排查成本；强制统一 CPU 集合会降低调度弹性；为追求向量化而重写内核可能提高维护代价或损害无 RVV 机器的可移植性。收益应以真实模型/上下文的端到端指标计量，而非仅以汇编指令数或理论向量宽度计量。</p>
+<h3 id="5-2-llm-运行时与模型格式-gguf-入口不等于整条推理链已优化">5.2 LLM 运行时与模型格式：GGUF 入口不等于整条推理链已优化</h3>
+<p><strong>接口与实现依据。</strong> llama.cpp 提供 GGUF 模型加载和 RISC-V/RVV CPU 构建入口，Qwen 文档给出以 llama.cpp 运行指定 GGUF 文件的模型侧接口；ONNX Runtime 的 RISCV64 构建、TVM 的 riscv64 LLVM target 和 ExecuTorch 的 RISC-V RFC 则提供图模型及 PyTorch 路径的实现依据 [S05][S07][S09][S10][S18]。实现工作需要同时管理 tokenizer、权重量化、矩阵乘内核、采样、线程、KV cache、内存分配和模型图的受理/回退。</p>
+<p><strong>失效边界。</strong> 模型“能加载”可能只说明权重和格式兼容，不能说明预填充、解码、采样、长上下文或多并发均满足目标；小模型也可能因 KV cache、临时张量或内存碎片在持续运行中失败。ONNX/TVM 的交叉编译可产出目标代码，不代表所有 Transformer 算子、动态 shape 或第三方 NPU 后端都被覆盖。ExecuTorch 的 RFC 说明方向和阶段，不能被写成已完成的一等 RISC-V 发布支持。</p>
+<p><strong>验证条件。</strong> 固定模型 hash、GGUF/ONNX/PT2E 格式、量化、tokenizer、prompt、采样参数、上下文、线程和 CPU 亲和性，分别测加载、prefill、首 token、稳态解码、最长上下文、并发和持续运行。同步记录 RSS、KV cache、内存峰值、失败/回退和任务质量；对于图运行时，还应保存算子覆盖、未受理节点、数据复制和实际后端报告。比较不同量化时必须以质量阈值与完整用户任务做门槛，而非仅比较 token/s。</p>
+<p><strong>成本与权衡。</strong> 更低比特量化减少权重和带宽压力，却可能降低任务质量并提高转换/校准成本；更大的 batch 可能提高吞吐，却损害交互首 token 与内存；为了减少复制而复用缓冲区会增加生命周期管理复杂度。兼容更多模型格式与运行时会加大测试矩阵，故应先收敛到有业务价值的模型、上下文和硬件组合。</p>
+<h3 id="5-3-npu-内存与端到端指标-标称-tops-需要被实际图执行证伪或确认">5.3 NPU、内存与端到端指标：标称 TOPS 需要被实际图执行证伪或确认</h3>
+<p><strong>接口与实现依据。</strong> SpacemiT K1/K3、ESWIN EIC7700 等公开资料说明部分中国 RISC-V SoC 同时具备 CPU、向量或 DNN/NPU 单元 [S13][S14][S16]。这些硬件通常通过独立驱动、模型转换器和厂商编译器接受图或算子；CPU/RVV 路径则由通用运行时和内核承担。实现设计必须把权重、KV cache、激活、NPU buffer、host/device 复制和系统内存竞争共同纳入资源账本。</p>
+<p><strong>失效边界。</strong> INT8 TOPS 是特定精度和条件下的峰值操作数，不等于某个量化 LLM 的 token/s、首 token、长上下文或持续功耗。Transformer 的算子、动态序列、量化格式、KV cache、带宽、编译器支持、CPU/NPU 同步与未受理节点都可能导致局部 NPU 最快、端到端反而更慢。更重要的是，SoC 含 NPU 并不证明当前模型真的经过该 NPU 编译和执行；只看初始化日志或厂商规格页属于失败边界。</p>
+<p><strong>验证条件。</strong> 对每个模型路径，报告实际 NPU 编译成功状态、接受图/算子比例、CPU/RVV 回退节点、传输/同步时间、加载和缓存时间；并在相同输入上对比纯 CPU、CPU+RVV 和 NPU 主路径。端到端结果至少覆盖 prefill、首 token、稳态 token/s、P50/P99、峰值 RSS、NPU/CPU 利用率、温度/功耗代理指标与输出质量。连续运行、最长上下文和设备热稳态须另行记录，避免把一次短测外推为产品体验。</p>
+<p><strong>成本与权衡。</strong> NPU 专用模型或静态 shape 可提高受理率，却会增加转换、调试、精度回归和版本锁定成本；使用更大内存 SKU 可容纳模型和 KV cache，却提高 BOM、功耗和散热设计压力；维护 CPU 回退可提高覆盖，却扩大测试矩阵。负责人应把资源、质量、维护和供应可用性一起纳入门槛，而不是只选择峰值 TOPS 最大的方案。</p>
+<h2 id="6-演进方向与情景">6. 演进方向与情景</h2>
+<p>RISC-V AI/LLM 的技术演进更像多条链路逐步接合：Linux/LLVM/GCC 让 RV64 与 RVV 的基础能力可发现、可编译；llama.cpp/GGUF 给开放模型提供 CPU 入口；ORT、TVM 和 PyTorch 生态逐步补足图模型与部署路径；中国 SoC 和发行版让本地板卡、NPU 与 OS 组合更可获得 [S01][S03][S05][S07][S09][S10][S13][S16][S20]。但这不意味着异构性会快速消失：不同芯片的 VLEN、内存、NPU SDK、驱动、模型格式和后端覆盖仍会决定产品级差异。</p>
+<p>图 3 所示的生态连接还意味着，模型团队、编译器/运行时团队和 SoC 团队需要围绕同一 workload 协作。模型团队不能只交付参数量和权重；芯片团队不能只交付 TOPS；系统团队也不能只报告能启动 Linux。共同事实应包括输入分布、上下文、质量标准、资源预算、实际执行路径、回退和长期热稳定性。只有这些字段可追溯，RISC-V 的开放软件优势才可以转化为可发布的平台能力。</p>
+<div class="table-wrap"><table><thead><tr><th>情景</th><th>触发条件</th><th>可能变化</th><th>应优先建设的能力</th><th>可信度</th></tr></thead><tbody><tr><td>RVV CPU 路径成熟</td><td>通用内核、编译器与目标硬件持续改进</td><td>小模型/量化 LLM 的 CPU 可用性提高</td><td>特性发现、多 VLEN 基准、标量回退 [S01][S03][S05]</td><td>【S】</td></tr><tr><td>NPU 模型工具链完善</td><td>SoC 厂商公开并维护 Transformer 编译与 profiler</td><td>更多图节点迁移到 NPU</td><td>算子受理报告、图切分可观测、精度门禁 [S13][S14][S16]</td><td>【S】</td></tr><tr><td>国内模型与设备结合加深</td><td>Qwen/GGUF 等格式与板卡运行时持续适配</td><td>原型门槛降低，设备矩阵扩大</td><td>模型转换 CI、量化质量与内存预算 [S05][S18][S19]</td><td>【S】</td></tr><tr><td>统一性不足持续存在</td><td>VLEN、驱动和 SDK 继续碎片化</td><td>设备专用调优和回退长期存在</td><td>capability matrix、原始日志归档、跨设备发布门禁 [S01][S02][S20]</td><td>【C*】</td></tr><tr><td>资源成为产品上限</td><td>模型上下文和并发需求增长快于端侧内存带宽</td><td>量化、路由和模型分级更关键</td><td>KV cache 预算、首 token 与热稳态 SLO</td><td>【P】</td></tr></tbody></table></div>
+<h3 id="6-1-对研发组织的含义">6.1 对研发组织的含义</h3>
+<p>组织应按“一个可重放的模型 workload”而不是按 CPU、NPU、模型或 OS 各自的局部指标分工。模型负责人定义质量、上下文和量化边界；运行时负责人输出模型受理、图切分和回退证据；编译器/系统负责人管理 <code>-march</code>、特性发现、线程、内存和二进制分发；芯片/驱动负责人提供 NPU 受理、性能与功耗诊断。共同发布门禁则比较相同模型和输入下的 CPU、RVV、NPU 端到端结果。</p>
+<h3 id="6-2-对个人能力的含义">6.2 对个人能力的含义</h3>
+<p>从 RISC-V Linux 开发走向 AI/LLM 性能负责人，关键不是记住一组扩展名，而是能把 ISA、代码生成、模型格式、内存和硬件后端建立证据链：先判定机器实际拥有何种能力，再解释编译产物和运行时走了哪条路径，随后以正确性、首 token、稳态、内存和热状态验证收益，最后把设备差异沉淀为能力矩阵和自动回归。这样才能在开放 ISA 的灵活性与异构设备的复杂度之间做出可复核取舍。</p>
+<h2 id="7-建议与验收">7. 建议与验收</h2>
+<h3 id="7-1-从第一天建立-risc-v-llm-工作负载合同">7.1 从第一天建立“RISC-V LLM 工作负载合同”</h3>
+<p>项目开始时应固定目标设备、CPU ISA 与扩展、RVV/VLEN、RAM、内核/BSP、驱动、编译器、模型和量化；同时定义语言、任务、prompt/输出长度、最大上下文、并发、质量阈值、延迟、内存、功耗与离线/联网边界。它将 <code>hwprobe</code>、<code>-march</code>、模型格式和 NPU 受理等底层条件转换为可验收的产品合同 [S01][S02][S03][S18]。</p>
+<p>第二步是为每次运行保存执行证据：实际选择的 CPU/RVV/NPU 后端、模型编译日志、图受理与回退、线程/绑核、加载、prefill、首 token、稳态 token/s、RSS、温度/功耗和质量。第三步才是优化内核、量化、图编译、批处理或缓存。这个顺序可避免把单次启动成功或芯片规格页误判为平台收益。</p>
+<h3 id="主张-证据矩阵">主张—证据矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>主张</th><th>直接证据</th><th>反例/边界</th><th>结论等级</th></tr></thead><tbody><tr><td>RV64、RVV 与 NPU 应分层验收</td><td>Linux 将 V 扩展单独暴露；芯片资料分别描述 CPU/RVV/NPU [S01][S02][S13][S16]</td><td>SoC 具体实现与驱动能力仍须逐机核验</td><td>【C*】</td></tr><tr><td>开源 LLM 有 RV64/RVV 原型部署入口</td><td>llama.cpp RISC-V 配置与 Qwen GGUF 指引 [S05][S18]</td><td>无通用 riscv64 发布二进制或全设备认证</td><td>【C】</td></tr><tr><td>图模型存在 riscv64 构建/交叉编译入口</td><td>ORT RISCV64 构建、TVM target、ExecuTorch RFC [S07][S09][S10]</td><td>不能推导算子、EP 或性能成熟度</td><td>【C】</td></tr><tr><td>中国生态可形成模型—SoC—OS 的组合</td><td>SpacemiT、ESWIN、Qwen、MNN、openEuler 公开资料 [S13][S16][S18][S19][S20]</td><td>缺少统一的跨设备 LLM 性能口径</td><td>【S】</td></tr><tr><td>TOPS 不能代替 LLM 用户体验</td><td>NPU/DNN 规格与模型/运行时前置条件彼此独立 [S13][S14][S16]</td><td>特定模型可在特定条件下获益，仍需实测</td><td>【C*】</td></tr></tbody></table></div>
+<h3 id="7-2-团队机制建议">7.2 团队机制建议</h3>
+<ol><li>建立 <strong>RISC-V 能力清单</strong>：按设备记录 ISA、RVV/VLEN、核拓扑、内核、BSP、驱动、NPU SDK、内存和已验证运行时版本。</li><li>建立 <strong>双基线</strong>：每个候选模型同时保留可移植 CPU 基线与 RVV/NPU 优化基线，优化路径不可用时必须有可解释回退。</li><li>建立 <strong>模型受理报告</strong>：保存模型转换、实际图/算子分配、复制、同步、缓存和未受理原因；禁止以 NPU 初始化成功替代图级证据。</li><li>建立 <strong>资源稳态协议</strong>：分开测试加载、prefill、首 token、短/长上下文、并发与连续运行，保持温度/电源/频率和输入版本可复现。</li><li>建立 <strong>跨层发布门禁</strong>：模型、编译器、内核、驱动或固件任一升级时，同时检查质量、非法指令、回退率、内存、热稳态和端到端 SLO。</li></ol>
+<h3 id="建议-验收矩阵">建议—验收矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>建议</th><th>90 天可交付物</th><th>验收条件</th><th>验证手段</th><th>优先级</th></tr></thead><tbody><tr><td>固化设备能力清单</td><td>设备 YAML/JSON、<code>hwprobe</code> 采集、编译配置</td><td>能识别无 RVV、异构 RVV 与 NPU 不可用情况</td><td>启动自检、固定版本归档 [S01][S02]</td><td>P0</td></tr><tr><td>建立一个 LLM 双基线</td><td>同模型 CPU 与 RVV/NPU 运行配置</td><td>两条路径输出质量相符且回退可用</td><td>固定 prompt、量化、上下文与线程</td><td>P0</td></tr><tr><td>建立模型受理可观测性</td><td>后端日志、图/算子报告、复制/同步统计</td><td>可解释一次 NPU 未受理或端到端退化</td><td>运行时 profiler 与转换日志</td><td>P0</td></tr><tr><td>完成资源稳态验证</td><td>首 token、稳态、RSS、温度/功耗报告</td><td>最长上下文和连续运行未越过资源/质量 SLO</td><td>固定设备状态、热循环和多次运行</td><td>P0</td></tr><tr><td>建立跨版本门禁</td><td>CI 任务、阈值、失败产物</td><td>编译器/驱动/模型回归可被阻断和定位</td><td>设备池、基线 diff、原始日志</td><td>P1</td></tr></tbody></table></div>
+<h2 id="8-不确定性与研究限制">8. 不确定性与研究限制</h2>
+<ol><li>本报告不对 RISC-V、Arm、x86 或任何厂商做市场份额、出货量、性能或能效排名；公开资料的模型、量化、序列长度、内存、温度和测试方法不同，不能归一化比较。</li><li>Linux、编译器和上游源码所述的“支持”表示接口、构建或代码路径存在，不等价于特定模型、特定板卡的完整功能、稳定性或量产认证 [S01][S03][S05][S07][S10]。</li><li>芯片 TOPS、可推理参数量和演示口径不等于 LLM 的首 token、稳定 token/s、长上下文、并发、功耗或质量；这些均需在目标 workload 上单独实测 [S13][S14][S16]。</li><li>RISC-V 设备可能在 V 扩展、VLEN、核拓扑、内核、编译器和 NPU SDK 上差异显著。任何单机结论都不应自动迁移到其他 riscv64 设备 [S01][S02][S03][S04]。</li><li>公开产品页会更新，项目状态与供货状态会变化；例如公告中的开发板计划不等同可持续供货。采购和量产决策前应重新核验实际 SKU、BSP、驱动和维护承诺 [S15]。</li><li>本文不替代模型安全评估、开源许可审查、数据合规、固件安全审计或硬件可靠性验证；这些应作为实际产品项目的独立门禁。</li></ol>
+<h2 id="参考来源">参考来源</h2>
+<div class="table-wrap"><table><thead><tr><th>ID</th><th>来源</th><th>类型</th><th>本文使用范围</th></tr></thead><tbody><tr><td>[S01]</td><td><a href="https://docs.kernel.org/arch/riscv/vector.html" rel="noopener">Linux Kernel：RISC-V Vector Extension</a></td><td>Linux 内核官方文档</td><td>用户态向量状态、<code>prctl</code> 与 RVV 语义</td></tr><tr><td>[S02]</td><td><a href="https://docs.kernel.org/arch/riscv/hwprobe.html" rel="noopener">Linux Kernel：RISC-V Hardware Probing</a></td><td>Linux 内核官方文档</td><td><code>riscv_hwprobe</code>、V 扩展和异构 CPU 集合</td></tr><tr><td>[S03]</td><td><a href="https://llvm.org/docs/RISCVUsage.html" rel="noopener">LLVM：RISC-V Target Usage</a></td><td>LLVM 上游文档</td><td>RVV、目标特性与代码生成</td></tr><tr><td>[S04]</td><td><a href="https://gcc.gnu.org/onlinedocs/gcc/RISC-V-Options.html" rel="noopener">GCC：RISC-V Options</a></td><td>GCC 官方文档</td><td><code>-march</code>、ABI 与向量选项</td></tr><tr><td>[S05]</td><td><a href="https://github.com/ggml-org/llama.cpp/blob/master/ggml/src/ggml-cpu/CMakeLists.txt" rel="noopener">llama.cpp：CPU CMake configuration</a></td><td>llama.cpp 上游源码</td><td>RISC-V/RVV 构建开关与 CPU 路径</td></tr><tr><td>[S06]</td><td><a href="https://github.com/ggml-org/llama.cpp/issues/20988" rel="noopener">llama.cpp issue #20988</a></td><td>llama.cpp 上游 issue</td><td>riscv64 发布二进制与构建边界</td></tr><tr><td>[S07]</td><td><a href="https://onnxruntime.ai/docs/build/inferencing.html" rel="noopener">ONNX Runtime：Build for inferencing</a></td><td>ONNX Runtime 官方文档</td><td>Linux RISCV64 构建路径</td></tr><tr><td>[S08]</td><td><a href="https://github.com/microsoft/onnxruntime/blob/main/cmake/onnxruntime_mlas.cmake" rel="noopener">ONNX Runtime：MLAS CMake</a></td><td>ONNX Runtime 上游源码</td><td>RVV 内核选择与标量回退</td></tr><tr><td>[S09]</td><td><a href="https://tvm.apache.org/docs/how_to/tutorials/cross_compilation_and_rpc.html" rel="noopener">Apache TVM：Cross compilation and RPC</a></td><td>TVM 官方文档</td><td><code>riscv64-unknown-linux-gnu</code> 交叉编译</td></tr><tr><td>[S10]</td><td><a href="https://github.com/pytorch/executorch/issues/18991" rel="noopener">ExecuTorch issue #18991：First-class RISC-V support</a></td><td>PyTorch/ExecuTorch 上游 RFC</td><td>RISC-V 支持阶段和边界</td></tr><tr><td>[S11]</td><td><a href="https://www.sifive.com/blog/introduction-to-the-sifive-intelligence-x280" rel="noopener">SiFive：Introduction to Intelligence X280</a></td><td>SiFive 官方技术博客</td><td>RISC-V 向量处理器 IP 定位</td></tr><tr><td>[S12]</td><td><a href="https://semidynamics.com/ip-cores/c1-cervell" rel="noopener">Semidynamics：C1 Cervell</a></td><td>Semidynamics 官方产品页</td><td>RISC-V NPU IP 定位</td></tr><tr><td>[S13]</td><td><a href="https://www.spacemit.com/products/keystone/k1" rel="noopener">K1 product page</a></td><td>SpacemiT 官方产品页</td><td>K1 CPU、RVV、NPU 与内存规格</td></tr><tr><td>[S14]</td><td><a href="https://www.spacemit.com/products/keystone/k3" rel="noopener">K3 product page</a></td><td>SpacemiT 官方产品页</td><td>K3 本地 AI 产品定位与能力口径</td></tr><tr><td>[S15]</td><td><a href="https://community.milkv.io/t/introducing-the-milk-v-oasis-with-sg2380-a-revolutionary-risc-v-desktop-experience/780" rel="noopener">Milk-V Community：Oasis with SG2380</a></td><td>Milk-V 官方社区公告</td><td>Oasis/SG2380 目标规格与项目状态</td></tr><tr><td>[S16]</td><td><a href="https://www.eswin.com/news/newsinfo/98.html" rel="noopener">ESWIN：EIC7700</a></td><td>ESWIN 官方发布</td><td>P550 CPU 与 DNN 加速器规格</td></tr><tr><td>[S17]</td><td><a href="https://www.starfivetech.com/en/index.php?s=computing&amp;amp;c=show&amp;amp;id=1" rel="noopener">JH7110 product page</a></td><td>StarFive 官方产品页</td><td>JH7110 CPU/GPU 公开规格边界</td></tr><tr><td>[S18]</td><td><a href="https://qwen.readthedocs.io/en/latest/run_locally/llama.cpp.html" rel="noopener">Qwen：Run llama.cpp locally</a></td><td>Qwen 官方文档</td><td>GGUF、llama.cpp 与版本要求</td></tr><tr><td>[S19]</td><td><a href="https://github.com/alibaba/MNN/blob/master/source/backend/cpu/CMakeLists.txt" rel="noopener">Alibaba MNN：CPU backend CMake</a></td><td>MNN 上游源码</td><td>RVV 后端构建连接点</td></tr><tr><td>[S20]</td><td><a href="https://www.openeuler.openatom.cn/en/news/20240628-openEuler%2024.03%20LTS-%20Pioneering%20Native%20RISC-V%20Support/" rel="noopener">openEuler：24.03 LTS native RISC-V support</a></td><td>openEuler 官方发布</td><td>RISC-V OS 适配与平台样本</td></tr></tbody></table></div>
+<h2 id="附录-研究方法">附录：研究方法</h2>
+<h3 id="a-证据采集规则">A. 证据采集规则</h3>
+<ol><li>优先采用 Linux、编译器、模型/运行时上游项目，以及 SoC/板卡/OS 厂商的原始资料；不以聚合跑分、二手评测或社交媒体截图支持技术事实。</li><li>将“RV64”“RVV”“NPU/TPU”分开记录。任何关于 AI 加速的结论必须明确实际执行单元、模型格式和后端，而不能仅引用架构名称。</li><li>对模型可运行、TOPS、参数量和 token/s，保留原始来源条件；除非模型、量化、上下文、并发、温度、内存和方法可比，否则不进行跨设备排名。</li><li>对上游 RFC、产品计划和 OS 支持，明确其生命周期状态；采购、上线和量产前必须在目标 SKU、BSP、驱动和运行时版本上复核。</li></ol>
+<h3 id="b-建议的最小实验记录">B. 建议的最小实验记录</h3>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>必填记录</th></tr></thead><tbody><tr><td>设备环境</td><td>设备/SKU、CPU 核与 ISA、RVV/VLEN、RAM、内核/BSP、固件、驱动、温度和供电状态</td></tr><tr><td>构建</td><td>源码 commit、编译器、<code>-march</code>、ABI、优化选项、反汇编与动态库版本</td></tr><tr><td>模型</td><td>模型 hash、格式、量化、tokenizer、最大上下文、KV cache、采样参数</td></tr><tr><td>后端</td><td>实际 CPU/RVV/NPU 路径、图受理率、未受理节点、回退、传输/同步与缓存</td></tr><tr><td>负载</td><td>prompt/输出分布、并发、线程/绑核、冷/热态、持续时长和网络条件</td></tr><tr><td>指标</td><td>任务质量、加载、prefill、首 token、稳态 token/s、P50/P99、RSS、功耗/温升、失败率</td></tr></tbody></table></div>
+<h3 id="c-图表说明">C. 图表说明</h3>
+<p>图 1 至图 3 为依据公开接口、上游项目和产品资料绘制的工程结构图。它们用于说明 RV64、RVV、NPU、模型和运行时之间必须单独验证的关系，不包含市场份额、芯片排名、未公开实现或跨平台性能比较。</p>
+</main>
+</div>
+</body>
+</html>

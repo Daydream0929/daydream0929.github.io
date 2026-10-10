@@ -1,0 +1,201 @@
+# 技术调研报告集数据；由 document skill 的 publish_site.py 维护，按 id 合并条目，字段顺序 id/title/summary/date/tags/url。
+- id: riscv64-bringup-uboot-opensbi-init-research
+  title: RISC-V 64 Bringup 技术调研报告（v3.0）：从加电到 init —— OpenSBI、U-Boot 与 Linux/Android/RTOS 启动链
+  summary: 从加电到 init 的完整启动链（OpenSBI/U-Boot/Linux/Android/RTOS）：commit 级源码锚点与故障定位速查。
+  date: '2026-10-10'
+  tags:
+  - RISC-V
+  - bringup
+  - OpenSBI
+  - U-Boot
+  url: /reports/riscv64-bringup-uboot-opensbi-init-research.html
+- id: ai-agent-tools-cli-client-research
+  title: AI Agent 工具技术调研：CLI 与客户端的形态差异及工作流选型（Codex / Claude Code / Qoder / OpenCode）
+  summary: Codex、Claude Code、Qoder、OpenCode 等 AI Agent 工具的 CLI 与客户端形态差异、工作流选型与生态对照。
+  date: '2026-10-09'
+  tags:
+  - AI Agent
+  - 工具链
+  url: /reports/ai-agent-tools-cli-client-research.html
+- id: riscv64-android-linux-init-bringup-research
+  title: RISC-V 64 Android/Linux Bringup 深挖：first stage / second stage 与 PID 1 之前发生了什么
+  summary: Linux 内核入口到 PID 1 与 Android first/second stage init 的启动链源码级深挖与 AVB 校验路径。
+  date: '2026-10-09'
+  tags:
+  - RISC-V
+  - Android
+  - bringup
+  url: /reports/riscv64-android-linux-init-bringup-research.html
+- id: riscv64-boot-address-aia-research
+  title: RISC-V 64 启动卡死排查技术调研：PMP、DDR 物理地址、虚拟地址与 AIA/APLIC 机制
+  summary: 启动卡死排查：PMP、DDR 物理地址、虚拟地址映射与 AIA/APLIC 机制的规格与实现核查。
+  date: '2026-10-09'
+  tags:
+  - RISC-V
+  - PMP
+  - AIA
+  - 启动
+  url: /reports/riscv64-boot-address-aia-research.html
+- id: riscv64-interrupt-plic-aplic-research
+  title: RISC-V 64 中断控制器调研：PLIC 与 AIA（APLIC / IMSIC）——Bringup 中断 Bug 的根因与排查
+  summary: PLIC 与 AIA（APLIC/IMSIC）中断控制器机制：bringup 中断 bug 的根因与排查方法。
+  date: '2026-10-08'
+  tags:
+  - RISC-V
+  - 中断
+  - AIA
+  url: /reports/riscv64-interrupt-plic-aplic-research.html
+- id: riscv-cpu-microarchitecture-baseline-software-research
+  title: RISC-V CPU 发展全景调研：微架构演进、基础软件走向与 AI Agent 时代的性能工程
+  summary: RISC-V CPU 微架构演进、基础软件走向与 AI Agent 时代的性能工程全景。
+  date: '2026-09-30'
+  tags:
+  - RISC-V
+  - 微架构
+  - 基础软件
+  url: /reports/riscv-cpu-microarchitecture-baseline-software-research.html
+- id: autosar-riscv32-ap-research
+  title: AUTOSAR 知识综述与 RISC-V 32 位 RTOS 承载 Adaptive Platform 的可行性调研
+  summary: AUTOSAR 知识综述，以及 RISC-V 32 位 RTOS 承载 Adaptive Platform 的可行性与工程量分析。
+  date: '2026-09-29'
+  tags:
+  - AUTOSAR
+  - RTOS
+  - 车规
+  url: /reports/autosar-riscv32-ap-research.html
+- id: opencode-research
+  title: OpenCode 技术调研：与 Qoder、Codex、Claude Code 的路线差异，以及在其上自建 agent 工具的可行路径
+  summary: OpenCode 与 Qoder/Codex/Claude Code 的路线差异，以及在其上自建 agent 工具的可行路径。
+  date: '2026-09-29'
+  tags:
+  - AI Agent
+  - 源码分析
+  url: /reports/opencode-research.html
+- id: paperclip-technical-research
+  title: Paperclip 技术调研：面向 AI Agent 团队的组织与执行控制平台
+  summary: 面向 AI Agent 团队的组织与执行控制平台：定位、架构与源码级分析。
+  date: '2026-09-29'
+  tags:
+  - AI Agent
+  - 工程平台
+  url: /reports/paperclip-technical-research.html
+- id: riscv64-virtualization-research
+  title: RISC-V 64 虚拟化技术调研：机制、Linux/Android/RTOS 的路线差异与平台选型
+  summary: RISC-V 64 虚拟化机制、Linux/Android/RTOS 的路线差异与 Hypervisor 平台选型。
+  date: '2026-09-29'
+  tags:
+  - RISC-V
+  - 虚拟化
+  url: /reports/riscv64-virtualization-research.html
+- id: rtos-riscv64-autosar-research
+  title: RTOS 技术调研：实时机制、与 Linux/Android 的边界、RISC-V 64 生态与车规（AUTOSAR）落位
+  summary: RTOS 实时机制、与 Linux/Android 的边界、RISC-V 64 生态与车规（AUTOSAR）落位。
+  date: '2026-09-29'
+  tags:
+  - RTOS
+  - RISC-V
+  - AUTOSAR
+  url: /reports/rtos-riscv64-autosar-research.html
+- id: android17-riscv64-opportunities
+  title: Android 17 与 RISC-V 64：AI、车规与虚拟化的新特性机会
+  summary: Android 17 在 RISC-V 64 上的 AI、车规与虚拟化新特性机会与上游适配现状。
+  date: '2026-09-08'
+  tags:
+  - Android
+  - RISC-V
+  - 系统
+  url: /reports/android17-riscv64-opportunities.html
+- id: cpu-performance-software-hardware-leadership-research
+  title: 从 CPU 性能工程到软硬件协同技术负责人：招聘趋势、能力要求与成长路径
+  summary: 从 CPU 性能工程到软硬件协同负责人：招聘趋势、能力要求与成长路径分析。
+  date: '2026-09-08'
+  tags:
+  - 性能工程
+  - 能力路线
+  url: /reports/cpu-performance-software-hardware-leadership-research.html
+- id: edge-ai-domestic-global-status-research
+  title: 端侧 AI 国内外发展现状：模型、系统、芯片与产品生态调研
+  summary: 端侧 AI 模型、系统、芯片与产品生态的国内外现状调研。
+  date: '2026-09-08'
+  tags:
+  - 端侧 AI
+  - 生态
+  url: /reports/edge-ai-domestic-global-status-research.html
+- id: riscv64-ai-llm-domestic-global-research
+  title: RISC-V 64 位 AI/LLM 国内外发展现状：ISA、运行时、芯片与部署边界调研
+  summary: RISC-V 64 位 AI/LLM 的 ISA、运行时、芯片与部署边界的国内外现状调研。
+  date: '2026-09-08'
+  tags:
+  - RISC-V
+  - AI/LLM
+  - 国内生态
+  url: /reports/riscv64-ai-llm-domestic-global-research.html
+- id: riscv-summits-android-domestic-global-trends-research
+  title: 国内外 RISC-V 峰会中的 Android 发展与趋势调研：欧洲、中国与全球视角
+  summary: 欧洲、中国与全球 RISC-V 峰会中的 Android 信号：AOSP 上游状态、交付门槛与趋势辨析。
+  date: '2026-09-08'
+  tags:
+  - RISC-V
+  - Android
+  - 峰会
+  url: /reports/riscv-summits-android-domestic-global-trends-research.html
+- id: domestic-cpu-foundation-software-research
+  title: 国内外 CPU 基础软件：操作系统、性能工程与 RISC-V 的技术发展和演进
+  summary: 国内外 CPU 基础软件现状：操作系统、性能工程与 RISC-V 的发展与演进对照。
+  date: '2026-09-07'
+  tags:
+  - CPU
+  - 基础软件
+  - 国内生态
+  url: /reports/domestic-cpu-foundation-software-research.html
+- id: embodied-intelligence-research
+  title: 具身智能技术调研：从视觉—语言—动作模型到可验证的物理闭环
+  summary: 从 VLA 模型到可验证物理闭环：具身智能技术路线、部署门槛与产业现状。
+  date: '2026-09-07'
+  tags:
+  - 具身智能
+  - 机器人
+  url: /reports/embodied-intelligence-research.html
+- id: rdma-research-riscv
+  title: RDMA 技术调研：原理、性能机制与 RISC-V 适配现状
+  summary: RDMA 原理与性能机制，及 fence/Zicbom/IOMMU 等要点的 RISC-V 适配现状（rdma-core 源码级核实）。
+  date: '2026-09-07'
+  tags:
+  - RDMA
+  - RISC-V
+  - 网络
+  url: /reports/rdma-research-riscv.html
+- id: riscv-rva23-research
+  title: RISC-V RVA23 指令集调研：从可组合 ISA 到可部署应用基线
+  summary: RVA23 profile：从可组合 ISA 到可部署应用基线，规范、机制、工具链与落地评估。
+  date: '2026-09-07'
+  tags:
+  - RISC-V
+  - 指令集
+  - 生态
+  url: /reports/riscv-rva23-research.html
+- id: agi-era-outlook-2026
+  title: AGI 时代技术展望：前沿模型能力与 Scaling 趋势
+  summary: AGI 时代前沿模型能力与 Scaling 趋势的技术事实梳理与产业展望。
+  date: '2026-09-04'
+  tags:
+  - AI
+  - 趋势展望
+  url: /reports/agi-era-outlook-2026.html
+- id: eigen-riscv64-research
+  title: Eigen 的 riscv64 向量化后端（RVV10）技术调研
+  summary: Eigen RVV10 后端的真实覆盖面与工作机制：commit 级源码核查与启用成本评估。
+  date: '2026-09-04'
+  tags:
+  - Eigen
+  - RISC-V
+  - RVV
+  url: /reports/eigen-riscv64-research.html
+- id: riscv-atomics-research
+  title: riscv64 原子指令体系调研：Zaamo / Zalrsc / Zacas / Zabha / Zalasr / Ztso
+  summary: Zaamo/Zalrsc/Zacas/Zabha/Zalasr/Ztso 原子指令体系的技术细节与实现约束。
+  date: '2026-09-04'
+  tags:
+  - RISC-V
+  - 指令集
+  url: /reports/riscv-atomics-research.html

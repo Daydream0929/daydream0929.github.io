@@ -7,11 +7,8 @@
 | 图类型 | 工具 | 说明 |
 |--------|------|------|
 | 数据图（柱状/折线/散点/热力图） | matplotlib 3.7.5 | 经 figstyle.py 房屋风格 |
-| 架构图 / 流程图 / 依赖图 / 状态机（常规） | graphviz 2.43（dot） | 布局专业，替代 mermaid |
-| 机制图 / 架构概念图 / 对照矩阵（需精确控制） | 手写 SVG | 套用 `figure-design-system.md` 全部规则 |
+| 架构图 / 流程图 / 依赖图 / 状态机 | graphviz 2.43（dot） | 布局专业，替代 mermaid |
 | ~~mermaid~~ | 弃用 | 布局与观感不达标；存量报告暂不迁移 |
-
-颜色、网格、复杂度、连线与排版规则见 `figure-design-system.md`（语义色角色、每图 ≤9 节点、单一强调色、4px 网格、汉字 ≥12px、连线六规则）。三条最容易踩的红线：非共轴连线必须正交走线（禁斜线）、同一节点边的多个连接点间距 ≥12px、标签掩码不压线不压节点。
 
 环境事实（2026-09-04 核实）：远端 python3.8 + matplotlib 3.7.5（user 安装，经清华镜像）；中文字体用系统 Alibaba PuHuiTi 2.0（matplotlib 文字默认转矢量路径，浏览器零字体依赖）；graphviz 在 /usr/bin/dot。
 
@@ -51,14 +48,7 @@ figstyle.save_dot(body, 'reportname-arch')
 
 ## 生成与验证流程
 
-1. 图脚本放 /tmp 或 .figs/（一次性），输出固定到 reports/figures/ 或 reports/assets/（发布目录，随报告一起被端口服务）。
+1. 图脚本放 /tmp 或 .figs/（一次性），输出固定到 reports/figures/（发布目录，随报告一起被端口服务）。
 2. md 里引用相对路径 `figures/<name>.svg`；md2html 渲染为带题注的 figure。
-3. 手写 SVG 图在发布前跑几何自检（生成式图自动跳过）：
-
-```bash
-python3 skills/document/scripts/check_svg_geometry.py reports/assets/<fig>.svg
-```
-
-错误级发现（斜线连线、贴角端点、节点重叠、实线穿盒、贴边线段）必须修复；警告级（端点入盒、扇出间距 <12px、虚线穿盒、汉字 <12px）逐条确认。豁免单个元素用 class="skip-geometry"。设计自查清单见 `figure-design-system.md` §8。
-4. 发布后浏览器验证：图 URL 可达、figure/figcaption 元素存在、无 404。
-5. 图的生成脚本若含关键数据转换，把脚本存档到报告同目录 `.figs/`（数据可复现原则同样适用于图）。
+3. 发布后浏览器验证：图 URL 可达、figure/figcaption 元素存在、无 404。
+4. 图的生成脚本若含关键数据转换，把脚本存档到报告同目录 `.figs/`（数据可复现原则同样适用于图）。

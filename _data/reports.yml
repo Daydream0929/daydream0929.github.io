@@ -200,8 +200,8 @@
   - 指令集
   url: /reports/riscv-atomics-research.html
 - id: riscv64-opensbi-firmware-research
-  title: OpenSBI 技术调研报告（v1.0）：RISC-V 64 平台的 M 态固件 —— 从固件形态到 ecall 分发的完整机制
-  summary: 从 fw_dynamic 交棒到 ecall 分发的完整机制：三种固件形态、冷启动固定序列、域与 PMP 保护落盘、SBI v3.0 扩展面与 HSM 状态机，全部锚定 OpenSBI master 6ad246a1 的源码行号。
+  title: OpenSBI 技术调研报告（v1.1）：RISC-V 64 平台的 M 态固件 —— 从固件形态到 ecall 分发的完整机制
+  summary: OpenSBI v1.1：固件形态/冷启动/ecall 分发与 SBI v3.0（源码锚点版）
   date: '2026-10-10'
   tags:
   - RISC-V

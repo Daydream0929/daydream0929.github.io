@@ -208,3 +208,12 @@
   - OpenSBI
   - 固件
   url: /reports/riscv64-opensbi-firmware-research.html
+- id: re-a-research
+  title: REA 技术调研报告（v1.0）：面向编码助手的逆向工程工具链 —— 从双入口适配到依据留痕与能力边界
+  summary: 开源逆向工程工具链 rea-agents 6.4.0 源码级调研：CLI/MCP 双入口共享组装层、173 个公开工具、依据留痕模型与 Android 双链边界，附 RISC-V 事实/推断/未知三档判定。
+  date: '2026-10-12'
+  tags:
+  - MCP
+  - 逆向工程
+  - 开源工具
+  url: /reports/re-a-research.html

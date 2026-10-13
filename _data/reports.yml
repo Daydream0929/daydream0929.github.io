@@ -218,8 +218,8 @@
   - 开源工具
   url: /reports/re-a-research.html
 - id: gem5-research
-  title: gem5 仿真软件技术调研报告（v1.1）：事件驱动内核、模型谱系与 RISC-V 支持边界
-  summary: gem5 v25.1.0.1 源码级调研（v1.1）：事件内核/SimObject 装配/CPU 与存储模型/RISC-V 支持面；新增社区与 RISC-V 64 活跃度实测（近 12 个月 87 笔提交、KVM 已合入 develop）与零基础上手路径。
+  title: gem5 仿真软件技术调研报告（v1.2）：事件驱动内核、模型谱系与 RISC-V 支持边界
+  summary: gem5 源码级调研 v1.2：新增双轨发展史（2015 桩文件至 2026 KVM 的五阶段路线、851 笔 RISC-V 提交全史）与 RISC-V 64 模块地图及三档切入建议；含事件内核/装配/CPU 与存储模型/社区活跃度/零基础上手路径。
   date: '2026-10-13'
   tags:
   - gem5

@@ -93,6 +93,8 @@ python3 skills/document/scripts/publish.py --root . --validate
 
 `--profile auto` 按 `背景与现状` 是否含国内小节自动识别档位；需要强制按某个档位检查时显式传 `technical-research` 或 `technical-research-general`。`--profile` 仅作用于技术调研报告；`文档类型` 为 `调研报告` 的文件按通用调研结构自动校验。两类文件都会被 `publish.py --validate` 纳入检查。`--json` 可用于机器可读的校验结果。未传 `--validate` 的发布命令保持原有行为，不会以新规范阻断遗留报告。
 
+**渲染与执行的次序（重要）。** `publish.py` 会把根目录下每个 md 文件都重新生成为预览态 HTML（含外链脚本与 `assets/` 相对引用）并写入 `reports/`。因此自包含渲染必须放在**最后一次** `publish.py` 调用之后——正确顺序是「写报告 → validator 校验 → `publish.py --validate` → 渲染自包含 HTML → html_check → publish_site 发布」；渲染完成后不要再对同一根目录运行 `publish.py`，否则自包含产物会被覆写成预览态，且可能被 publish_site 直接发布出去（线上表现为图片 404、出现外链脚本）。
+
 5. 渲染完成后执行实时上传（个人网站归档）：`python3 skills/document/scripts/publish_site.py reports/<report>.html --summary "一句话摘要" --tags RISC-V,Linux`。脚本提交并推送站点仓库，GitHub Actions 随后自动部署；发布完成以脚本输出的线上 URL 可访问为准（详见下节「发布到个人网站（实时）」）。
 
 **生效时间。** 本节结构与语言规范（2026-10-10 版）及源码级深度门槛自 2026-10-10 起对新建与重写报告生效；此前已发布的旧结构报告保持原状态，待其下一次升版时按新标准重写。2026-10-13 增补 `调研报告`（通用调研）类型及其校验；既有两类报告不受影响。

@@ -217,3 +217,13 @@
   - 逆向工程
   - 开源工具
   url: /reports/re-a-research.html
+- id: gem5-research
+  title: gem5 仿真软件技术调研报告（v1.0）：事件驱动内核、模型谱系与 RISC-V 支持边界
+  summary: gem5 v25.1.0.1 源码级调研：双语言装配、事件驱动内核、CPU 五模型与经典/Ruby 双存储体系、统计与检查点闭环，附 RISC-V 事实/推断/未知三档判定。
+  date: '2026-10-13'
+  tags:
+  - gem5
+  - 仿真
+  - 体系结构
+  - RISC-V
+  url: /reports/gem5-research.html

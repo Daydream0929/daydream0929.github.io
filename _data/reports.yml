@@ -227,3 +227,13 @@
   - 体系结构
   - RISC-V
   url: /reports/gem5-research.html
+- id: oss-community-research
+  title: 开源社区调研报告（v1.0）：活跃社区全景与业余贡献入场路径
+  summary: 面向业余时间的开源贡献选型：gem5、香山、OpenSBI、Perfetto 等 10 余个社区活动度实测（2026-10-13）、五维匹配评估与 90 天入场计划。
+  date: '2026-10-13'
+  tags:
+  - 开源社区
+  - 开源贡献
+  - RISC-V
+  - 职业发展
+  url: /reports/oss-community-research.html

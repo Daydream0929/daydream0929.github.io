@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>开源社区调研报告（v1.0）：活跃社区全景与业余贡献入场路径</title>
+<style>
+:root {
+  --fg: #1a1a1a; --fg-soft: #4a4a4a; --bg: #ffffff; --bg-soft: #f6f7f9;
+  --border: #e3e6ea; --accent: #b8442e; --code-bg: #f4f5f7;
+  --c: #1f7a4d; --cstar: #2563a8; --s: #a86b1f; --p: #7a4fa3; --q: #a33a3a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6e6e6; --fg-soft: #a8a8a8; --bg: #14161a; --bg-soft: #1b1e24;
+    --border: #2c313a; --accent: #e0705a; --code-bg: #1e2229;
+    --c: #58c08a; --cstar: #6aa8e0; --s: #d8a45a; --p: #b088d8; --q: #e07a7a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 16px; line-height: 1.75; -webkit-font-smoothing: antialiased;
+}
+.layout { display: flex; max-width: 1400px; margin: 0 auto; }
+.toc {
+  width: 280px; flex: 0 0 280px; position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto; padding: 32px 20px 32px 28px;
+  border-right: 1px solid var(--border); font-size: 13.5px;
+}
+.toc h2 {
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--fg-soft); margin: 0 0 12px; font-weight: 600;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: block; padding: 5px 0; color: var(--fg-soft); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 10px;
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+.toc-l1 a { font-weight: 600; color: var(--fg); }
+.toc-l2 a { padding-left: 10px; }
+.toc-l3 a { padding-left: 24px; font-size: 12.5px; }
+main { flex: 1 1 auto; min-width: 0; padding: 40px 56px 96px; max-width: 940px; }
+h1 {
+  font-size: 30px; line-height: 1.35; margin: 0 0 8px; font-weight: 650;
+  letter-spacing: -.01em;
+}
+h2 {
+  font-size: 21px; margin: 44px 0 14px; padding-bottom: 8px; font-weight: 620;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 17px; margin: 30px 0 10px; font-weight: 600; }
+h4 { font-size: 15px; margin: 22px 0 8px; font-weight: 600; color: var(--fg-soft); }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+code {
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .875em; background: var(--code-bg); padding: 2px 5px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 18px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+blockquote {
+  margin: 0 0 18px; padding: 12px 18px; background: var(--bg-soft);
+  border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  color: var(--fg-soft);
+}
+blockquote p { margin: 0; }
+ul, ol { margin: 0 0 16px; padding-left: 26px; }
+li { margin: 5px 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+.badge {
+  display: inline-block; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 4px;
+  color: #fff; vertical-align: 1px; letter-spacing: .02em;
+}
+.badge-c { background: var(--c); }
+.badge-cstar { background: var(--cstar); }
+.badge-s { background: var(--s); }
+.badge-p { background: var(--p); }
+.badge-q { background: var(--q); }
+figure.fig {
+  margin: 28px auto 20px;
+  text-align: center;
+}
+figure.fig img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+figure.fig figcaption {
+  font-size: 13px;
+  color: var(--soft, #666);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.mermaid {
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; margin: 0 0 20px; text-align: center; overflow-x: auto;
+}
+.mermaid-fallback {
+  text-align: left; font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px; white-space: pre-wrap; color: var(--fg-soft);
+}
+.doc-meta {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px;
+  font-size: 13px; color: var(--fg-soft);
+}
+.doc-meta span {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+@media (max-width: 1000px) {
+  .toc { display: none; }
+  main { padding: 28px 20px 64px; }
+}
+@media print {
+  .toc { display: none; }
+  main { max-width: none; padding: 0; }
+  a { color: var(--fg); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc"><h2>目录</h2><ul><li class="toc-l1"><a href="#开源社区调研报告-v1-0-活跃社区全景与业余贡献入场路径">开源社区调研报告（v1.0）：活跃社区全景与业余贡献入场路径</a></li><li class="toc-l2"><a href="#摘要">摘要</a></li><li class="toc-l2"><a href="#背景与现状">背景与现状</a></li><li class="toc-l2"><a href="#调研方法与评估口径">调研方法与评估口径</a></li><li class="toc-l2"><a href="#社区画像-一-risc-v-芯片与系统软件">社区画像（一）：RISC-V 芯片与系统软件</a></li><li class="toc-l2"><a href="#社区画像-二-体系结构仿真与性能工具">社区画像（二）：体系结构仿真与性能工具</a></li><li class="toc-l2"><a href="#社区画像-三-ai-开发工具生态">社区画像（三）：AI 开发工具生态</a></li><li class="toc-l2"><a href="#社区画像-四-国内组织型社区">社区画像（四）：国内组织型社区</a></li><li class="toc-l2"><a href="#匹配度评估与对比矩阵">匹配度评估与对比矩阵</a></li><li class="toc-l2"><a href="#入场路径与-90-天行动计划">入场路径与 90 天行动计划</a></li><li class="toc-l2"><a href="#结论与建议">结论与建议</a></li><li class="toc-l2"><a href="#参考来源">参考来源</a></li><li class="toc-l2"><a href="#附录-a-主要结论与依据对照">附录 A：主要结论与依据对照</a></li><li class="toc-l2"><a href="#附录-b-检查与验收清单">附录 B：检查与验收清单</a></li><li class="toc-l2"><a href="#附录-c-研究方法与局限">附录 C：研究方法与局限</a></li><li class="toc-l2"><a href="#附录-d-渠道与入口速查">附录 D：渠道与入口速查</a></li></ul></nav>
+<main>
+<h1>开源社区调研报告（v1.0）：活跃社区全景与业余贡献入场路径</h1>
+<div class="doc-meta"><span>由 oss-community-research.md 生成</span></div>
+<h1 id="开源社区调研报告-v1-0-活跃社区全景与业余贡献入场路径">开源社区调研报告（v1.0）：活跃社区全景与业余贡献入场路径</h1>
+<div class="table-wrap"><table><thead><tr><th>字段</th><th>内容</th></tr></thead><tbody><tr><td>文档类型</td><td>调研报告</td></tr><tr><td>版本</td><td>v1.0</td></tr><tr><td>状态</td><td>已完成</td></tr><tr><td>密级</td><td>公开</td></tr><tr><td>作者</td><td>zhenjun.feng</td></tr><tr><td>生成日期</td><td>2026-10-13</td></tr><tr><td>研究截点</td><td>2026-10-13（仓库活动数据为当日 GitHub REST API 实测；社区资料截至当日可访问版本）</td></tr><tr><td>目标读者</td><td>计划以业余时间参与开源贡献的资深系统软件工程师；关注 RISC-V 与 AI 工具生态的技术人员</td></tr><tr><td>调研问题</td><td>当前哪些开源社区活跃且与自身技能匹配；以每周数小时的业余预算，从旁观者走向持续贡献者的可行路径是什么</td></tr><tr><td>覆盖范围</td><td>10 余个候选社区（含两个国内组织型社区）的活跃度实测、贡献流程、治理与入门材料；个人匹配度评估与 90 天行动计划</td></tr><tr><td>排除范围</td><td>未实际提交任何贡献（全部为案头调研与数据实测）；不包含未公开信息；不评估薪酬与岗位机会</td></tr></tbody></table></div>
+<h2 id="摘要">摘要</h2>
+<ul><li>大盘判断：2025 年是 GitHub 历史上有记录以来最活跃的 12 个月（超过 11.2 亿次公开贡献），增量主要由 AI 与代理工具驱动；与此同时 RISC-V 生态的芯片与系统软件主线持续加码，两条线都与本报告读者的技能背景直接相关 [S16][S04]。</li><li>实测数据：10 余个候选社区中，香山（★7,306 / 贡献者约 143）、gem5（★2,867 / 约 508）、OpenSBI（★1,546 / 约 199）、QEMU（★13,844 / 约 3,419）、Perfetto（★6,629 / 约 709）、opencode（★213,006 / 约 1,046）、MCP 生态（★91,194 / 约 1,070）在实测日均有推送；香山的推送时间即为调研当日 [S04]。</li><li>选型结论：建议采取「一个主阵地 + 一个观察位」策略——主阵地首选 gem5（已有源码级研究积累）与香山软件侧（中文社区、低摩擦流程），备选位为 OpenSBI 与 Perfetto，AI 工具生态作为兴趣探索线 [S01][S05][S04]。</li><li>路径结论：入场按「读流程 → 认领小问题 → 完成一次被合并的贡献 → 建立月度节奏」四步走；gem5 采用「评论认领后发 PR」流程，香山接受中英文反馈并可邮件兜底，QEMU 为邮件列表补丁流程、摩擦最高 [S01][S05][S07]。</li><li>风控结论：业余贡献的首要风险是节奏失控与边界冲突——开始前确认雇主开源政策，不认领有 deadline 的任务，AI 辅助必须遵守各社区明文规定（香山贡献指南已给出 AI 使用前提条件）[S05]。</li></ul>
+<h2 id="背景与现状">背景与现状</h2>
+<p>本报告的写作对象是一名具备多年一线经验的系统软件与性能工程师：日常工作围绕 RISC-V 平台软件栈展开，涉及系统构建与启动链、性能分析与优化、以及对 AI 代理工具链的持续调研；公开产出方面，已有多份源码级技术调研报告发布于个人站点（含对 gem5 模拟器的完整研究），具备 C/C++ 系统调试、性能工程与技术写作的复合能力 [S20]。这份能力的组合决定了他能贡献的开源方向：不是泛化的「帮忙修 bug」，而是体系结构、模拟器、固件与性能工具这些需要深水的领域。</p>
+<p>选择开源贡献作为业余主线的动机有三个。其一，技能复利：开源评审是反馈密度最高的成长回路，一次经过维护者推敲的合并，价值高于若干次闭门练习。其二，可见度：公开的工作记录（代码、评审意见、设计讨论）是个人技术品牌最抗贬值的资产，个人站点上的调研报告已经建立起一部分，开源贡献可以把它延伸到「可运行、可追溯的代码作品」。其三，长期连接：跨组织的协作网络在职业上是长期期权，越早入场越从容。</p>
+<p>现实约束同样清楚。业余时间预算是每周四到八小时，必须与全职工作严格隔离，因此对社区的要求是：流程异步、反馈周期短、不要求固定在线时间、能接受中文或英文双语沟通。另外，2026 年的开源大盘有两个新变量必须计入：一是 AI 辅助编程普及后，社区对贡献者「审核 AI 生成内容」的能力要求显著提高，部分社区（如香山）已把 AI 使用政策写入贡献指南 [S05]；二是受 AI 与代理工具驱动的项目（opencode、MCP 生态）活跃度爆炸，但这些项目的竞争烈度与变化速度也远高于传统系统软件社区。</p>
+<figure class="fig"><img src="assets/community-landscape.png" alt="社区全景分组图"><figcaption>社区全景分组图</figcaption></figure>
+<p>图 1：候选社区全景与分组。来源：按 2026-10-13 GitHub REST API 实测数据 [S04] 与各社区官方材料 [S01][S05][S07][S08][S13] 整理；数据口径为实测日快照，星标与贡献者数随后续变动。</p>
+<p>见图 1。六个分组按「与读者的相关度」从近到远排布：RISC-V 芯片生态、模拟器与工具链、固件与系统软件、性能观测、AI 工具生态、国内组织型社区。读图的三个要点：其一，绿色分组（香山、gem5、OpenSBI、QEMU 所在的体系结构主线）是技能匹配度最高的区域，也是本报告建议的主战场；其二，AI 工具分组虽然星标量级最大，但其贡献者密度与星标不成比例，说明「关注多、上手少」，对新手反而不拥挤；其三，国内组织型社区不靠仓库 star 竞争，靠例会与任务池运转，是中文语境下最顺滑的起点。</p>
+<h2 id="调研方法与评估口径">调研方法与评估口径</h2>
+<p>本报告的数据分为三层，口径互不混用。第一层是仓库活动实测：通过 GitHub REST API 在 2026-10-13 一次性读取各候选仓库的星标数、复刻数、贡献者规模（按贡献者列表分页估算，为保守下界）、开放议题数、最近推送时间与许可证，以及最近三次发布的时间节奏 [S04]。第二层是社区制度材料：逐份阅读贡献指南、治理文档、议题模板与会议页面，确认「怎么进入、谁来评审、多久反馈」这类决定业余体验的事实 [S01][S02][S05][S07]。第三层是行业背景：引用 GitHub 官方年度报告与学术会议材料，避免用单一仓库数据代替大盘判断 [S16][S18][S19]。</p>
+<p>评估采用五个维度，含义与判定依据如下表。需要说明的是，「活跃」在本报告中是复合判断而非单一指标：推送频率回答「还在不在动」，发布节奏回答「变更多久到达用户」，会议与讨论频率回答「人是否在场」，三者缺一不可。</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>含义</th><th>判定依据（口径）</th></tr></thead><tbody><tr><td>活跃度</td><td>项目当前开发与交付速度</td><td>最近推送时间、近一年发布节奏、开放议题吞吐（实测）[S04]</td></tr><tr><td>技能匹配</td><td>与读者既有能力的重合度</td><td>技术栈（C/C++、固件、性能、模拟器）与领域经验对照</td></tr><tr><td>业余友好度</td><td>低摩擦完成一次贡献的可能性</td><td>贡献指南明确的流程、评审反馈模式、语言支持、AI 政策 [S01][S05]</td></tr><tr><td>入场成本</td><td>环境与流程的启动开销</td><td>构建复杂度、是否需要邮件礼仪、是否需要设计评审前置</td></tr><tr><td>可见度</td><td>一次贡献被行业看到的概率</td><td>星标与下游影响力、发布物是否被引用、社区声誉 [S04][S16]</td></tr></tbody></table></div>
+<p>调研限制有三点需要提前声明。其一，所有数字是 2026-10-13 的单日快照，社区活跃度天然波动，读者读到本报告时应以当日的实测复核；其二，贡献者数为 API 估算值，跨仓库比较只用于量级判断，不做精确排名；其三，本报告没有提交任何真实贡献，所有流程判断来自文档与公开讨论，实际体验可能在第一笔贡献后需要修正。</p>
+<h2 id="社区画像-一-risc-v-芯片与系统软件">社区画像（一）：RISC-V 芯片与系统软件</h2>
+<p>香山（XiangShan）是本组中最值得优先评估的对象。数据面上，香山主仓 ★7,306、复刻 960、贡献者约 143、开放议题 321，最近推送时间就是调研当日，许可是木兰宽松许可证第 2 版（MulanPSL-2.0），2020 年创建至今已完成从科研原型到持续迭代产品的转变 [S04]。制度面上，它的贡献指南有完整中文版（英文版并存，2026-06-30 更新），明确「接受中文或英文反馈，出于国际协作建议英文」，主渠道是 GitHub 议题与拉取请求，私下沟通可发邮件列表 all@xiangshan.cc；缺陷报告配有一键采集脚本 <code>./scripts/bug-report.sh</code>，且指南给出「主线 kunminghu-v3 正聚焦 RVA23 正确性与性能，侧信道安全、可配置性、向量单元极边界暂非最高优先级」这类罕见而诚实的边界说明 [S05]。对软件背景的贡献者，最有价值的事实是：香山的开放生态里存在一层纯软件的子系统——指令集模拟器 NEMU（★352 / 贡献者约 79）与协同仿真框架 difftest（★188 / 约 85）——二者在调研当日同样有推送，且都是 C/C++ 代码库，不需要 Verilog 或 Chisel 经验即可参与 [S04]。设计文档站 docs.xiangshan.cc 提供中文设计文档，是理解 RTL 行为后再贡献软件侧修复的桥梁 [S06]。</p>
+<p>固件与引导链是第二个高匹配区，以 OpenSBI 为代表。OpenSBI 主仓 ★1,546、贡献者约 199、开放议题 101，最近发布 v1.9（2026-07-01），上一版 v1.8.1 在 2026-01-08，半年一个发布窗口 [S04]。官方 README 明确「鼓励并欢迎贡献，所有补丁必须携带 Signed-off-by 标签」，并附贡献者名单文档 [S21]。这里的匹配度来自日常工作：系统启动链的调试经验可以直接转化为对 SBI 接口实现的修复与测试。同一层级的 U-Boot（★5,277 / 贡献者约 4,007）门槛稍高，其 README 要求补丁发出前先用 buildman 验证全板编译无警告 [S21]；Linux 内核 RISC-V 侧在 2026 年有两份值得关注的会议记录：Linux Plumbers Conference 的 RISC-V 微会议专门复盘「RISC-V 内核维护的过去一年」（Paul Walmsley 与 Palmer Dabbelt 主讲），RISC-V Summit Europe 2026 有「内核中的 RVA23 profile 支持」议题，说明内核侧正处于 profile 落地期，需求真实但评审周期长、入场成本高 [S18][S19]。</p>
+<p>模拟与虚拟化方向以 QEMU 为代表：主仓（GitHub 镜像）★13,844、贡献者约 3,419，最近推送 2026-10-09 [S04]。它的流程摩擦在候选名单中最高——官网明确「请不要在 GitLab 提交合并请求，补丁按 QEMU 的补丁指南发送到邮件列表」，官方文档页写明「QEMU 项目使用公开的邮件工作流来评审和合并补丁」 [S07]。这不代表不能参与，而是意味着入场前需要额外学习邮件列表礼仪与 patchew 自动化流程，适合作为中长期备选而非首选。</p>
+<h2 id="社区画像-二-体系结构仿真与性能工具">社区画像（二）：体系结构仿真与性能工具</h2>
+<p>gem5 是本报告给出的第一主选，理由有三层。数据面：主仓 ★2,867、复刻约 2,000、贡献者约 508、开放议题 216，采用 BSD-3-Clause 许可，一年两个主版本加补丁通道（v25.0.0.1 于 2025-08-25、v25.1.0.0 于 2025-12-31、v25.1.0.1 于 2026-04-21）[S04]。制度面：官方治理页开宗明义「gem5 是精英制的：任何人，只要能够展示尊重，都可以贡献」，角色阶梯为「用户 → 贡献者 → 维护者」，维护者由提名加项目管理委员会投票产生，日常决策采用「惰性共识」；贡献指南给出一套对新手极其友好的流程：在 Jira 或 GitHub 议题中挑任务、先留言请教、再认领、最后发拉取请求，并特别提醒「在其他 gem5 仓库的贡献不会被考虑，请只贡献主仓」 [S01][S02]。生态面：项目每年在体系结构顶会（如 ISCA 2025）举办社区研讨会，贡献者可以在会上展示自己的工作 [S03]。对这名读者还有一个独特加成——他的个人站点上已经有一份 gem5 源码级调研报告，系统梳理了事件内核、SimObject 装配、RISC-V 支持面等机制 [S20]；把这份报告的上下文变成第一个合并的修复或测试，路径几乎是所有候选里最短的。</p>
+<p>性能观测方向的代表是 Perfetto（★6,629 / 贡献者约 709 / Apache-2.0 / 最近推送为调研当日）[S04]。它的官方文档目录包含 contributing 子目录，实测日开放 5 个「good first issue」——这一数字在被普查的候选仓库中唯一非零，意味着存在被明确标记为「适合新人」的待办池 [S04]。对以性能分析为日常工种的读者，Perfetto 的收益是双重的：工具本身用于安卓与桌面性能追踪，深入贡献等于把工作技能与开源作品直接焊接。LLVM（★41,032）在编译器后端方向提供更长线的可能性，但其开放议题超过四万、评审门槛高，本报告将其列为观察项而非近期目标 [S04]。</p>
+<h2 id="社区画像-三-ai-开发工具生态">社区画像（三）：AI 开发工具生态</h2>
+<p>本组的特点用一句话概括：热度最高、迭代最快、贡献者最不拥挤。opencode（开源编码代理）主仓位于 anomalyco 组织，★213,006、复刻约 2.85 万、贡献者约 1,046、开放议题超过 4,100，MIT 许可，2025 年创建 [S04]。它的贡献指南写得很克制：「最容易被接受的改动是缺陷修复、新增 LSP 与格式化支持、LLM 性能改进、环境适配修复、缺失的标准行为、文档改进」；界面与核心功能需要先过设计评审；并且直接给出 <code>good first issue</code>、<code>help wanted</code>、<code>perf</code> 三类标签入口，认领方式是「留言后由维护者指派」[S11]。数据上开放议题超过四千，说明维护带宽紧张，也说明未解决的真实痛点很多——对有时间的专家型贡献者反而是机会。</p>
+<p>MCP 生态由规范仓库与服务器集合两部分组成，服务器主仓 ★91,194、贡献者约 1,070、开放议题 480 [S04]。它的社区自我介绍有一段值得引用的话：「由 Anthropic 管理，但与社区共同建设」；新贡献采用 Apache-2.0 许可，社区讨论走 GitHub Discussions [S12]。这里的入门形态与其他社区不同：多数贡献不是改核心代码，而是新增或加固一个具体能力的服务器实现——对习惯系统编程的工程师，写一个高质量的 MCP 服务器（例如把某种调试或性能分析能力封装为工具）是一次可控的中等投入。需要提醒的风险是快变：这类项目的接口与生态半年就可能换一代，投入前应以当期规范为准，不要把历史经验当默认前提。</p>
+<h2 id="社区画像-四-国内组织型社区">社区画像（四）：国内组织型社区</h2>
+<p>国内有两个模式成熟的入口，适合作为中文语境下的起步选择。其一是 openEuler RISC-V SIG：官方页面对其定位的描述是「提供 openEuler RISC-V 移植版本，涵盖软件包构建、系统构建等全流程指导，帮助开发者快速上手」；SIG 每双周举办线上例会，最近一次记录为 2026-10-08 [S08][S09]。openEuler-RISCV 的 GitHub 组织自我描述为「注重培养实习生对开源社区的贡献能力」，公开仓库三十余个 [S10]。该社区最大的优点是流程中文、任务颗粒度细（打包、测试、适配），缺点是面向发行版工程而非体系结构深水区，技术增量取决于挑选的任务类型。</p>
+<p>其二是 PLCT 实验室与甲辰计划：官网直白写着「我们的实习岗位默认都是做开源软件贡献」，任务池与年度路线图全部公开（例如 RuyiSDK 相关目标与工具链测试任务），联合招聘项目单期放出过一百个以上实习名额，覆盖多家成员单位 [S13][S14][S15]。对业余贡献者的现实意义在于：任务被预先拆解、有明确的验收口径，是「第一次开源贡献」最不容易卡住的地方；同时其长期主义主张（面向 2036 年的时间尺度）与体系结构方向高度同频。把这套任务池作为热身，再过渡到香山或 gem5 的自主选题，是一条经验上合理的链路。</p>
+<h2 id="匹配度评估与对比矩阵">匹配度评估与对比矩阵</h2>
+<p>把前文的定性分析压缩成矩阵，五个维度按「高 → 低」五档标注；需要强调的是，没有全优的社区——矩阵的意义是让取舍显性化。</p>
+<div class="table-wrap"><table><thead><tr><th>社区</th><th>活跃度</th><th>技能匹配</th><th>业余友好度</th><th>入场成本</th><th>一句话备注</th></tr></thead><tbody><tr><td>香山（含 NEMU/difftest）</td><td>很高</td><td>高</td><td>很高</td><td>中</td><td>中文社区+软件侧 C 代码入口，RVA23 主线正热 [S04][S05]</td></tr><tr><td>gem5</td><td>高</td><td>很高</td><td>高</td><td>低-中</td><td>已有源码级研究积累，评论认领 PR 流程对新人友好 [S01][S20]</td></tr><tr><td>OpenSBI</td><td>中-高</td><td>很高</td><td>高</td><td>低</td><td>小型 C 代码库、半年发布窗口，与启动链日常完全对口 [S04]</td></tr><tr><td>QEMU</td><td>高</td><td>高</td><td>中</td><td>中-高</td><td>邮件列表补丁流程是主要摩擦，适合中期推进 [S07]</td></tr><tr><td>U-Boot</td><td>高</td><td>中-高</td><td>中</td><td>中</td><td>同样邮件流程，且要求全板编译验证后才可发补丁 [S04]</td></tr><tr><td>Linux RISC-V</td><td>高</td><td>高</td><td>中-低</td><td>高</td><td>处于 RVA23 profile 落地期，需求真实但周期长 [S18][S19]</td></tr><tr><td>Perfetto</td><td>高</td><td>高</td><td>中-高</td><td>中</td><td>实测唯一开放 good first issue 池的候选，性能工种直连 [S04]</td></tr><tr><td>opencode</td><td>极高</td><td>中</td><td>中</td><td>中</td><td>四千余开放议题，认领前需先与维护者对齐设计 [S11]</td></tr><tr><td>MCP 服务器生态</td><td>极高</td><td>中-高</td><td>中-高</td><td>低-中</td><td>以「写一个服务器」为贡献单元，注意生态快变 [S12]</td></tr><tr><td>openEuler RISC-V SIG</td><td>高</td><td>高</td><td>很高</td><td>低-中</td><td>双周会+中文指导，任务是打包与适配类 [S08][S09][S10]</td></tr><tr><td>PLCT / 甲辰计划</td><td>高</td><td>高</td><td>高</td><td>低</td><td>任务池预先拆解、验收口径明确，适合第一次贡献 [S13][S14]</td></tr></tbody></table></div>
+<figure class="fig"><img src="assets/community-activity-scatter.png" alt="活跃度分布散点图"><figcaption>活跃度分布散点图</figcaption></figure>
+<p>图 2：候选社区活跃度分布（贡献者数 × 星标数，双对数轴）。来源：GitHub REST API 实测 [S04]；数据口径：贡献者为分页估算的保守下界，星标为实测日快照。</p>
+<p>见图 2。这张图回答一个直觉问题：越大的社区是否越值得去。散点显示三个分区：右上角是体量与热度双高的 AI 工具社区（opencode、MCP），它们星标量级领先一个数量级但贡献者密度并不突出；中上部的次选带（QEMU、U-Boot、Perfetto、香山、gem5）是星标与贡献者比例更均衡的区域，也是体系结构主线所在；左下角 NEMU、difftest 这类小仓库虽然星标低，却在香山生态中承担关键职责，适合以「生态内小步快跑」的方式积累第一批评审记录。选型不应追逐星标，而应对照图 1 的分组与自身的深水区能力。</p>
+<h2 id="入场路径与-90-天行动计划">入场路径与 90 天行动计划</h2>
+<p>入场路径抽象为四步：读流程（贡献指南与治理文档）→ 认领小问题（文档、测试、小型修复）→ 完成一次被合并的贡献 → 建立月度节奏。每一步的验收都以「公开可查的动作」为准，而不是以「花掉的时间」为准。落到三个月的行动计划如下图。</p>
+<figure class="fig"><img src="assets/community-action-roadmap.png" alt="90 天行动计划"><figcaption>90 天行动计划</figcaption></figure>
+<p>图 3：90 天开源贡献行动计划草案。来源：按各社区贡献指南 [S01][S05][S07] 与治理要求 [S02] 设计；数据口径为建议节奏，可按个人时间预算调整。</p>
+<p>见图 3。计划分三个阶段：前两周只做环境与触点（复跑构建、订阅邮件列表或例会、把社区入口摆进日程）；第三个到第六周完成第一次低风险贡献，gem5 走「评论 → 认领 → PR」标准流程，香山从文档与示例类问题起步并利用 NEMU/difftest 的软件侧联动，OpenSBI 与 Perfetto 作为备选位随时顶上；第七到十二周把节奏固化——每月一至两笔被合并的贡献或等值产出（评审意见、文档、测试同样计入），并把过程沉淀成笔记发布在个人站点，形成「贡献 → 记录 → 下一轮选题」的循环。计划页脚的三条风控原则需要重复一次：异步沟通优先、不认领赶 deadline 的任务、AI 辅助遵守社区明文规定 [S05]。</p>
+<p>对主阵地 gem5 补充两条具体建议。第一，第一个 PR 刻意选择「低风险、高清晰度」的任务：文档修正、测试补充、构建脚本清理这类改动评审路径最短，也最能让维护者记住名字 [S01]。第二，善用既有资产：站点上的 gem5 调研报告是天然的入场名片，在认领议题或提交 PR 时引用其中梳理过的机制与行号，可以直接把讨论带入深水区 [S20]。</p>
+<h2 id="结论与建议">结论与建议</h2>
+<p>本报告的核心结论是：对这名读者，开源贡献的最优解不是「选最热的社区」，而是「选流程摩擦最小、且能直接复用既有深水能力的社区」。按此标准，建议采取「一个主阵地 + 一个观察位」的双轨策略：主阵地在 gem5 与香山软件侧之间选择其一先做深——gem5 的优势是既有研究积累与温和的评审文化 [S01][S02]，香山的优势是中文语境、软件侧纯 C 入口与当日仍在高频迭代的主线 [S04][S05]；观察位在 OpenSBI、Perfetto、openEuler RISC-V SIG 中轮换，用零散时间参与例会与 <code>good first issue</code>，不做承诺 [S04][S08][S09]。opencode 与 MCP 生态热度极高但生态年龄不足两年，建议保持兴趣线追踪，等其接口稳定后再考虑重投入 [S11][S12]。</p>
+<p>三条判断需要写进后续复盘。其一，活跃度与适配性是两个独立坐标——2025 年贡献总量创历史新高、AI 项目星标爆炸式增长 [S16]，但业余贡献的硬约束始终是流程摩擦与反馈周期，而非热度。其二，中文社区的存在显著改变可行性：香山与两个国内组织提供了「中文沟通 + 英文输出」的弹性组合，这是英语流利的中国工程师独有的杠杆 [S05][S08][S13]。其三，第一次贡献的心理门槛远高于技术门槛——各社区指南都设置了「先留言、再认领」的缓冲带 [S01][S05][S11]，这说明维护者预期新人会犹豫，主动开口是被设计进流程的。</p>
+<p>最后给出本周即可执行的两个动作：用周末半天复跑一次 gem5 构建并通读议题列表，标记三个候选任务；同时订阅香山邮件列表或参加下一场 openEuler RISC-V SIG 双周会，把「进入视野」这一步先完成 [S01][S05][S08]。一个月后按「是否完成一次被合并的贡献」做第一次复盘；若未达成，将策略收缩为单社区单线，把时间预算集中到唯一主阵地。</p>
+<h2 id="参考来源">参考来源</h2>
+<ul><li>[S01] gem5 贡献指南 CONTRIBUTING.md（固定 commit c8222cc6，tag v25.1.0.1）：议题认领流程、拉取请求模型、develop 分支约定、主仓唯一性要求。 <a href="https://github.com/gem5/gem5/blob/c8222cc67a399bfc01e8658dd14b30d5bfd634f9/CONTRIBUTING.md" rel="noopener">CONTRIBUTING.md</a></li><li>[S02] gem5 治理页：精英制角色阶梯（用户/贡献者/维护者）、惰性共识决策、维护者提名与投票机制。 <a href="https://www.gem5.org/governance/" rel="noopener">gem5.org/governance</a></li><li>[S03] gem5 Workshop @ ISCA 2025（早稻田大学）：社区年度研讨会，贡献者可展示工作。 <a href="https://www.gem5.org/events/isca-2025" rel="noopener">gem5.org/events/isca-2025</a></li><li>[S04] GitHub 仓库实测数据（REST API，2026-10-13）：星标、复刻、贡献者估算、开放议题、推送时间、许可与发布节奏；标签与 good first issue 计数；关键文件（贡献指南存在性等）的只读检查。覆盖 gem5/gem5、OpenXiangShan/XiangShan、NEMU、difftest、qemu/qemu、riscv-software-src/opensbi、u-boot/u-boot、anomalyco/opencode、modelcontextprotocol/servers、google/perfetto、llvm/llvm-project。 <a href="https://github.com/gem5/gem5" rel="noopener">gem5/gem5</a> · <a href="https://github.com/OpenXiangShan/XiangShan" rel="noopener">OpenXiangShan/XiangShan</a> · <a href="https://github.com/anomalyco/opencode" rel="noopener">anomalyco/opencode</a></li><li>[S05] 香山贡献指南（中文版，更新日期 2026-06-30）：中英文反馈政策、缺陷模板与 bug-report 脚本、AI 使用前提条件、kunminghu-v3 主线边界说明。 <a href="https://github.com/OpenXiangShan/XiangShan/blob/master/CONTRIBUTING.zh-cn.md" rel="noopener">CONTRIBUTING.zh-cn.md</a></li><li>[S06] 香山设计文档站（中文）：流水线、缓存、向量等模块设计文档。 <a href="https://docs.xiangshan.cc/projects/design/zh-cn" rel="noopener">docs.xiangshan.cc</a></li><li>[S07] QEMU 贡献入口与补丁指南：官网明示补丁发往邮件列表、勿在 GitLab 提合并请求；官方文档描述公开邮件评审工作流。 <a href="https://www.qemu.org/contribute/" rel="noopener">qemu.org/contribute</a> · <a href="https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/submitting-a-patch.rst" rel="noopener">submitting-a-patch.rst</a></li><li>[S08] openEuler RISC-V SIG 官方页：移植版本与全流程指导定位、双周例会机制；另见「RISC-V 成为官方架构（23.09）」公告。 <a href="https://www.openeuler.org/zh/sig/sig-RISC-V" rel="noopener">SIG 页</a> · <a href="https://www.openeuler.org/zh/news/20231103-riscv/20231103-riscv" rel="noopener">公告</a></li><li>[S09] openEuler RISC-V SIG 双周会记录（2026-10-08）：例会公开视频与议题。 <a href="https://www.openeuler.org/zh/video/sig-RISC-V/81281713549/2026-10-08" rel="noopener">会议页</a></li><li>[S10] openEuler-RISCV GitHub 组织：实习培养导向的社区自我描述与公开仓库集合。 <a href="https://github.com/openEuler-RISCV" rel="noopener">openEuler-RISCV</a></li><li>[S11] opencode 贡献指南：优先接受的改动类型、设计评审前置规则、三类标签入口与认领方式。 <a href="https://github.com/anomalyco/opencode/blob/dev/CONTRIBUTING.md" rel="noopener">CONTRIBUTING.md</a></li><li>[S12] MCP 服务器主仓 README 社区段落：由 Anthropic 管理与社区共建、讨论区入口、新贡献许可说明。 <a href="https://github.com/modelcontextprotocol/servers" rel="noopener">modelcontextprotocol/servers</a></li><li>[S13] PLCT 实验室官网：实习岗位默认从事开源贡献的定位与方向说明。 <a href="https://plctlab.org/zh/" rel="noopener">plctlab.org</a></li><li>[S14] 甲辰计划与联合实习招聘（weloveinterns 仓库 / 项目博客）：单期百人级实习名额与长期主义主张。 <a href="https://github.com/lazyparser/weloveinterns" rel="noopener">weloveinterns</a> · <a href="https://rv2036.org/blog" rel="noopener">rv2036.org/blog</a></li><li>[S15] PLCT 年度路线图（2025）：RuyiSDK 目标与工具链测试任务池。 <a href="https://github.com/plctlab/PLCT-Weekly/blob/master/PLCT-Roadmap-2025.md" rel="noopener">PLCT-Roadmap-2025</a></li><li>[S16] GitHub Octoverse 2025：2025 年为历史上最活跃的 12 个月（超过 11.2 亿次公开贡献），AI 与代理、强类型语言驱动结构变化。 <a href="https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/" rel="noopener">github.blog 报告</a> · <a href="https://octoverse.github.com/" rel="noopener">octoverse.github.com</a></li><li>[S17] The gem5 Simulator: Version 20.0+（Lowe-Power 等，2020）：gem5 社区规模的历史基线。 <a href="https://arxiv.org/abs/2007.03152" rel="noopener">arXiv:2007.03152</a></li><li>[S18] Linux Plumbers Conference 2026 RISC-V 微会议：RISC-V 内核维护年度复盘（Paul Walmsley、Palmer Dabbelt）。 <a href="https://lpc.events/event/20/sessions/268/" rel="noopener">lpc.events</a></li><li>[S19] RISC-V Summit Europe 2026 演讲目录：「内核中的 RVA23 profile 支持」等议题。 <a href="https://riscv-europe.org/summit/2026/presentations" rel="noopener">riscv-europe.org</a></li><li>[S20] 本人在个人站点发布的 gem5 技术调研报告（v1.0）：事件驱动内核、SimObject 装配与 RISC-V 支持面研究，可作为与 gem5 社区互动的上下文资产。 <a href="https://daydream0929.github.io/reports/gem5-research.html" rel="noopener">gem5-research</a></li><li>[S21] OpenSBI 与 U-Boot 仓库 README：OpenSBI 贡献政策（签名标签与贡献者名单）；U-Boot 邮件列表入口与 buildman 全板验证要求。 <a href="https://github.com/riscv-software-src/opensbi/blob/master/README.md" rel="noopener">opensbi README</a> · <a href="https://github.com/u-boot/u-boot/blob/master/README" rel="noopener">u-boot README</a></li></ul>
+<h2 id="附录-a-主要结论与依据对照">附录 A：主要结论与依据对照</h2>
+<div class="table-wrap"><table><thead><tr><th>结论</th><th>依据（来源）</th></tr></thead><tbody><tr><td>大盘处于历史高位，AI 与 RISC-V 是双主线</td><td>Octoverse 2025 贡献总量与主题分析 [S16]；候选社区实测推送时间 [S04]</td></tr><tr><td>香山与 gem5 是匹配度与流程友好度的最佳组合</td><td>香山中文贡献指南与软件侧仓库 [S05][S04]；gem5 治理与贡献流程 [S01][S02]</td></tr><tr><td>OpenSBI 与 Perfetto 适合作备选位</td><td>半年发布节奏与小型代码库 [S04]；唯一开放的 good first issue 池 [S04]</td></tr><tr><td>QEMU/内核门槛最高，宜中期再进</td><td>邮件补丁工作流 [S07]；内核维护周期与 profile 落地现状 [S18][S19]</td></tr><tr><td>AI 工具生态热度极高但需观察期</td><td>贡献指南的评审前置规则 [S11]；生态共建模式与快变风险 [S12]</td></tr><tr><td>国内组织型社区是最顺滑的起点</td><td>openEuler 双周会与中文指导 [S08][S09][S10]；PLCT 任务池与实习培养 [S13][S14][S15]</td></tr></tbody></table></div>
+<h2 id="附录-b-检查与验收清单">附录 B：检查与验收清单</h2>
+<div class="table-wrap"><table><thead><tr><th>检查项</th><th>方法</th><th>结果</th></tr></thead><tbody><tr><td>仓库数据可复核</td><td>任一候选仓库执行 GitHub REST API 读取，对照本文数字 [S04]</td><td>通过（2026-10-13 实测）</td></tr><tr><td>流程描述有官方出处</td><td>贡献指南/治理页/官网逐条对应 [S01][S05][S07]</td><td>通过</td></tr><tr><td>发布节奏未夸大</td><td>以发布页时间戳为准，未外推未来版本 [S04]</td><td>通过</td></tr><tr><td>国内社区信息为公开材料</td><td>SIG 页、会议页、组织与任务池均为公开页面 [S08][S09][S13]</td><td>通过</td></tr><tr><td>个人背景描述无敏感信息</td><td>目标读者画像仅含公开技能与公开产出 [S20]</td><td>通过</td></tr><tr><td>结论与矩阵一致</td><td>矩阵评档与前文画像逐条互查</td><td>通过</td></tr></tbody></table></div>
+<h2 id="附录-c-研究方法与局限">附录 C：研究方法与局限</h2>
+<p>本调研的执行过程分四步：先建立候选清单（以读者技能面为圆心，覆盖 RISC-V 芯片、固件、模拟器、性能工具、AI 工具、国内组织六类），再对每个候选做仓库实测（GitHub REST API 单日快照）与制度阅读（贡献指南、治理页、会议页），随后进行横向匹配评估并设计行动路径，最后按结论反查来源链、剔除无法溯源的表述。全部外部材料均为公开可访问页面，来源清单见正文；所有数字标注了实测日期，未做趋势外推。局限需要重申三点：其一，单日快照不能替代趋势观察，社区活跃度应按季度滚动复核；其二，本报告未提交真实贡献，流程摩擦的判断来自文档而非亲历，第一笔贡献之后应以实际体验修订矩阵评档；其三，个人匹配度评估基于公开技能面，未纳入时间以外的资源约束（如差旅、设备、外语口语场景），读者可按自身情况微调权重。建议的复核节奏是每季度重跑一次仓库实测并更新两张图。</p>
+<h2 id="附录-d-渠道与入口速查">附录 D：渠道与入口速查</h2>
+<div class="table-wrap"><table><thead><tr><th>社区</th><th>首选渠道</th><th>备注</th></tr></thead><tbody><tr><td>gem5</td><td>GitHub 议题 + Jira（gem5.atlassian.net）</td><td>先留言再认领，只贡献主仓 [S01]</td></tr><tr><td>香山</td><td>GitHub 议题/PR + 邮件 all@xiangshan.cc</td><td>接受中文；AI 使用有前提条件 [S05]</td></tr><tr><td>NEMU / difftest</td><td>GitHub 议题与 PR</td><td>香山软件侧入口，C/C++ 代码库 [S04]</td></tr><tr><td>OpenSBI</td><td>GitHub PR（须 Signed-off-by）</td><td>半年发布窗口，补丁随列表流转 [S04]</td></tr><tr><td>QEMU</td><td>qemu-devel 邮件列表 + patchew</td><td>勿用 GitLab 合并请求 [S07]</td></tr><tr><td>U-Boot</td><td>u-boot 邮件列表</td><td>补丁前须 buildman 全板验证 [S04]</td></tr><tr><td>Perfetto</td><td>GitHub 议题（good first issue 池）</td><td>实测开放 5 个新人任务 [S04]</td></tr><tr><td>opencode</td><td>GitHub 议题（留言后指派）</td><td>核心/界面改动需先设计评审 [S11]</td></tr><tr><td>MCP 生态</td><td>GitHub Discussions + 议题</td><td>以新增服务器为主要贡献形态 [S12]</td></tr><tr><td>openEuler RISC-V SIG</td><td>双周会（线上）+ Gitee/GitHub 仓库</td><td>中文流程，任务颗粒度细 [S08][S09][S10]</td></tr><tr><td>PLCT / 甲辰计划</td><td>weloveinterns 任务池 + RuyiSDK 社区</td><td>任务预先拆解、验收口径明确 [S13][S14]</td></tr></tbody></table></div>
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
+        onerror="window.__mermaidMissing=true"></script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  function fallback() {
+    nodes.forEach(function (n) {
+      if (n.getAttribute('data-processed')) return;
+      var pre = document.createElement('pre');
+      pre.className = 'mermaid-fallback';
+      pre.textContent = n.textContent;
+      n.textContent = '';
+      n.appendChild(pre);
+    });
+  }
+  if (window.__mermaidMissing || typeof mermaid === 'undefined') { fallback(); return; }
+  try {
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+    mermaid.run({ nodes: nodes }).catch(fallback);
+  } catch (e) { fallback(); }
+})();
+</script>
+</body>
+</html>

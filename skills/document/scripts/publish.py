@@ -25,7 +25,7 @@ INDEX_TEMPLATE = u"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>技术调研报告索引</title>
+<title>调研报告索引</title>
 <style>
 :root {{ --fg:#1a1a1a; --soft:#4a4a4a; --bg:#fff; --soft-bg:#f6f7f9;
         --border:#e3e6ea; --accent:#b8442e; }}
@@ -51,7 +51,7 @@ a:hover {{ text-decoration:underline; }}
 </head>
 <body>
 <div class="wrap">
-<h1>技术调研报告索引</h1>
+<h1>调研报告索引</h1>
 <p class="sub">生成时间 {generated} · 共 {count} 份报告 · 源码在工作区根目录，HTML 在本目录</p>
 <table>
 <thead><tr><th>报告</th><th>章节数</th><th>更新时间</th><th>Markdown 源文件</th></tr></thead>
@@ -75,8 +75,11 @@ def collect_sources(root):
     return found
 
 
-def declares_technical_research(source):
-    """Return true only for reports that explicitly opt into validation."""
+VALIDATED_DOC_TYPES = ('技术调研报告', '调研报告')
+
+
+def declares_validatable_report(source):
+    """Return true only for report files that explicitly opt into validation."""
     try:
         in_fence = False
         with open(source, 'r', encoding='utf-8-sig') as handle:
@@ -88,7 +91,7 @@ def declares_technical_research(source):
                 if in_fence:
                     continue
                 cells = [cell.strip() for cell in line.strip().strip('|').split('|')]
-                if len(cells) >= 2 and cells[0] == '文档类型' and cells[1] == '技术调研报告':
+                if len(cells) >= 2 and cells[0] == '文档类型' and cells[1] in VALIDATED_DOC_TYPES:
                     return True
     except (OSError, UnicodeError):
         pass
@@ -110,7 +113,7 @@ def main():
     parser.add_argument('--out', default=None,
                         help='output directory (default: <root>/reports)')
     parser.add_argument('--validate', action='store_true',
-                        help='validate declared 技术调研报告 files before publishing')
+                        help='validate declared report files (技术调研报告 / 调研报告) before publishing')
     args = parser.parse_args()
 
     root = os.path.abspath(args.root)
@@ -124,7 +127,7 @@ def main():
     validator = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              'validate_research_report.py')
     for source in collect_sources(root):
-        if args.validate and declares_technical_research(source):
+        if args.validate and declares_validatable_report(source):
             if validate_declared_report(validator, source) != 0:
                 print('validation failed: %s' % source)
                 validation_failures += 1

@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Validate the fixed structure for Chinese technical research reports.
+"""Validate the fixed structure for Chinese research reports.
 
-Two structure generations are recognized:
+Three report kinds are recognized:
 
-* current structure (2026-10-10 版): 摘要 / 背景与现状 / 技术详解 / (故障定位速查) /
-  总结与展望 / 参考来源 / 附录 A-C / (附录 D)，正文承载技术内容，过程性材料进附录，
-  正文禁用 Meta 词汇与证据标记；
+* 技术调研报告 (current structure, 2026-10-10 版): 摘要 / 背景与现状 / 技术详解 /
+  (故障定位速查) / 总结与展望 / 参考来源 / 附录 A-C / (附录 D)，正文承载技术内容，
+  过程性材料进附录，正文禁用 Meta 词汇与证据标记；
+* 调研报告 (general survey, 2026-10-13 版): the lighter survey structure
+  摘要 / 背景与现状 / 自由主题章节(≥2) / 结论与建议 / 参考来源 / 附录 A-C——
+  no source-code depth gates, same metadata/source/language rules;
 * legacy structure (2026-10-10 前): frozen. Only the generic checks run
   (metadata / sources / figures / tables / open markers) so that historical
   reports are not blocked by the new rules.
 
-This validator deliberately uses only the Python standard library so it can run
-in the same lightweight environments as the document publishing scripts.
+Dispatch happens on the metadata field 文档类型; --profile only tunes the
+technical-report track. This validator deliberately uses only the Python
+standard library so it can run in the same lightweight environments as the
+document publishing scripts.
 """
 
 from __future__ import print_function
@@ -39,6 +44,17 @@ REQUIRED_APPENDICES = (
     "附录 B：检查与验收清单",
     "附录 C：研究方法与局限",
 )
+
+# 文档类型（元数据 文档类型 字段）与调研报告结构门槛（2026-10-13 起）。
+DOC_KIND_TECHNICAL = "技术调研报告"
+DOC_KIND_SURVEY = "调研报告"
+VALID_DOC_KINDS = (DOC_KIND_TECHNICAL, DOC_KIND_SURVEY)
+SURVEY_BACKGROUND_MIN_HAN = 400
+SURVEY_SECTION_MIN_HAN = 300
+SURVEY_MIN_BODY_SECTIONS = 2
+SURVEY_CLOSING_MIN_HAN = 300
+SURVEY_CLOSING_RE = re.compile(r"^(?:结论|总结)")
+SURVEY_FIGURE_MIN = 2
 
 # 旧版固定结构（冻结识别用）。历史报告命中其一即按冻结处理。
 LEGACY_H2_DOMESTIC = (
@@ -573,6 +589,160 @@ def _validate_simple_section(lines, headings, errors, title, min_han, rule_prefi
     return True
 
 
+def _validate_survey(lines, h2_records, actual_h2, errors):
+    """调研报告（通用调研）：摘要—背景与现状—自由主题章节—收束—来源—附录。"""
+    total = len(lines)
+    if actual_h2 and actual_h2[0] != ABSTRACT_TITLE:
+        _error(
+            errors,
+            "H2-SEQUENCE",
+            h2_records[0][1] if h2_records else 1,
+            "第一个二级标题必须为“摘要”",
+        )
+    _validate_summary(lines, _heading_records(lines), errors)
+
+    index_of = {}
+    for position, (title, _line) in enumerate(h2_records):
+        index_of.setdefault(title, position)
+    ref_index = index_of.get(REFERENCE_TITLE)
+    bg_index = index_of.get(BACKGROUND_TITLE)
+    if bg_index is None:
+        _error(errors, "H2-SEQUENCE", 1, "缺少“背景与现状”章节")
+        return
+    if ref_index is None:
+        _error(errors, "H2-SEQUENCE", 1, "缺少“参考来源”章节")
+        return
+    if not bg_index < ref_index:
+        _error(
+            errors,
+            "H2-SEQUENCE",
+            h2_records[bg_index][1],
+            "二级标题顺序必须为：摘要 < 背景与现状 < 主题章节 < 结论/总结 < 参考来源",
+        )
+        return
+
+    def section_text(index):
+        start = h2_records[index][1]
+        end = h2_records[index + 1][1] if index + 1 < len(h2_records) else total + 1
+        return "\n".join(lines[start:end - 1])
+
+    bg_text = section_text(bg_index)
+    bg_han = len(HAN_RE.findall(bg_text))
+    if bg_han < SURVEY_BACKGROUND_MIN_HAN:
+        _error(
+            errors,
+            "SURVEY-BACKGROUND-LENGTH",
+            h2_records[bg_index][1],
+            "“背景与现状”需要至少 %d 个汉字，当前为 %d 个" % (SURVEY_BACKGROUND_MIN_HAN, bg_han),
+        )
+    if not SOURCE_ID_RE.search(bg_text):
+        _error(
+            errors,
+            "SURVEY-BACKGROUND-SOURCE",
+            h2_records[bg_index][1],
+            "“背景与现状”至少需要一个 [Snn] 来源",
+        )
+
+    middle = list(range(bg_index + 1, ref_index))
+    closing_pos = None
+    for pos in middle:
+        if SURVEY_CLOSING_RE.match(h2_records[pos][0]):
+            closing_pos = pos
+            break
+    if closing_pos is None:
+        _error(
+            errors,
+            "SURVEY-CLOSING",
+            h2_records[bg_index][1],
+            "缺少以“结论”或“总结”开头的收束章节（位于主题章节与“参考来源”之间）",
+        )
+        return
+
+    body_positions = [
+        pos
+        for pos in middle
+        if pos < closing_pos and not h2_records[pos][0].startswith("附录")
+    ]
+    if len(body_positions) < SURVEY_MIN_BODY_SECTIONS:
+        _error(
+            errors,
+            "SURVEY-BODY-COUNT",
+            h2_records[bg_index][1],
+            "主题章节至少需要 %d 个（标题自定），当前为 %d 个"
+            % (SURVEY_MIN_BODY_SECTIONS, len(body_positions)),
+        )
+    for pos in body_positions:
+        title, line_number = h2_records[pos]
+        text = section_text(pos)
+        han = len(HAN_RE.findall(text))
+        if han < SURVEY_SECTION_MIN_HAN:
+            _error(
+                errors,
+                "SURVEY-BODY-LENGTH",
+                line_number,
+                "主题章节“%s”内容不足：当前 %d 个汉字，门槛为 %d"
+                % (title, han, SURVEY_SECTION_MIN_HAN),
+            )
+        if not SOURCE_ID_RE.search(text):
+            _error(
+                errors,
+                "SURVEY-BODY-SOURCE",
+                line_number,
+                "主题章节“%s”至少需要一个 [Snn] 来源" % title,
+            )
+
+    closing_positions = [pos for pos in middle if pos >= closing_pos]
+    for pos in closing_positions:
+        title, line_number = h2_records[pos]
+        text = section_text(pos)
+        han = len(HAN_RE.findall(text))
+        if han < SURVEY_CLOSING_MIN_HAN:
+            _error(
+                errors,
+                "SURVEY-CLOSING-LENGTH",
+                line_number,
+                "收束章节“%s”内容不足：当前 %d 个汉字，门槛为 %d"
+                % (title, han, SURVEY_CLOSING_MIN_HAN),
+            )
+        if not SOURCE_ID_RE.search(text):
+            _error(
+                errors,
+                "SURVEY-CLOSING-SOURCE",
+                line_number,
+                "收束章节“%s”至少需要一个 [Snn] 来源" % title,
+            )
+    if len(closing_positions) > 1:
+        _error(
+            errors,
+            "SURVEY-CLOSING",
+            h2_records[closing_positions[1]][1],
+            "收束章节之后不应再有正文小节；请将“%s”并入收束章节或改入附录"
+            % h2_records[closing_positions[1]][0],
+        )
+
+    appendix_titles = [title for title, _line in h2_records[ref_index + 1:]]
+    for offset, expected in enumerate(REQUIRED_APPENDICES):
+        if offset >= len(appendix_titles):
+            break
+        if appendix_titles[offset] != expected:
+            _error(
+                errors,
+                "H2-SEQUENCE",
+                h2_records[ref_index + 1 + offset][1],
+                "附录顺序错误：第 %d 个附录应为“%s”，当前为“%s”"
+                % (offset + 1, expected, appendix_titles[offset]),
+            )
+    for extra in appendix_titles[len(REQUIRED_APPENDICES):]:
+        if not extra.startswith("附录"):
+            _error(
+                errors,
+                "H2-SEQUENCE",
+                h2_records[ref_index + 1][1],
+                "参考来源之后的章节“%s”必须为附录" % extra,
+            )
+    _validate_appendices(lines, _heading_records(lines), errors, appendix_titles)
+
+
 def _validate_appendices(lines, headings, errors, appendix_titles):
     """附录 A/B 需含表格与来源；附录 C 记录方法与局限。"""
     for required_title in REQUIRED_APPENDICES:
@@ -648,8 +818,13 @@ def validate_report(report_path, profile="technical-research"):
         if field not in metadata:
             _error(errors, "META-FIELD", 1, "元数据表缺少“%s”字段" % field)
     document_type = metadata.get("文档类型", "").strip()
-    if document_type != "技术调研报告":
-        _error(errors, "META-TYPE", _find_line(lines, "文档类型"), "文档类型必须为“技术调研报告”")
+    if document_type not in VALID_DOC_KINDS:
+        _error(
+            errors,
+            "META-TYPE",
+            _find_line(lines, "文档类型"),
+            "文档类型必须为“技术调研报告”或“调研报告”",
+        )
 
     table_count = 0
     for index in range(len(lines) - 1):
@@ -677,8 +852,18 @@ def validate_report(report_path, profile="technical-research"):
             cited_sources.add(source_id)
             first_citation_line.setdefault(source_id, index + 1)
         for source_token in SOURCE_TOKEN_RE.findall(line):
-            if not SOURCE_ID_RE.fullmatch(source_token):
-                _error(errors, "SOURCE-ID-FORMAT", index + 1, "来源 ID 必须采用 [Snn] 格式：%s" % source_token)
+            if SOURCE_ID_RE.fullmatch(source_token):
+                continue
+            token_body = source_token[1:-1]
+            # 只拦“编号尝试”：含数字（如 [S1]、[S01a]）或字面占位符 [Snn]；
+            # 以大写 S 开头的普通单词链接文本（如 [SConstruct]）不误报。
+            if re.search(r"\d", token_body) or token_body.lower() == "snn":
+                _error(
+                    errors,
+                    "SOURCE-ID-FORMAT",
+                    index + 1,
+                    "来源 ID 必须采用 [Snn] 格式：%s" % source_token,
+                )
     for source_id in sorted(cited_sources - source_ledger):
         _error(
             errors,
@@ -695,12 +880,13 @@ def validate_report(report_path, profile="technical-research"):
                 local_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(report_path)), target))
                 if os.path.isfile(local_path):
                     valid_images.append((index + 1, target))
-    if len(valid_images) < 3:
+    fig_min = 3 if document_type == DOC_KIND_TECHNICAL else SURVEY_FIGURE_MIN
+    if len(valid_images) < fig_min:
         _error(
             errors,
             "FIGURE-LOCAL",
             valid_images[0][0] if valid_images else 1,
-            "至少需要 3 张路径存在的相对本地图片，当前为 %d 张" % len(valid_images),
+            "至少需要 %d 张路径存在的相对本地图片，当前为 %d 张" % (fig_min, len(valid_images)),
         )
 
     captions = []
@@ -708,8 +894,13 @@ def validate_report(report_path, profile="technical-research"):
         match = CAPTION_RE.search(line)
         if match:
             captions.append((match.group(1), index + 1, _caption_context(lines, index)))
-    if len(captions) < 3:
-        _error(errors, "FIGURE-CAPTION", 1, "至少需要 3 条以“图 N：”开头的图注，当前为 %d 条" % len(captions))
+    if len(captions) < fig_min:
+        _error(
+            errors,
+            "FIGURE-CAPTION",
+            1,
+            "至少需要 %d 条以“图 N：”开头的图注，当前为 %d 条" % (fig_min, len(captions)),
+        )
     for number, line_number, context in captions:
         if not re.search(r"来源|数据", context) or not SOURCE_ID_RE.search(context):
             _error(
@@ -743,7 +934,18 @@ def validate_report(report_path, profile="technical-research"):
                 _error(errors, "TODO", index + 1, "发现未解决标记“%s”" % match.group(0))
         return {"ok": not errors, "errors": errors, "warnings": warnings, "profile": "legacy"}
 
-    # ---- 当前结构（2026-10-10 版） ----
+    # ---- 调研报告（通用调研，2026-10-13 版） ----
+    if document_type == DOC_KIND_SURVEY:
+        _validate_survey(lines, h2_records, actual_h2, errors)
+        main_body_end = reference_start
+        _validate_meta_language(lines, headings, errors, main_body_end)
+        for index, line in enumerate(lines):
+            match = TODO_RE.search(line)
+            if match:
+                _error(errors, "TODO", index + 1, "发现未解决标记“%s”" % match.group(0))
+        return {"ok": not errors, "errors": errors, "warnings": warnings, "profile": "survey"}
+
+    # ---- 技术调研报告：当前结构（2026-10-10 版） ----
     _validate_summary(lines, headings, errors)
 
     background_found = _section_bounds(headings, BACKGROUND_TITLE, total_lines=len(lines))
@@ -849,7 +1051,9 @@ def format_text_result(result):
     lines_out = []
     if result["ok"]:
         label = PROFILES.get(result.get("profile", ""), {}).get("label", "")
-        if result.get("profile") == "legacy":
+        if result.get("profile") == "survey":
+            lines_out.append("PASS: 调研报告校验通过（通用调研结构）")
+        elif result.get("profile") == "legacy":
             lines_out.append("PASS: 技术调研报告校验通过（旧结构冻结，仅通用检查）")
         elif label:
             lines_out.append("PASS: 技术调研报告校验通过（%s）" % label)
@@ -871,14 +1075,14 @@ def _emit(result, as_json):
 def main(argv=None):
     parser = ResearchArgumentParser(
         prog="validate_research_report.py",
-        description="校验中文技术调研报告的固定结构和可追溯性。",
+        description="校验中文调研报告（技术调研报告 / 通用调研报告）的结构和可追溯性。",
     )
     parser.add_argument("report", help="要校验的 Markdown 报告")
     parser.add_argument(
         "--profile",
         required=True,
         choices=("technical-research", "technical-research-general", "auto"),
-        help="技术调研报告结构档位：含国内小节（technical-research）、通用（technical-research-general）或自动识别（auto）",
+        help="技术调研报告结构档位：含国内小节（technical-research）、通用（technical-research-general）或自动识别（auto）；文档类型为“调研报告”的文件忽略该参数，按通用调研结构校验",
     )
     parser.add_argument("--json", action="store_true", dest="as_json", help="输出 JSON 结果")
     try:

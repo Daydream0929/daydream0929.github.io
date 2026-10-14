@@ -237,3 +237,13 @@
   - RISC-V
   - 职业发展
   url: /reports/oss-community-research.html
+- id: cpu-vendors-software-trends-research
+  title: 全球 CPU 设计公司技术现状与趋势调研报告（v1.0）：Intel、AMD、Apple、Arm、高通的产品线与软件层未来方向
+  summary: Intel/AMD/Apple/Arm/高通五巨头软件层现状与趋势：35 条官方来源、产品×软件双轨时间线、五条主线（ISA 收敛/AI 栈分层/Arm64 平台化/固件标准化/机密计算）与 2027 判断。
+  date: '2026-10-14'
+  tags:
+  - CPU
+  - 软件生态
+  - AI PC
+  - Arm
+  url: /reports/cpu-vendors-software-trends-research.html

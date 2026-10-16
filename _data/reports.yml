@@ -247,3 +247,23 @@
   - AI PC
   - Arm
   url: /reports/cpu-vendors-software-trends-research.html
+- id: model-orchestration-research
+  title: 多模型编排框架调研报告（v1.0）：旗舰主控与订阅制 CLI 执行的协作方式
+  summary: 从 Paperclip 心跳准入、Magentic 台账与 CCR 路由三条函数级调用链出发，核对「旗舰主控 + 订阅制 CLI 执行」的框架适配空缺，给出零依赖的事件/台账落地建议（条件式）。
+  date: '2026-10-16'
+  tags:
+  - AI Agent
+  - 多模型编排
+  - 成本治理
+  - Paperclip
+  url: /reports/model-orchestration-research.html
+- id: openai-dots-brief
+  title: OpenAI Dots 观察短评（v1.0）：云端常驻代理的职责边界与采用触发条件
+  summary: 以官方文档为一手来源对照 OpenAI Dots 与「旗舰主控」模式：官方已证/未证边界、额度三口径，及按场景条件化的采用触发条件。
+  date: '2026-10-16'
+  tags:
+  - OpenAI
+  - 云端代理
+  - 技术观察
+  - Agent
+  url: /reports/openai-dots-brief.html

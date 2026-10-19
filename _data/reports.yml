@@ -267,3 +267,23 @@
   - 技术观察
   - Agent
   url: /reports/openai-dots-brief.html
+- id: bionic-riscv64-research
+  title: Android Bionic 技术调研报告（v1.7-r2）：体系边界、运行机制与 RISC-V64 实现现状
+  summary: 基于 android17-release 固定 commit 的源码级调研：Bionic 五部件边界、启动/链接、线程与 TLS、Scudo、字符串与 unwind 机制，以及 RISC-V64 支持层级与观测方法（未在真机运行基准）。
+  date: '2026-10-19'
+  tags:
+  - Android
+  - Bionic
+  - RISC-V64
+  - 系统软件
+  url: /reports/bionic-riscv64-research.html
+- id: art-runtime-riscv64-research
+  title: Android Runtime（ART）机制与 RISC-V64 上游支持演进研究
+  summary: 基于 platform/art 公开分支 pin 的机制与演进调研：启动/类加载/解释器/AOT/JIT/GC/JNI/ABI 全链路、RISC-V64 提交史与支持分层、后续优化问题地图（评审稿，未经独立复核）。
+  date: '2026-10-19'
+  tags:
+  - Android
+  - ART
+  - RISC-V64
+  - 运行时
+  url: /reports/art-runtime-riscv64-research.html

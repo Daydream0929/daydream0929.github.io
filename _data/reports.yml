@@ -278,9 +278,9 @@
   - 系统软件
   url: /reports/bionic-riscv64-research.html
 - id: art-runtime-riscv64-research
-  title: Android Runtime（ART）机制与 RISC-V64 上游支持演进研究
-  summary: 基于 platform/art 公开分支 pin 的机制与演进调研：启动/类加载/解释器/AOT/JIT/GC/JNI/ABI 全链路、RISC-V64 提交史与支持分层、后续优化问题地图（评审稿，未经独立复核）。
-  date: '2026-10-19'
+  title: Android Runtime（ART）机制与 RISC-V64 支持研究（v2.0-r7）
+  summary: 以 String.equals 贯通启动、类加载、nterp、JIT/AOT、GC 与 JNI，解析 RISC-V64 后端、ABI 和后续优化入口。
+  date: '2026-10-20'
   tags:
   - Android
   - ART

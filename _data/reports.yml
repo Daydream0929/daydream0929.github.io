@@ -268,22 +268,32 @@
   - Agent
   url: /reports/openai-dots-brief.html
 - id: bionic-riscv64-research
-  title: Android Bionic 技术调研报告（v1.7-r2）：体系边界、运行机制与 RISC-V64 实现现状
-  summary: 基于 android17-release 固定 commit 的源码级调研：Bionic 五部件边界、启动/链接、线程与 TLS、Scudo、字符串与 unwind 机制，以及 RISC-V64 支持层级与观测方法（未在真机运行基准）。
-  date: '2026-10-19'
+  title: Android Bionic 技术调研报告（v1.8-public）：体系边界、运行机制与 RISC-V64 实现现状
+  summary: Bionic 体系边界、启动/链接/线程/分配器/字符串机制与 benchmark 测量口径；含 RISC-V64 实现与未实测边界。
+  date: '2026-10-21'
   tags:
+  - RISC-V
   - Android
   - Bionic
-  - RISC-V64
-  - 系统软件
+  - benchmark
   url: /reports/bionic-riscv64-research.html
 - id: art-runtime-riscv64-research
-  title: Android Runtime（ART）机制与 RISC-V64 支持研究（v2.0-r7）
-  summary: 以 String.equals 贯通启动、类加载、nterp、JIT/AOT、GC 与 JNI，解析 RISC-V64 后端、ABI 和后续优化入口。
-  date: '2026-10-20'
+  title: Android Runtime（ART）机制与 RISC-V64 支持研究（v2.1-public）
+  summary: ART 运行时、解释器、JIT/AOT、GC、线程/JNI 与 RISC-V64 支持边界，并增补 benchmark/run-test 测量方法。
+  date: '2026-10-21'
   tags:
+  - RISC-V
   - Android
   - ART
-  - RISC-V64
-  - 运行时
+  - benchmark
   url: /reports/art-runtime-riscv64-research.html
+- id: libcore-runtime-mechanism-research
+  title: Android libcore 端到端机制与 Benchmark 前置研究（公开版）
+  summary: libcore Buffer/Memory、String/Charset、并发、IO/NIO、数值/ICU、反射/序列化/加密机制与 benchmark 家族/测量前置。
+  date: '2026-10-21'
+  tags:
+  - RISC-V
+  - Android
+  - libcore
+  - benchmark
+  url: /reports/libcore-runtime-mechanism-research.html
